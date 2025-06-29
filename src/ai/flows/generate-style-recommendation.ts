@@ -50,13 +50,18 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    
-    if (!output || !output.recommendations) {
-        console.warn("Style recommendation AI returned invalid or empty output.");
-        return defaultRecommendation;
+    try {
+      const { output } = await recommendationPrompt(input);
+      
+      if (!output || !output.recommendations) {
+          console.warn("Style recommendation AI returned invalid or empty output.");
+          return defaultRecommendation;
+      }
+      
+      return output;
+    } catch (e) {
+      console.error("Error within styleRecommendationFlow:", e);
+      return defaultRecommendation;
     }
-    
-    return output;
   }
 );

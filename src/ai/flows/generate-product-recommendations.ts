@@ -97,13 +97,18 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    
-    if (!output || !Array.isArray(output.productIds)) {
-      console.warn("Product recommendation AI returned invalid or empty output.");
+    try {
+      const { output } = await recommendationPrompt(input);
+      
+      if (!output || !Array.isArray(output.productIds)) {
+        console.warn("Product recommendation AI returned invalid or empty output.");
+        return { productIds: [] };
+      }
+      
+      return output;
+    } catch (e) {
+      console.error("Error within productRecommendationFlow:", e);
       return { productIds: [] };
     }
-    
-    return output;
   }
 );

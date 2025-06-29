@@ -84,13 +84,18 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    
-    if (!output || !Array.isArray(output.productIds)) {
-      console.warn("Find similar products AI returned invalid or empty output.");
+    try {
+      const { output } = await recommendationPrompt(input);
+      
+      if (!output || !Array.isArray(output.productIds)) {
+        console.warn("Find similar products AI returned invalid or empty output.");
+        return { productIds: [] };
+      }
+      
+      return output;
+    } catch (e) {
+      console.error("Error within findSimilarProductsFlow:", e);
       return { productIds: [] };
     }
-    
-    return output;
   }
 );
