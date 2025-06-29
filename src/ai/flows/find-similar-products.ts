@@ -30,10 +30,10 @@ const FlowInputSchema = z.object({
 });
 
 // This is the schema for the exported function
-export const FindSimilarProductsInputSchema = FlowInputSchema.omit({ availableProducts: true });
+const FindSimilarProductsInputSchema = FlowInputSchema.omit({ availableProducts: true });
 export type FindSimilarProductsInput = z.infer<typeof FindSimilarProductsInputSchema>;
 
-export const FindSimilarProductsOutputSchema = z.object({
+const FindSimilarProductsOutputSchema = z.object({
   productIds: z.array(z.string()).describe('An array of recommended product IDs.'),
 });
 export type FindSimilarProductsOutput = z.infer<typeof FindSimilarProductsOutputSchema>;

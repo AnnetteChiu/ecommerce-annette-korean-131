@@ -10,12 +10,12 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const GenerateStyleRecommendationInputSchema = z.object({
+const GenerateStyleRecommendationInputSchema = z.object({
   browsingHistory: z.string().describe('A comma-separated list of product names the user has viewed.'),
 });
 export type GenerateStyleRecommendationInput = z.infer<typeof GenerateStyleRecommendationInputSchema>;
 
-export const GenerateStyleRecommendationOutputSchema = z.object({
+const GenerateStyleRecommendationOutputSchema = z.object({
   recommendations: z.string().describe('The personalized style recommendation text.'),
 });
 export type GenerateStyleRecommendationOutput = z.infer<typeof GenerateStyleRecommendationOutputSchema>;
