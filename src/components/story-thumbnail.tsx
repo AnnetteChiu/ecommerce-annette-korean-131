@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Story } from '@/types';
+import { Eye } from 'lucide-react';
 
 interface StoryThumbnailProps {
   story: Story;
@@ -22,6 +23,10 @@ export function StoryThumbnail({ story }: StoryThumbnailProps) {
         </div>
       </div>
       <p className="mt-2 text-sm font-medium text-muted-foreground group-hover:text-primary truncate">{story.title}</p>
+      <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-1">
+        <Eye className="w-3 h-3" />
+        <span>500</span>
+      </div>
     </Link>
   );
 }
