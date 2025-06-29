@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Search, Shirt } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -19,19 +19,6 @@ export function Header() {
           <nav>
             <TooltipProvider>
               <div className="flex items-center gap-1">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" asChild>
-                      <Link href="/virtual-try-on">
-                        <Shirt className="h-5 w-5" />
-                        <span className="sr-only">Virtual Try-On</span>
-                      </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Virtual Try-On</p>
-                  </TooltipContent>
-                </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button variant="ghost" size="icon" asChild>
