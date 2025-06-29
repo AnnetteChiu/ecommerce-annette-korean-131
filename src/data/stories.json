@@ -1,0 +1,52 @@
+
+[
+  {
+    "id": "1",
+    "title": "Fall Collection",
+    "coverImageUrl": "https://i3.codibook.net/files/1982111046201/9d1bb9a33effcc85/2023912575.jpg",
+    "pages": [
+      {
+        "imageUrl": "https://i3.codibook.net/files/1982111046201/9d1bb9a33effcc85/2023912575.jpg",
+        "productId": "7"
+      },
+      {
+        "imageUrl": "https://i3.codibook.net/files/1982111057001/628075af5aea531d/556922438.jpg",
+        "productId": "8"
+      },
+      {
+        "imageUrl": "https://i4.codibook.net/files/198211264802/a6bdedca4eceb1ef/1791833231.jpg",
+        "productId": "4"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "title": "Denim Days",
+    "coverImageUrl": "https://i4.codibook.net/files/1982112685804/edabfea5b35cf5fe/152972137.jpg",
+    "pages": [
+      {
+        "imageUrl": "https://i4.codibook.net/files/1982112685804/edabfea5b35cf5fe/152972137.jpg",
+        "productId": "2"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "title": "Office Chic",
+    "coverImageUrl": "https://i3.codibook.net/files/1982110569605/7fcb6ef8a658d6ef/1454816676.jpg",
+    "pages": [
+      {
+        "imageUrl": "https://i3.codibook.net/files/1982111037202/d26e3ac3c73dda18/516944500.jpg",
+        "productId": "6"
+      },
+      {
+        "imageUrl": "https://i3.codibook.net/files/1982103119162/5f/1463450168.jpg",
+        "productId": "5"
+      },
+      {
+        "imageUrl": "https://i3.codibook.net/files/1982110569605/7fcb6ef8a658d6ef/1454816676.jpg",
+        "productId": "1"
+      }
+    ]
+  }
+]

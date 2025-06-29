@@ -7,3 +7,15 @@ export interface Product {
   purchaseUrl: string;
   category: string;
 }
+
+export interface StoryPage {
+  imageUrl: string;
+  productId?: string;
+}
+
+export interface Story {
+  id: string;
+  title: string;
+  coverImageUrl: string;
+  pages: StoryPage[];
+}
