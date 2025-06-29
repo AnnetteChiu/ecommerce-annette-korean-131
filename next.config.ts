@@ -23,6 +23,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'i4.codibook.net',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

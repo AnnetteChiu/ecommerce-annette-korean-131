@@ -12,6 +12,22 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, Link as LinkIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
+const defaultModelImageUrl = 'https://i4.codibook.net/files/198211264802/a6bdedca4eceb1ef/1791833231.jpg';
+
+const imageUrlToDataUri = async (url: string) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+      throw new Error(`Failed to fetch image. Status: ${response.status}`);
+  }
+  const blob = await response.blob();
+  return new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+  });
+}
+
 export default function VirtualTryOnPage() {
   const [modelImagePreview, setModelImagePreview] = useState<string | null>(null);
   const [modelImageDataUri, setModelImageDataUri] = useState<string | null>(null);
@@ -20,13 +36,33 @@ export default function VirtualTryOnPage() {
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isFetchingUrl, setIsFetchingUrl] = useState(false);
+  const [isLoadingDefault, setIsLoadingDefault] = useState(true);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     setProducts(getProducts());
-  }, []);
+
+    const loadDefaultModel = async () => {
+      try {
+        const dataUri = await imageUrlToDataUri(defaultModelImageUrl);
+        setModelImageDataUri(dataUri);
+        setModelImagePreview(defaultModelImageUrl);
+        setModelImageUrl(defaultModelImageUrl);
+      } catch (error) {
+        console.error("Failed to load default model image:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Failed to load default image',
+            description: 'Could not fetch the default model image.',
+        });
+      } finally {
+        setIsLoadingDefault(false);
+      }
+    };
+    loadDefaultModel();
+  }, [toast]);
   
   const clearModelState = () => {
     setGeneratedImage(null);
@@ -50,25 +86,12 @@ export default function VirtualTryOnPage() {
         const result = e.target?.result as string;
         setModelImagePreview(URL.createObjectURL(file));
         setModelImageDataUri(result);
+        setModelImageUrl(''); // Clear URL input when a file is chosen
         clearModelState();
       };
       reader.readAsDataURL(file);
     }
   };
-
-  const imageUrlToDataUri = async (url: string) => {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch image. Status: ${response.status}`);
-    }
-    const blob = await response.blob();
-    return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-    });
-  }
 
   const handleUrlSubmit = async () => {
     if (!modelImageUrl) {
@@ -133,7 +156,7 @@ export default function VirtualTryOnPage() {
     });
   };
 
-  const isLoading = isPending || isFetchingUrl;
+  const isLoading = isPending || isFetchingUrl || isLoadingDefault;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -183,11 +206,11 @@ export default function VirtualTryOnPage() {
             </Card>
 
             <div className="w-full aspect-[3/4] relative border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/20">
-                {(isPending || isFetchingUrl) && (
+                {isLoading && (
                     <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-10 rounded-lg">
                         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
                         <p className="text-muted-foreground">
-                          {isPending ? 'Generating your new look...' : 'Fetching your image...'}
+                          {isLoadingDefault ? 'Loading default model...' : isPending ? 'Generating your new look...' : 'Fetching your image...'}
                         </p>
                         {isPending && <p className="text-sm text-muted-foreground/80">This can take a moment.</p>}
                     </div>
