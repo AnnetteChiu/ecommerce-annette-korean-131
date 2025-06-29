@@ -38,12 +38,12 @@
   },
   {
     "id": "5",
-    "name": "The Traveler's Watch",
-    "description": "A timeless design meets modern craftsmanship. This watch features a sapphire crystal face, a genuine leather strap, and a reliable Japanese quartz movement. Water-resistant and built to last, it's the perfect companion for any journey.",
-    "price": 220.00,
-    "imageUrl": "https://placehold.co/600x600",
+    "name": "Elegant Black Dress",
+    "description": "A sophisticated and versatile black dress, perfect for any occasion. Its classic silhouette and comfortable fabric make it an essential piece for a polished look.",
+    "price": 155.00,
+    "imageUrl": "https://i3.codibook.net/files/1982103119162/5f/1463450168.jpg",
     "purchaseUrl": "https://example.com/buy/5",
-    "category": "Accessories"
+    "category": "Apparel"
   },
   {
     "id": "6",
