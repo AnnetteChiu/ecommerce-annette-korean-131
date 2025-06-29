@@ -71,7 +71,7 @@ Here is the catalog of available products to recommend from:
 
 Photo: {{media url=photoDataUri}}
 
-Return only the IDs of the recommended products from the provided catalog. Prioritize items that are a close match to what is shown in the image.`
+Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Prioritize items that are a close match to what is shown in the image.`
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
@@ -81,7 +81,12 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    return output || { productIds: [] };
+    try {
+      const { output } = await recommendationPrompt(input);
+      return output || { productIds: [] };
+    } catch (error) {
+      console.error("Error in findSimilarProductsFlow:", error);
+      return { productIds: [] };
+    }
   }
 );

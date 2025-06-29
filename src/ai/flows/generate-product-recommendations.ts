@@ -84,7 +84,7 @@ Here is the catalog of available products to recommend from:
 - Name: {{this.name}}, ID: {{this.id}}, Category: {{this.category}}, Description: {{this.description}}
 {{/each}}
 
-Return only the IDs of the recommended products from the provided catalog.`
+Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. For example: {"productIds": ["1", "2"]}`
 });
 
 const productRecommendationFlow = ai.defineFlow(
@@ -94,7 +94,12 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    return output || { productIds: [] };
+    try {
+      const { output } = await recommendationPrompt(input);
+      return output || { productIds: [] };
+    } catch (error) {
+        console.error("Error in productRecommendationFlow:", error);
+        return { productIds: [] };
+    }
   }
 );
