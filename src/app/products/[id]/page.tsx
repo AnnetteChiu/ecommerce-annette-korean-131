@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProductViewTracker } from '@/components/product-view-tracker';
 import { ExternalLink } from 'lucide-react';
+import { RecommendedProducts } from '@/components/recommended-products';
 
 type ProductPageProps = {
   params: {
@@ -48,6 +49,7 @@ export default function ProductPage({ params }: ProductPageProps) {
           </Button>
         </div>
       </div>
+      <RecommendedProducts currentProductId={product.id} />
     </>
   );
 }
