@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/generate-style-recommendation.ts';
 import '@/ai/flows/find-similar-products.ts';
+import '@/ai/flows/virtual-try-on-flow.ts';

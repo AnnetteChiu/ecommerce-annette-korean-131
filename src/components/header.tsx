@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, Shirt } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -18,19 +18,34 @@ export function Header() {
           </Link>
           <nav>
             <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" asChild>
-                    <Link href="/search-by-image">
-                      <Search className="h-5 w-5" />
-                      <span className="sr-only">Search by Image</span>
-                    </Link>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Search by Image</p>
-                </TooltipContent>
-              </Tooltip>
+              <div className="flex items-center gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href="/virtual-try-on">
+                        <Shirt className="h-5 w-5" />
+                        <span className="sr-only">Virtual Try-On</span>
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Virtual Try-On</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href="/search-by-image">
+                        <Search className="h-5 w-5" />
+                        <span className="sr-only">Search by Image</span>
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Search by Image</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
             </TooltipProvider>
           </nav>
         </div>
