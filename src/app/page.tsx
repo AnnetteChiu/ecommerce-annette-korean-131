@@ -14,7 +14,7 @@ export default function Home() {
     <div className="space-y-16">
       <section className="relative h-[60vh] rounded-lg overflow-hidden flex items-center justify-center text-center text-white p-8 shadow-xl">
         <Image
-          src="https://i4.codibook.net/files/1982120449802/be4b443f04f3eeb3/1591521268.jpg"
+          src="https://i3.codibook.net/files/1982091248011/db83bd046d982ef6/1061289592.jpg"
           alt="Woman in stylish outfit"
           fill
           className="object-cover object-center"
