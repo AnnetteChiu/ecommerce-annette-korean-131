@@ -41,21 +41,26 @@ export const GenerateProductRecommendationsOutputSchema = z.object({
 export type GenerateProductRecommendationsOutput = z.infer<typeof GenerateProductRecommendationsOutputSchema>;
 
 export async function generateProductRecommendations(input: GenerateProductRecommendationsInput): Promise<GenerateProductRecommendationsOutput> {
-  const allProducts = getProducts();
-  
-  // Only filter out the currently viewed product, allowing previously viewed items to be recommended.
-  const availableProducts = allProducts
-    .filter(p => p.id !== input.currentProductId)
-    .map(({ id, name, description, category }) => ({ id, name, description, category }));
+  try {
+    const allProducts = getProducts();
+    
+    // Only filter out the currently viewed product, allowing previously viewed items to be recommended.
+    const availableProducts = allProducts
+      .filter(p => p.id !== input.currentProductId)
+      .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
-  if (availableProducts.length === 0) {
-    return { productIds: [] };
+    if (availableProducts.length === 0) {
+      return { productIds: [] };
+    }
+    
+    return await productRecommendationFlow({ 
+      ...input, 
+      availableProducts,
+    });
+  } catch (error) {
+      console.error("Error calling productRecommendationFlow from wrapper:", error);
+      return { productIds: [] };
   }
-  
-  return productRecommendationFlow({ 
-    ...input, 
-    availableProducts,
-  });
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -84,7 +89,7 @@ Here is the catalog of available products to recommend from:
 - Name: {{this.name}}, ID: {{this.id}}, Category: {{this.category}}, Description: {{this.description}}
 {{/each}}
 
-Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. For example: {"productIds": ["1", "2"]}`
+Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Your response MUST be ONLY the JSON object, with no other text, explanation, or markdown formatting.`
 });
 
 const productRecommendationFlow = ai.defineFlow(

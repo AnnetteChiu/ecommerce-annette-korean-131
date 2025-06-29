@@ -39,19 +39,24 @@ export const FindSimilarProductsOutputSchema = z.object({
 export type FindSimilarProductsOutput = z.infer<typeof FindSimilarProductsOutputSchema>;
 
 export async function findSimilarProducts(input: FindSimilarProductsInput): Promise<FindSimilarProductsOutput> {
-  const allProducts = getProducts();
+  try {
+    const allProducts = getProducts();
+    
+    const availableProducts = allProducts
+      .map(({ id, name, description, category }) => ({ id, name, description, category }));
   
-  const availableProducts = allProducts
-    .map(({ id, name, description, category }) => ({ id, name, description, category }));
-
-  if (availableProducts.length === 0) {
+    if (availableProducts.length === 0) {
+      return { productIds: [] };
+    }
+    
+    return await findSimilarProductsFlow({ 
+      ...input, 
+      availableProducts,
+    });
+  } catch (error) {
+    console.error("Error calling findSimilarProductsFlow from wrapper:", error);
     return { productIds: [] };
   }
-  
-  return findSimilarProductsFlow({ 
-    ...input, 
-    availableProducts,
-  });
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -71,7 +76,7 @@ Here is the catalog of available products to recommend from:
 
 Photo: {{media url=photoDataUri}}
 
-Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Prioritize items that are a close match to what is shown in the image.`
+Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Prioritize items that are a close match to what is shown in the image. Your response MUST be ONLY the JSON object, with no other text, explanation, or markdown formatting.`
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
