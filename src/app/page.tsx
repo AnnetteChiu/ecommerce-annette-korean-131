@@ -5,6 +5,7 @@ import { StoryThumbnail } from '@/components/story-thumbnail';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { BrandWeek } from '@/components/brand-week';
 
 export default function Home() {
   const products = getProducts();
@@ -32,6 +33,8 @@ export default function Home() {
           </Button>
         </div>
       </section>
+
+      <BrandWeek />
       
       {stories.length > 0 && (
         <section>
