@@ -91,15 +91,6 @@
     "category": "Apparel"
   },
   {
-    "id": "11",
-    "name": "The Minimalist Watch",
-    "description": "Featuring a clean, numberless dial and a genuine leather strap, this watch is a testament to understated elegance. It's a timeless piece that complements any wrist.",
-    "price": 220.00,
-    "imageUrl": "https://placehold.co/600x600.png",
-    "purchaseUrl": "https://example.com/buy/11",
-    "category": "Accessories"
-  },
-  {
     "id": "12",
     "name": "Leather Ankle Boots",
     "description": "Crafted from supple genuine leather, these ankle boots offer both style and durability. The sleek silhouette and comfortable block heel make them a go-to choice for any season.",
