@@ -71,5 +71,41 @@
     "imageUrl": "https://i3.codibook.net/files/1982111057001/628075af5aea531d/556922438.jpg",
     "purchaseUrl": "https://example.com/buy/8",
     "category": "Apparel"
+  },
+  {
+    "id": "9",
+    "name": "The City Slicker Handbag",
+    "description": "A chic and structured handbag designed for the modern professional. With its clean lines and polished hardware, it's the perfect companion for navigating the city in style.",
+    "price": 179.99,
+    "imageUrl": "https://i4.codibook.net/files/1982110534571/5856b3e8e2007d4f/1683952763.jpg",
+    "purchaseUrl": "https://example.com/buy/9",
+    "category": "Bags"
+  },
+  {
+    "id": "10",
+    "name": "Tailored Black Trousers",
+    "description": "Cut for a flattering slim fit, these black trousers are a versatile foundation for any outfit. Dress them up with a blazer for the office or down with a simple tee for a relaxed weekend look.",
+    "price": 110.00,
+    "imageUrl": "https://i4.codibook.net/files/1982110931165/3815b3c332159048/1824364239.jpg",
+    "purchaseUrl": "https://example.com/buy/10",
+    "category": "Apparel"
+  },
+  {
+    "id": "11",
+    "name": "The Minimalist Watch",
+    "description": "Featuring a clean, numberless dial and a genuine leather strap, this watch is a testament to understated elegance. It's a timeless piece that complements any wrist.",
+    "price": 220.00,
+    "imageUrl": "https://placehold.co/600x600.png",
+    "purchaseUrl": "https://example.com/buy/11",
+    "category": "Accessories"
+  },
+  {
+    "id": "12",
+    "name": "Leather Ankle Boots",
+    "description": "Crafted from supple genuine leather, these ankle boots offer both style and durability. The sleek silhouette and comfortable block heel make them a go-to choice for any season.",
+    "price": 199.50,
+    "imageUrl": "https://i3.codibook.net/files/198210134449/791880a424a1b025/1154546415.jpg",
+    "purchaseUrl": "https://example.com/buy/12",
+    "category": "Footwear"
   }
 ]
