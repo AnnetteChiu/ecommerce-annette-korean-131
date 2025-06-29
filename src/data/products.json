@@ -91,15 +91,6 @@
     "category": "Apparel"
   },
   {
-    "id": "12",
-    "name": "Leather Ankle Boots",
-    "description": "Crafted from supple genuine leather, these ankle boots offer both style and durability. The sleek silhouette and comfortable block heel make them a go-to choice for any season.",
-    "price": 199.50,
-    "imageUrl": "https://i3.codibook.net/files/198210134449/791880a424a1b025/1154546415.jpg",
-    "purchaseUrl": "https://example.com/buy/12",
-    "category": "Footwear"
-  },
-  {
     "id": "13",
     "name": "Plaid Flannel Shirt",
     "description": "A classic plaid flannel shirt, perfect for a layered look. Its soft fabric and timeless pattern make it a versatile piece for any casual wardrobe.",
