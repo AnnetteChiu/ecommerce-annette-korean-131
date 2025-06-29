@@ -42,11 +42,10 @@ export type GenerateProductRecommendationsOutput = z.infer<typeof GenerateProduc
 
 export async function generateProductRecommendations(input: GenerateProductRecommendationsInput): Promise<GenerateProductRecommendationsOutput> {
   const allProducts = getProducts();
-  const viewedProductIds = new Set(input.browsingHistory.map(p => p.id));
-  viewedProductIds.add(input.currentProductId);
-
+  
+  // Only filter out the currently viewed product, allowing previously viewed items to be recommended.
   const availableProducts = allProducts
-    .filter(p => !viewedProductIds.has(p.id))
+    .filter(p => p.id !== input.currentProductId)
     .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
   if (availableProducts.length === 0) {
