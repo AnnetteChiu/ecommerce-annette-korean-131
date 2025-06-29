@@ -134,5 +134,14 @@
     "imageUrl": "https://i3.codibook.net/files/1981080878873/58/2107639184.jpg",
     "purchaseUrl": "https://example.com/buy/15",
     "category": "Apparel"
+  },
+  {
+    "id": "16",
+    "name": "Classic Trench Coat",
+    "description": "A timeless trench coat that adds a layer of sophistication to any outfit. Its classic design and neutral color make it a versatile wardrobe staple.",
+    "price": 220.00,
+    "imageUrl": "https://i4.codibook.net/files/1982111976805/33e76a122d46837d/1138209628.jpg",
+    "purchaseUrl": "https://example.com/buy/16",
+    "category": "Apparel"
   }
 ]
