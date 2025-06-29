@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useRouter, notFound } from 'next/navigation';
+import { useRouter, notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getStoryById } from '@/lib/stories';
@@ -11,14 +11,9 @@ import { X, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
-type StoryPageProps = {
-  params: {
-    id: string;
-  };
-};
-
-export default function StoryViewerPage({ params }: StoryPageProps) {
+export default function StoryViewerPage() {
   const router = useRouter();
+  const params = useParams<{ id: string }>();
   const storyId = params.id;
   const [story, setStory] = useState<Story | null>(null);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
