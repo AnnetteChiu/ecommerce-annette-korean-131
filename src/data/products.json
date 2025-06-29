@@ -56,12 +56,12 @@
   },
   {
     "id": "7",
-    "name": "Sculptural Brass Vase",
-    "description": "More than just a vase, this is a piece of art. Its fluid, organic shape is handcrafted from solid brass, creating a stunning centerpiece with or without flowers. A statement piece for the modern home.",
-    "price": 180.00,
-    "imageUrl": "https://placehold.co/600x600",
+    "name": "Cozy Knit Cardigan",
+    "description": "Stay warm and stylish with this cozy knit cardigan. Perfect for layering over your favorite outfits, it offers both comfort and a chic, relaxed look.",
+    "price": 185.00,
+    "imageUrl": "https://i3.codibook.net/files/1982111046201/9d1bb9a33effcc85/2023912575.jpg",
     "purchaseUrl": "https://example.com/buy/7",
-    "category": "Decor"
+    "category": "Apparel"
   },
   {
     "id": "8",
