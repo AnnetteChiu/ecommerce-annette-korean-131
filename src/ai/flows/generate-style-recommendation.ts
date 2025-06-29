@@ -32,10 +32,10 @@ const FlowInputSchema = z.object({
 });
 
 // This is the schema for the exported function
-export const GenerateProductRecommendationsInputSchema = FlowInputSchema.omit({ availableProducts: true });
+const GenerateProductRecommendationsInputSchema = FlowInputSchema.omit({ availableProducts: true });
 export type GenerateProductRecommendationsInput = z.infer<typeof GenerateProductRecommendationsInputSchema>;
 
-export const GenerateProductRecommendationsOutputSchema = z.object({
+const GenerateProductRecommendationsOutputSchema = z.object({
   productIds: z.array(z.string()).describe('An array of recommended product IDs.'),
 });
 export type GenerateProductRecommendationsOutput = z.infer<typeof GenerateProductRecommendationsOutputSchema>;
