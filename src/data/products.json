@@ -116,5 +116,14 @@
     "imageUrl": "https://i4.codibook.net/files/1982111958801/8aa2bb557fb9ac3e/611526659.jpg",
     "purchaseUrl": "https://example.com/buy/13",
     "category": "Apparel"
+  },
+  {
+    "id": "14",
+    "name": "Ivory Turtleneck Sweater",
+    "description": "A classic ivory turtleneck sweater, perfect for a cozy and chic look. Made from a soft knit fabric, it's a versatile piece for your winter wardrobe.",
+    "price": 85.00,
+    "imageUrl": "https://i4.codibook.net/files/1982120421002/5d93fa7365d7311f/1601351912.jpg",
+    "purchaseUrl": "https://example.com/buy/14",
+    "category": "Apparel"
   }
 ]
