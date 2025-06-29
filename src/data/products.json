@@ -29,12 +29,12 @@
   },
   {
     "id": "4",
-    "name": "Modernist Desk Lamp",
-    "description": "Illuminate your workspace with this sleek, adjustable desk lamp. Featuring a minimalist design with a matte black finish and brass accents, it provides focused, warm light. Perfect for late-night reading or creative sessions.",
-    "price": 89.50,
-    "imageUrl": "https://placehold.co/600x600",
+    "name": "Classic Beige Blazer",
+    "description": "A timeless beige blazer that adds a touch of sophistication to any outfit. Versatile and elegant, it's a must-have for your wardrobe.",
+    "price": 165.00,
+    "imageUrl": "https://i4.codibook.net/files/198211264802/a6bdedca4eceb1ef/1791833231.jpg",
     "purchaseUrl": "https://example.com/buy/4",
-    "category": "Lighting"
+    "category": "Apparel"
   },
   {
     "id": "5",
