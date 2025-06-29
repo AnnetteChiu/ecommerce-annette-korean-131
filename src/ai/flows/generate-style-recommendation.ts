@@ -1,100 +1,49 @@
 'use server';
 /**
- * @fileOverview An AI agent for generating product recommendations.
+ * @fileOverview An AI agent for generating style recommendations.
  *
- * - generateProductRecommendations - A function that generates product recommendations based on browsing history and the current product.
- * - GenerateProductRecommendationsInput - The input type for the exported function.
- * - GenerateProductRecommendationsOutput - The return type for the function.
+ * - generateStyleRecommendation - A function that generates style recommendations based on browsing history.
+ * - GenerateStyleRecommendationInput - The input type for the exported function.
+ * - GenerateStyleRecommendationOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {getProducts} from '@/lib/products';
 
-const BrowsingHistoryItemSchema = z.object({
-  id: z.string(),
-  name: z.string()
+export const GenerateStyleRecommendationInputSchema = z.object({
+  browsingHistory: z.string().describe('A comma-separated list of product names the user has viewed.'),
 });
+export type GenerateStyleRecommendationInput = z.infer<typeof GenerateStyleRecommendationInputSchema>;
 
-const ProductForPromptSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  category: z.string(),
+export const GenerateStyleRecommendationOutputSchema = z.object({
+  recommendations: z.string().describe('The personalized style recommendation text.'),
 });
+export type GenerateStyleRecommendationOutput = z.infer<typeof GenerateStyleRecommendationOutputSchema>;
 
-// This is the schema for the flow itself
-const FlowInputSchema = z.object({
-  currentProductId: z.string().describe('The ID of the product currently being viewed.'),
-  browsingHistory: z.array(BrowsingHistoryItemSchema).describe('A list of products the user has recently viewed.'),
-  count: z.number().optional().default(4).describe('The number of recommendations to return.'),
-  availableProducts: z.array(ProductForPromptSchema).describe('The catalog of available products to recommend from.'),
-});
-
-// This is the schema for the exported function
-const GenerateProductRecommendationsInputSchema = FlowInputSchema.omit({ availableProducts: true });
-export type GenerateProductRecommendationsInput = z.infer<typeof GenerateProductRecommendationsInputSchema>;
-
-const GenerateProductRecommendationsOutputSchema = z.object({
-  productIds: z.array(z.string()).describe('An array of recommended product IDs.'),
-});
-export type GenerateProductRecommendationsOutput = z.infer<typeof GenerateProductRecommendationsOutputSchema>;
-
-export async function generateProductRecommendations(input: GenerateProductRecommendationsInput): Promise<GenerateProductRecommendationsOutput> {
-  const allProducts = getProducts();
-  
-  // Only filter out the currently viewed product, allowing previously viewed items to be recommended.
-  const availableProducts = allProducts
-    .filter(p => p.id !== input.currentProductId)
-    .map(({ id, name, description, category }) => ({ id, name, description, category }));
-
-  if (availableProducts.length === 0) {
-    return { productIds: [] };
-  }
-  
-  return productRecommendationFlow({ 
-    ...input, 
-    availableProducts,
-  });
+export async function generateStyleRecommendation(input: GenerateStyleRecommendationInput): Promise<GenerateStyleRecommendationOutput> {
+  return styleRecommendationFlow(input);
 }
 
 const recommendationPrompt = ai.definePrompt({
-    name: 'productRecommendationPrompt',
-    input: { schema: FlowInputSchema },
-    output: { schema: GenerateProductRecommendationsOutputSchema },
-    prompt: `You are a helpful e-commerce style advisor. Your goal is to recommend products to users based on their interests.
+    name: 'styleRecommendationPrompt',
+    input: { schema: GenerateStyleRecommendationInputSchema },
+    output: { schema: GenerateStyleRecommendationOutputSchema },
+    prompt: `You are a helpful e-commerce style advisor. Your goal is to provide a short, personalized style recommendation to a user based on their browsing history.
 
-The user is currently viewing the product with ID: {{currentProductId}}.
+The user has viewed the following products:
+{{browsingHistory}}
 
-Here is the user's recent browsing history:
-{{#if browsingHistory}}
-{{#each browsingHistory}}
-- {{this.name}} (ID: {{this.id}})
-{{/each}}
-{{else}}
-The user has no browsing history yet.
-{{/if}}
-
-Based on the user's browsing history and the product they are currently viewing, please recommend up to {{count}} products from the catalog below that they might like.
-
-Consider the categories and styles of the products viewed. Try to recommend items that are complementary or similar.
-
-Here is the catalog of available products to recommend from:
-{{#each availableProducts}}
-- Name: {{this.name}}, ID: {{this.id}}, Category: {{this.category}}, Description: {{this.description}}
-{{/each}}
-
-Return only the IDs of the recommended products from the provided catalog.`
+Based on these items, generate a brief (2-3 sentences) style recommendation. For example, if they viewed dresses and heels, you could suggest a "chic, evening look." If they viewed jeans and t-shirts, you could suggest a "classic, casual style."`
 });
 
-const productRecommendationFlow = ai.defineFlow(
+const styleRecommendationFlow = ai.defineFlow(
   {
-    name: 'productRecommendationFlow',
-    inputSchema: FlowInputSchema,
-    outputSchema: GenerateProductRecommendationsOutputSchema,
+    name: 'styleRecommendationFlow',
+    inputSchema: GenerateStyleRecommendationInputSchema,
+    outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
     const { output } = await recommendationPrompt(input);
-    return output!;
+    return output || { recommendations: 'Could not generate a recommendation at this time. Please try again later.' };
   }
 );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { generateProductRecommendations } from '@/ai/flows/generate-style-recommendation';
+import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
 import { getProductById } from '@/lib/products';
 import { ProductCard } from './product-card';
 import type { Product } from '@/types';

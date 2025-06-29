@@ -82,6 +82,6 @@ const findSimilarProductsFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await recommendationPrompt(input);
-    return output!;
+    return output || { productIds: [] };
   }
 );
