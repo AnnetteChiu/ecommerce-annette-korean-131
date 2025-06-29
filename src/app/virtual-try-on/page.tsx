@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
@@ -8,15 +9,17 @@ import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, Link as LinkIcon } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function VirtualTryOnPage() {
   const [modelImagePreview, setModelImagePreview] = useState<string | null>(null);
   const [modelImageDataUri, setModelImageDataUri] = useState<string | null>(null);
+  const [modelImageUrl, setModelImageUrl] = useState<string>('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isFetchingUrl, setIsFetchingUrl] = useState(false);
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,6 +27,11 @@ export default function VirtualTryOnPage() {
   useEffect(() => {
     setProducts(getProducts());
   }, []);
+  
+  const clearModelState = () => {
+    setGeneratedImage(null);
+    setSelectedProduct(null);
+  }
 
   const handleModelImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -42,15 +50,17 @@ export default function VirtualTryOnPage() {
         const result = e.target?.result as string;
         setModelImagePreview(URL.createObjectURL(file));
         setModelImageDataUri(result);
-        setGeneratedImage(null); // Clear previous generation
-        setSelectedProduct(null); // Clear selected product
+        clearModelState();
       };
       reader.readAsDataURL(file);
     }
   };
-  
-  const productImageUrlToDataUri = async (url: string) => {
+
+  const imageUrlToDataUri = async (url: string) => {
     const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch image. Status: ${response.status}`);
+    }
     const blob = await response.blob();
     return new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -58,6 +68,29 @@ export default function VirtualTryOnPage() {
         reader.onerror = reject;
         reader.readAsDataURL(blob);
     });
+  }
+
+  const handleUrlSubmit = async () => {
+    if (!modelImageUrl) {
+        toast({ title: 'Please enter an image URL.'});
+        return;
+    }
+    setIsFetchingUrl(true);
+    try {
+        const dataUri = await imageUrlToDataUri(modelImageUrl);
+        setModelImageDataUri(dataUri);
+        setModelImagePreview(modelImageUrl);
+        clearModelState();
+    } catch (error) {
+        console.error("Failed to fetch image from URL:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Failed to load image',
+            description: 'Could not fetch image from the URL. Please check the link or try another.',
+        });
+    } finally {
+        setIsFetchingUrl(false);
+    }
   }
 
   const handleTryOn = (product: Product) => {
@@ -73,7 +106,7 @@ export default function VirtualTryOnPage() {
 
     startTransition(async () => {
       try {
-        const productPhotoDataUri = await productImageUrlToDataUri(product.imageUrl);
+        const productPhotoDataUri = await imageUrlToDataUri(product.imageUrl);
 
         const result = await virtualTryOn({
           modelPhotoDataUri: modelImageDataUri,
@@ -100,6 +133,8 @@ export default function VirtualTryOnPage() {
     });
   };
 
+  const isLoading = isPending || isFetchingUrl;
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
@@ -114,10 +149,10 @@ export default function VirtualTryOnPage() {
                 <CardHeader>
                     <CardTitle>1. Upload Your Photo</CardTitle>
                 </CardHeader>
-                <CardContent>
-                     <Button onClick={() => fileInputRef.current?.click()} variant="outline" size="lg" className="w-full">
+                <CardContent className="flex flex-col gap-4">
+                     <Button onClick={() => fileInputRef.current?.click()} variant="outline" size="lg" className="w-full" disabled={isLoading}>
                         <Upload className="mr-2" />
-                        Choose a photo of yourself
+                        Choose a photo from your device
                     </Button>
                     <Input
                         type="file"
@@ -125,16 +160,36 @@ export default function VirtualTryOnPage() {
                         onChange={handleModelImageUpload}
                         className="hidden"
                         accept="image/png, image/jpeg, image/webp"
+                        disabled={isLoading}
                     />
+                    <div className="flex items-center gap-2">
+                        <hr className="flex-grow border-t" />
+                        <span className="text-muted-foreground text-sm">OR</span>
+                        <hr className="flex-grow border-t" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                         <Input
+                            type="url"
+                            placeholder="Paste an image URL"
+                            value={modelImageUrl}
+                            onChange={(e) => setModelImageUrl(e.target.value)}
+                            disabled={isLoading}
+                         />
+                         <Button onClick={handleUrlSubmit} disabled={isLoading} size="icon" aria-label="Use URL">
+                            {isFetchingUrl ? <Loader2 className="animate-spin" /> : <LinkIcon />}
+                         </Button>
+                    </div>
                 </CardContent>
             </Card>
 
             <div className="w-full aspect-[3/4] relative border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/20">
-                {isPending && (
+                {(isPending || isFetchingUrl) && (
                     <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center z-10 rounded-lg">
                         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-                        <p className="text-muted-foreground">Generating your new look...</p>
-                        <p className="text-sm text-muted-foreground/80">This can take a moment.</p>
+                        <p className="text-muted-foreground">
+                          {isPending ? 'Generating your new look...' : 'Fetching your image...'}
+                        </p>
+                        {isPending && <p className="text-sm text-muted-foreground/80">This can take a moment.</p>}
                     </div>
                 )}
                 
@@ -163,7 +218,7 @@ export default function VirtualTryOnPage() {
                             <div key={product.id} className="relative group">
                                 <button 
                                     onClick={() => handleTryOn(product)} 
-                                    disabled={isPending || !modelImageDataUri}
+                                    disabled={isLoading || !modelImageDataUri}
                                     className="w-full text-left border-2 rounded-lg overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed transition-all focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                                 >
                                     <div className="aspect-square overflow-hidden">
