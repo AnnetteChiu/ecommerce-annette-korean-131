@@ -48,5 +48,24 @@
         "productId": "1"
       }
     ]
+  },
+  {
+    "id": "4",
+    "title": "Everyday Essentials",
+    "coverImageUrl": "https://i3.codibook.net/files/1982102326425/f4e9d7b4c9211c72/1814420628.jpg",
+    "pages": [
+      {
+        "imageUrl": "https://i3.codibook.net/files/1982102326425/f4e9d7b4c9211c72/1814420628.jpg",
+        "productId": "3"
+      },
+      {
+        "imageUrl": "https://i4.codibook.net/files/1982112685804/edabfea5b35cf5fe/152972137.jpg",
+        "productId": "2"
+      },
+      {
+        "imageUrl": "https://i3.codibook.net/files/1982110569605/7fcb6ef8a658d6ef/1454816676.jpg",
+        "productId": "1"
+      }
+    ]
   }
 ]
