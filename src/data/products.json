@@ -107,5 +107,14 @@
     "imageUrl": "https://i3.codibook.net/files/198210134449/791880a424a1b025/1154546415.jpg",
     "purchaseUrl": "https://example.com/buy/12",
     "category": "Footwear"
+  },
+  {
+    "id": "13",
+    "name": "Plaid Flannel Shirt",
+    "description": "A classic plaid flannel shirt, perfect for a layered look. Its soft fabric and timeless pattern make it a versatile piece for any casual wardrobe.",
+    "price": 95.00,
+    "imageUrl": "https://i4.codibook.net/files/1982111958801/8aa2bb557fb9ac3e/611526659.jpg",
+    "purchaseUrl": "https://example.com/buy/13",
+    "category": "Apparel"
   }
 ]
