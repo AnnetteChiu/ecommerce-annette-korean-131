@@ -19,19 +19,20 @@ type StoryPageProps = {
 
 export default function StoryViewerPage({ params }: StoryPageProps) {
   const router = useRouter();
+  const storyId = params.id;
   const [story, setStory] = useState<Story | null>(null);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [product, setProduct] = useState<Product | null>(null);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const storyData = getStoryById(params.id);
+    const storyData = getStoryById(storyId);
     if (storyData) {
       setStory(storyData);
     } else {
       notFound();
     }
-  }, [params.id]);
+  }, [storyId]);
 
   const goToNextPage = useCallback(() => {
     if (story && currentPageIndex < story.pages.length - 1) {
