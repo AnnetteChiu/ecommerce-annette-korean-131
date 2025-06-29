@@ -13,20 +13,24 @@ import {z} from 'genkit';
 const GenerateStyleRecommendationInputSchema = z.object({
   browsingHistory: z.string().describe('A comma-separated list of product names the user has viewed.'),
 });
-export type GenerateStyleRecommendationInput = z.infer<typeof GenerateStyleRecommendationInputSchema>;
-
 const GenerateStyleRecommendationOutputSchema = z.object({
   recommendations: z.string().describe('The personalized style recommendation text.'),
 });
+
+export type GenerateStyleRecommendationInput = z.infer<typeof GenerateStyleRecommendationInputSchema>;
 export type GenerateStyleRecommendationOutput = z.infer<typeof GenerateStyleRecommendationOutputSchema>;
 
-const defaultRecommendation = { recommendations: 'Could not generate a recommendation at this time. Please try again later.' };
+const defaultRecommendation = { recommendations: 'Could not generate a recommendation at this time. Please browse some items and try again.' };
 
 export async function generateStyleRecommendation(input: GenerateStyleRecommendationInput): Promise<GenerateStyleRecommendationOutput> {
+  if (!input.browsingHistory || input.browsingHistory.trim() === '') {
+      return { recommendations: 'Browse some products first to get a personalized style recommendation.' };
+  }
+
   try {
     return await styleRecommendationFlow(input);
   } catch (error) {
-    console.error("Error in generateStyleRecommendation wrapper:", error);
+    console.error("Critical error in generateStyleRecommendation:", error);
     return defaultRecommendation;
   }
 }
@@ -35,7 +39,7 @@ const recommendationPrompt = ai.definePrompt({
     name: 'styleRecommendationPrompt',
     input: { schema: GenerateStyleRecommendationInputSchema },
     output: { schema: GenerateStyleRecommendationOutputSchema },
-    prompt: `You are a helpful e-commerce style advisor. Your goal is to provide a short, personalized style recommendation to a user based on their browsing history.
+    prompt: `You are an e-commerce style advisor. Your goal is to provide a short, personalized style recommendation to a user based on their browsing history.
 
 The user has viewed the following products:
 {{browsingHistory}}
@@ -52,15 +56,13 @@ const styleRecommendationFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      
       if (!output || !output.recommendations) {
-          console.warn("Style recommendation AI returned invalid or empty output.");
+          console.warn("Style recommendation AI returned invalid or empty output. Using default.");
           return defaultRecommendation;
       }
-      
       return output;
     } catch (e) {
-      console.error("Error within styleRecommendationFlow:", e);
+      console.error("Error within styleRecommendationFlow, returning default.", e);
       return defaultRecommendation;
     }
   }

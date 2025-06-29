@@ -29,22 +29,23 @@ const FlowInputSchema = z.object({
 });
 
 const FindSimilarProductsInputSchema = FlowInputSchema.omit({ availableProducts: true });
-export type FindSimilarProductsInput = z.infer<typeof FindSimilarProductsInputSchema>;
-
 const FindSimilarProductsOutputSchema = z.object({
   productIds: z.array(z.string()).describe('An array of recommended product IDs.'),
 });
+
+export type FindSimilarProductsInput = z.infer<typeof FindSimilarProductsInputSchema>;
 export type FindSimilarProductsOutput = z.infer<typeof FindSimilarProductsOutputSchema>;
+
+const defaultResponse = { productIds: [] };
 
 export async function findSimilarProducts(input: FindSimilarProductsInput): Promise<FindSimilarProductsOutput> {
   try {
     const allProducts = getProducts();
-    
     const availableProducts = allProducts
       .map(({ id, name, description, category }) => ({ id, name, description, category }));
   
     if (availableProducts.length === 0) {
-      return { productIds: [] };
+      return defaultResponse;
     }
     
     return await findSimilarProductsFlow({ 
@@ -52,8 +53,8 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
       availableProducts,
     });
   } catch (error) {
-    console.error("Error in findSimilarProducts wrapper:", error);
-    return { productIds: [] };
+    console.error("Critical error in findSimilarProducts:", error);
+    return defaultResponse;
   }
 }
 
@@ -61,20 +62,15 @@ const recommendationPrompt = ai.definePrompt({
     name: 'findSimilarProductsPrompt',
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
-    prompt: `You are a helpful e-commerce style advisor. Your goal is to recommend products to users based on an image they uploaded.
+    system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
+    prompt: `Analyze the uploaded image's style, clothing, and colors. Recommend up to {{count}} products from the catalog below that are visually similar or a good stylistic match.
 
-The user has uploaded an image. Analyze the style, clothing items, colors, and overall aesthetic of the image.
-
-Based on your analysis, please recommend up to {{count}} products from the catalog below that are visually similar or would be a good stylistic match.
-
-Here is the catalog of available products to recommend from:
+Catalog of available products:
 {{#each availableProducts}}
 - Name: {{this.name}}, ID: {{this.id}}, Category: {{this.category}}, Description: {{this.description}}
 {{/each}}
 
-Photo: {{media url=photoDataUri}}
-
-Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Your response MUST be ONLY a valid JSON object, with no other text, explanation, or markdown formatting.`
+Photo: {{media url=photoDataUri}}`
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
@@ -86,16 +82,14 @@ const findSimilarProductsFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      
-      if (!output || !Array.isArray(output.productIds)) {
-        console.warn("Find similar products AI returned invalid or empty output.");
-        return { productIds: [] };
+      if (!output || !output.productIds) {
+        console.warn("Find similar products AI returned invalid or empty output. Using default.");
+        return defaultResponse;
       }
-      
       return output;
     } catch (e) {
-      console.error("Error within findSimilarProductsFlow:", e);
-      return { productIds: [] };
+      console.error("Error within findSimilarProductsFlow, returning default.", e);
+      return defaultResponse;
     }
   }
 );

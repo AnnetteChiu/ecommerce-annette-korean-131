@@ -31,12 +31,14 @@ const FlowInputSchema = z.object({
 });
 
 const GenerateProductRecommendationsInputSchema = FlowInputSchema.omit({ availableProducts: true });
-export type GenerateProductRecommendationsInput = z.infer<typeof GenerateProductRecommendationsInputSchema>;
-
 const GenerateProductRecommendationsOutputSchema = z.object({
   productIds: z.array(z.string()).describe('An array of recommended product IDs.'),
 });
+
+export type GenerateProductRecommendationsInput = z.infer<typeof GenerateProductRecommendationsInputSchema>;
 export type GenerateProductRecommendationsOutput = z.infer<typeof GenerateProductRecommendationsOutputSchema>;
+
+const defaultRecommendation = { productIds: [] };
 
 export async function generateProductRecommendations(input: GenerateProductRecommendationsInput): Promise<GenerateProductRecommendationsOutput> {
   try {
@@ -47,17 +49,17 @@ export async function generateProductRecommendations(input: GenerateProductRecom
       .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
     if (availableProducts.length === 0) {
-      return { productIds: [] };
+      return defaultRecommendation;
     }
     
-    return await productRecommendationFlow({ 
+    const result = await productRecommendationFlow({ 
       ...input, 
       availableProducts,
     });
+    return result;
   } catch (error) {
-    console.error("Error in generateProductRecommendations wrapper:", error);
-    // Return a default value to prevent client-side crashes
-    return { productIds: [] };
+    console.error("Critical error in generateProductRecommendations:", error);
+    return defaultRecommendation;
   }
 }
 
@@ -65,29 +67,25 @@ const recommendationPrompt = ai.definePrompt({
     name: 'productRecommendationPrompt',
     input: { schema: FlowInputSchema },
     output: { schema: GenerateProductRecommendationsOutputSchema },
-    prompt: `You are a helpful e-commerce style advisor. Your goal is to recommend products to users based on their interests.
+    system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
+    prompt: `Based on the user's browsing history and the product they are currently viewing, recommend up to {{count}} products from the catalog.
+Consider the categories and styles of the products. Try to recommend items that are complementary or similar.
 
-The user is currently viewing the product with ID: {{currentProductId}}.
+Current Product ID: {{currentProductId}}
 
-Here is the user's recent browsing history:
+Browsing History:
 {{#if browsingHistory}}
 {{#each browsingHistory}}
 - {{this.name}} (ID: {{this.id}})
 {{/each}}
 {{else}}
-The user has no browsing history yet.
+None
 {{/if}}
 
-Based on the user's browsing history and the product they are currently viewing, please recommend up to {{count}} products from the catalog below that they might like.
-
-Consider the categories and styles of the products viewed. Try to recommend items that are complementary or similar.
-
-Here is the catalog of available products to recommend from:
+Available Product Catalog:
 {{#each availableProducts}}
 - Name: {{this.name}}, ID: {{this.id}}, Category: {{this.category}}, Description: {{this.description}}
-{{/each}}
-
-Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Your response MUST be ONLY a valid JSON object, with no other text, explanation, or markdown formatting.`
+{{/each}}`
 });
 
 const productRecommendationFlow = ai.defineFlow(
@@ -99,16 +97,14 @@ const productRecommendationFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      
-      if (!output || !Array.isArray(output.productIds)) {
-        console.warn("Product recommendation AI returned invalid or empty output.");
-        return { productIds: [] };
+      if (!output || !output.productIds) {
+          console.warn("Product recommendation AI returned invalid or empty output. Using default.");
+          return defaultRecommendation;
       }
-      
       return output;
     } catch (e) {
-      console.error("Error within productRecommendationFlow:", e);
-      return { productIds: [] };
+      console.error("Error within productRecommendationFlow, returning default.", e);
+      return defaultRecommendation;
     }
   }
 );
