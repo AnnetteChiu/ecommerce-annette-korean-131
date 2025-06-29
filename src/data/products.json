@@ -143,5 +143,14 @@
     "imageUrl": "https://i4.codibook.net/files/1982111976805/33e76a122d46837d/1138209628.jpg",
     "purchaseUrl": "https://example.com/buy/16",
     "category": "Apparel"
+  },
+  {
+    "id": "17",
+    "name": "Casual Zip-Up Hoodie",
+    "description": "A versatile zip-up hoodie perfect for layering. Its relaxed fit and soft fabric provide all-day comfort, making it an essential for casual outings or lounging at home.",
+    "price": 125.00,
+    "imageUrl": "https://i3.codibook.net/files/1982020612009/9ef1ac681413d2ae/582552392.jpg",
+    "purchaseUrl": "https://example.com/buy/17",
+    "category": "Apparel"
   }
 ]
