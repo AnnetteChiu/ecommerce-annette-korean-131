@@ -20,8 +20,15 @@ export const GenerateStyleRecommendationOutputSchema = z.object({
 });
 export type GenerateStyleRecommendationOutput = z.infer<typeof GenerateStyleRecommendationOutputSchema>;
 
+const defaultRecommendation = { recommendations: 'Could not generate a recommendation at this time. Please try again later.' };
+
 export async function generateStyleRecommendation(input: GenerateStyleRecommendationInput): Promise<GenerateStyleRecommendationOutput> {
-  return styleRecommendationFlow(input);
+  try {
+    return await styleRecommendationFlow(input);
+  } catch (error) {
+    console.error("Error calling styleRecommendationFlow from wrapper:", error);
+    return defaultRecommendation;
+  }
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -43,7 +50,16 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    return output || { recommendations: 'Could not generate a recommendation at this time. Please try again later.' };
+    try {
+        const { output } = await recommendationPrompt(input);
+        if (!output || !output.recommendations) {
+            console.warn("Style recommendation AI returned invalid or empty output.");
+            return defaultRecommendation;
+        }
+        return output;
+    } catch (error) {
+        console.error("Error in styleRecommendationFlow:", error);
+        return defaultRecommendation;
+    }
   }
 );

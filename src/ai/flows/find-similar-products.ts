@@ -76,7 +76,7 @@ Here is the catalog of available products to recommend from:
 
 Photo: {{media url=photoDataUri}}
 
-Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Prioritize items that are a close match to what is shown in the image. Your response MUST be ONLY the JSON object, with no other text, explanation, or markdown formatting.`
+Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Prioritize items that are a close match to what is shown in the image. Your response MUST be ONLY a valid JSON object, with no other text, explanation, or markdown formatting.`
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
@@ -88,7 +88,11 @@ const findSimilarProductsFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      return output || { productIds: [] };
+      if (!output || !Array.isArray(output.productIds)) {
+        console.warn("Find similar products AI returned invalid or empty output.");
+        return { productIds: [] };
+      }
+      return output;
     } catch (error) {
       console.error("Error in findSimilarProductsFlow:", error);
       return { productIds: [] };

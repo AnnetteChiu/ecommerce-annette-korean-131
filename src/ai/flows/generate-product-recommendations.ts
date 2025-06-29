@@ -89,7 +89,7 @@ Here is the catalog of available products to recommend from:
 - Name: {{this.name}}, ID: {{this.id}}, Category: {{this.category}}, Description: {{this.description}}
 {{/each}}
 
-Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Your response MUST be ONLY the JSON object, with no other text, explanation, or markdown formatting.`
+Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Your response MUST be ONLY a valid JSON object, with no other text, explanation, or markdown formatting.`
 });
 
 const productRecommendationFlow = ai.defineFlow(
@@ -101,7 +101,11 @@ const productRecommendationFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      return output || { productIds: [] };
+      if (!output || !Array.isArray(output.productIds)) {
+        console.warn("Product recommendation AI returned invalid or empty output.");
+        return { productIds: [] };
+      }
+      return output;
     } catch (error) {
         console.error("Error in productRecommendationFlow:", error);
         return { productIds: [] };
