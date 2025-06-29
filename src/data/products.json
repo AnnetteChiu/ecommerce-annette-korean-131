@@ -7,7 +7,12 @@
     "price": 149.99,
     "imageUrl": "https://i3.codibook.net/files/1982110569605/7fcb6ef8a658d6ef/1454816676.jpg",
     "purchaseUrl": "https://example.com/buy/1",
-    "category": "Bags"
+    "category": "Bags",
+    "details": {
+      "material": "100% Vegan Leather, Cotton lining",
+      "fit": "Dimensions: 15\" W x 12\" H x 5\" D",
+      "care": "Wipe clean with a damp cloth."
+    }
   },
   {
     "id": "2",
@@ -16,7 +21,12 @@
     "price": 89.99,
     "imageUrl": "https://i4.codibook.net/files/1982112685804/edabfea5b35cf5fe/152972137.jpg",
     "purchaseUrl": "https://example.com/buy/2",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "98% Cotton, 2% Elastane",
+      "fit": "Relaxed fit with a straight leg. Model is 6'1\" and wearing a size 32.",
+      "care": "Machine wash cold, tumble dry low."
+    }
   },
   {
     "id": "3",
@@ -25,7 +35,12 @@
     "price": 45.00,
     "imageUrl": "https://i3.codibook.net/files/1982102326425/f4e9d7b4c9211c72/1814420628.jpg",
     "purchaseUrl": "https://example.com/buy/3",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "100% GOTS-certified organic cotton",
+      "fit": "Classic crewneck fit. True to size.",
+      "care": "Machine wash warm with like colors. Tumble dry medium."
+    }
   },
   {
     "id": "4",
@@ -34,7 +49,12 @@
     "price": 165.00,
     "imageUrl": "https://i4.codibook.net/files/198211264802/a6bdedca4eceb1ef/1791833231.jpg",
     "purchaseUrl": "https://example.com/buy/4",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "60% Wool, 40% Polyester",
+      "fit": "Tailored fit, single-breasted design.",
+      "care": "Dry clean only."
+    }
   },
   {
     "id": "5",
@@ -43,7 +63,12 @@
     "price": 155.00,
     "imageUrl": "https://i3.codibook.net/files/1982103119162/5f/1463450168.jpg",
     "purchaseUrl": "https://example.com/buy/5",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "95% Viscose, 5% Spandex",
+      "fit": "A-line silhouette, hits just above the knee.",
+      "care": "Machine wash cold, hang to dry."
+    }
   },
   {
     "id": "6",
@@ -52,7 +77,12 @@
     "price": 79.99,
     "imageUrl": "https://i3.codibook.net/files/1982111037202/d26e3ac3c73dda18/516944500.jpg",
     "purchaseUrl": "https://example.com/buy/6",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "100% Cotton Poplin",
+      "fit": "Slightly oversized fit with buttoned cuffs.",
+      "care": "Machine wash warm, iron on medium heat."
+    }
   },
   {
     "id": "7",
@@ -61,7 +91,12 @@
     "price": 185.00,
     "imageUrl": "https://i3.codibook.net/files/1982111046201/9d1bb9a33effcc85/2023912575.jpg",
     "purchaseUrl": "https://example.com/buy/7",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "50% Merino Wool, 30% Nylon, 20% Acrylic",
+      "fit": "Open-front, longline silhouette.",
+      "care": "Hand wash cold, lay flat to dry."
+    }
   },
   {
     "id": "8",
@@ -70,7 +105,12 @@
     "price": 195.00,
     "imageUrl": "https://i3.codibook.net/files/1982111057001/628075af5aea531d/556922438.jpg",
     "purchaseUrl": "https://example.com/buy/8",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "70% Merino Wool, 30% Alpaca",
+      "fit": "Relaxed, slightly cropped fit.",
+      "care": "Hand wash or dry clean."
+    }
   },
   {
     "id": "9",
@@ -79,7 +119,12 @@
     "price": 179.99,
     "imageUrl": "https://i3.codibook.net/files/1982100285804/9c1b366c15143216/983095673.jpg",
     "purchaseUrl": "https://example.com/buy/9",
-    "category": "Bags"
+    "category": "Bags",
+    "details": {
+      "material": "Genuine Leather, Microsuede lining",
+      "fit": "Dimensions: 13\" W x 10\" H x 6\" D. Includes detachable shoulder strap.",
+      "care": "Protect from rain. Use leather conditioner periodically."
+    }
   },
   {
     "id": "10",
@@ -88,7 +133,12 @@
     "price": 110.00,
     "imageUrl": "https://i4.codibook.net/files/1982112817488/bef9178d8d54aa30/340216035.jpg",
     "purchaseUrl": "https://example.com/buy/10",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "65% Recycled Polyester, 32% Viscose, 3% Elastane",
+      "fit": "Slim fit, high-waisted design with a front crease.",
+      "care": "Machine washable, do not tumble dry."
+    }
   },
   {
     "id": "13",
@@ -97,7 +147,12 @@
     "price": 95.00,
     "imageUrl": "https://i4.codibook.net/files/1982111958801/8aa2bb557fb9ac3e/611526659.jpg",
     "purchaseUrl": "https://example.com/buy/13",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "100% Cotton Flannel",
+      "fit": "Regular fit. Can be worn as a shirt or light jacket.",
+      "care": "Machine wash cold with like colors. Tumble dry low."
+    }
   },
   {
     "id": "14",
@@ -106,7 +161,12 @@
     "price": 85.00,
     "imageUrl": "https://i4.codibook.net/files/1982120421002/5d93fa7365d7311f/1601351912.jpg",
     "purchaseUrl": "https://example.com/buy/14",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "80% Acrylic, 20% Wool",
+      "fit": "Slim fit, perfect for layering.",
+      "care": "Hand wash cold or dry clean."
+    }
   },
   {
     "id": "15",
@@ -115,7 +175,12 @@
     "price": 98.00,
     "imageUrl": "https://i3.codibook.net/files/1981080878873/58/2107639184.jpg",
     "purchaseUrl": "https://example.com/buy/15",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "100% Cashmere",
+      "fit": "Classic fit. Ribbed hem and cuffs.",
+      "care": "Dry clean recommended."
+    }
   },
   {
     "id": "16",
@@ -124,7 +189,12 @@
     "price": 220.00,
     "imageUrl": "https://i4.codibook.net/files/1982111976805/33e76a122d46837d/1138209628.jpg",
     "purchaseUrl": "https://example.com/buy/16",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "Water-resistant cotton blend",
+      "fit": "Double-breasted with a waist belt for a customizable fit.",
+      "care": "Dry clean only."
+    }
   },
   {
     "id": "17",
@@ -133,7 +203,12 @@
     "price": 125.00,
     "imageUrl": "https://i3.codibook.net/files/1982020612009/9ef1ac681413d2ae/582552392.jpg",
     "purchaseUrl": "https://example.com/buy/17",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "80% Cotton, 20% Polyester Fleece",
+      "fit": "Relaxed fit with a drawstring hood.",
+      "care": "Machine wash warm, tumble dry low."
+    }
   },
   {
     "id": "18",
@@ -142,6 +217,11 @@
     "price": 115.00,
     "imageUrl": "https://i3.codibook.net/files/1982100581063/88/1139720143.jpg",
     "purchaseUrl": "https://example.com/buy/18",
-    "category": "Apparel"
+    "category": "Apparel",
+    "details": {
+      "material": "100% French Terry Cotton",
+      "fit": "Standard fit with kangaroo pocket.",
+      "care": "Machine wash cold, tumble dry."
+    }
   }
 ]

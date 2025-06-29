@@ -6,6 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { ProductViewTracker } from '@/components/product-view-tracker';
 import { ExternalLink } from 'lucide-react';
 import { RecommendedProducts } from '@/components/recommended-products';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 type ProductPageProps = {
   params: {
@@ -19,6 +25,8 @@ export default function ProductPage({ params }: ProductPageProps) {
   if (!product) {
     notFound();
   }
+
+  const hasDetails = product.details && (product.details.material || product.details.fit || product.details.care);
 
   return (
     <>
@@ -47,6 +55,36 @@ export default function ProductPage({ params }: ProductPageProps) {
               <ExternalLink className="ml-2" />
             </a>
           </Button>
+
+          {hasDetails && (
+            <Accordion type="single" collapsible className="w-full mt-8">
+              {product.details?.material && (
+                <AccordionItem value="material">
+                  <AccordionTrigger>Material</AccordionTrigger>
+                  <AccordionContent>
+                    {product.details.material}
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+              {product.details?.fit && (
+                <AccordionItem value="fit">
+                  <AccordionTrigger>Fit & Sizing</AccordionTrigger>
+                  <AccordionContent>
+                    {product.details.fit}
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+              {product.details?.care && (
+                <AccordionItem value="care">
+                  <AccordionTrigger>Care Instructions</AccordionTrigger>
+                  <AccordionContent>
+                    {product.details.care}
+                  </AccordionContent>
+                </AccordionItem>
+              )}
+            </Accordion>
+          )}
+
         </div>
       </div>
       <RecommendedProducts currentProductId={product.id} />

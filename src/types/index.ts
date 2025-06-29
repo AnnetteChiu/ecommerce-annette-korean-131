@@ -6,6 +6,11 @@ export interface Product {
   imageUrl: string;
   purchaseUrl: string;
   category: string;
+  details?: {
+    material?: string;
+    fit?: string;
+    care?: string;
+  };
 }
 
 export interface StoryPage {
