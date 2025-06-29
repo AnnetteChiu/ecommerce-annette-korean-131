@@ -143,5 +143,14 @@
     "imageUrl": "https://i3.codibook.net/files/1982020612009/9ef1ac681413d2ae/582552392.jpg",
     "purchaseUrl": "https://example.com/buy/17",
     "category": "Apparel"
+  },
+  {
+    "id": "18",
+    "name": "Essential Grey Hoodie",
+    "description": "A classic grey hoodie that offers both comfort and style. Made from soft, high-quality fabric, it's perfect for everyday wear.",
+    "price": 115.00,
+    "imageUrl": "https://i3.codibook.net/files/1982100581063/88/1139720143.jpg",
+    "purchaseUrl": "https://example.com/buy/18",
+    "category": "Apparel"
   }
 ]
