@@ -23,7 +23,6 @@ const ProductForPromptSchema = z.object({
   category: z.string(),
 });
 
-// This is the schema for the flow itself
 const FlowInputSchema = z.object({
   currentProductId: z.string().describe('The ID of the product currently being viewed.'),
   browsingHistory: z.array(BrowsingHistoryItemSchema).describe('A list of products the user has recently viewed.'),
@@ -31,7 +30,6 @@ const FlowInputSchema = z.object({
   availableProducts: z.array(ProductForPromptSchema).describe('The catalog of available products to recommend from.'),
 });
 
-// This is the schema for the exported function
 const GenerateProductRecommendationsInputSchema = FlowInputSchema.omit({ availableProducts: true });
 export type GenerateProductRecommendationsInput = z.infer<typeof GenerateProductRecommendationsInputSchema>;
 
@@ -44,7 +42,6 @@ export async function generateProductRecommendations(input: GenerateProductRecom
   try {
     const allProducts = getProducts();
     
-    // Only filter out the currently viewed product, allowing previously viewed items to be recommended.
     const availableProducts = allProducts
       .filter(p => p.id !== input.currentProductId)
       .map(({ id, name, description, category }) => ({ id, name, description, category }));
@@ -58,8 +55,9 @@ export async function generateProductRecommendations(input: GenerateProductRecom
       availableProducts,
     });
   } catch (error) {
-      console.error("Error calling productRecommendationFlow from wrapper:", error);
-      return { productIds: [] };
+    console.error("Error in generateProductRecommendations wrapper:", error);
+    // Return a default value to prevent client-side crashes
+    return { productIds: [] };
   }
 }
 
@@ -99,16 +97,13 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !Array.isArray(output.productIds)) {
-        console.warn("Product recommendation AI returned invalid or empty output.");
-        return { productIds: [] };
-      }
-      return output;
-    } catch (error) {
-        console.error("Error in productRecommendationFlow:", error);
-        return { productIds: [] };
+    const { output } = await recommendationPrompt(input);
+    
+    if (!output || !Array.isArray(output.productIds)) {
+      console.warn("Product recommendation AI returned invalid or empty output.");
+      return { productIds: [] };
     }
+    
+    return output;
   }
 );

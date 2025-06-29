@@ -18,7 +18,6 @@ const ProductForPromptSchema = z.object({
   category: z.string(),
 });
 
-// This is the schema for the flow itself
 const FlowInputSchema = z.object({
   photoDataUri: z
     .string()
@@ -29,7 +28,6 @@ const FlowInputSchema = z.object({
   availableProducts: z.array(ProductForPromptSchema).describe('The catalog of available products to recommend from.'),
 });
 
-// This is the schema for the exported function
 const FindSimilarProductsInputSchema = FlowInputSchema.omit({ availableProducts: true });
 export type FindSimilarProductsInput = z.infer<typeof FindSimilarProductsInputSchema>;
 
@@ -54,7 +52,7 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
       availableProducts,
     });
   } catch (error) {
-    console.error("Error calling findSimilarProductsFlow from wrapper:", error);
+    console.error("Error in findSimilarProducts wrapper:", error);
     return { productIds: [] };
   }
 }
@@ -76,7 +74,7 @@ Here is the catalog of available products to recommend from:
 
 Photo: {{media url=photoDataUri}}
 
-Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Prioritize items that are a close match to what is shown in the image. Your response MUST be ONLY a valid JSON object, with no other text, explanation, or markdown formatting.`
+Return a JSON object containing a 'productIds' array with the IDs of the recommended products from the provided catalog. Your response MUST be ONLY a valid JSON object, with no other text, explanation, or markdown formatting.`
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
@@ -86,16 +84,13 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !Array.isArray(output.productIds)) {
-        console.warn("Find similar products AI returned invalid or empty output.");
-        return { productIds: [] };
-      }
-      return output;
-    } catch (error) {
-      console.error("Error in findSimilarProductsFlow:", error);
+    const { output } = await recommendationPrompt(input);
+    
+    if (!output || !Array.isArray(output.productIds)) {
+      console.warn("Find similar products AI returned invalid or empty output.");
       return { productIds: [] };
     }
+    
+    return output;
   }
 );

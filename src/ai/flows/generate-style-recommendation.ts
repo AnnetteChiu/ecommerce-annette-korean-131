@@ -26,7 +26,7 @@ export async function generateStyleRecommendation(input: GenerateStyleRecommenda
   try {
     return await styleRecommendationFlow(input);
   } catch (error) {
-    console.error("Error calling styleRecommendationFlow from wrapper:", error);
+    console.error("Error in generateStyleRecommendation wrapper:", error);
     return defaultRecommendation;
   }
 }
@@ -50,16 +50,13 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    try {
-        const { output } = await recommendationPrompt(input);
-        if (!output || !output.recommendations) {
-            console.warn("Style recommendation AI returned invalid or empty output.");
-            return defaultRecommendation;
-        }
-        return output;
-    } catch (error) {
-        console.error("Error in styleRecommendationFlow:", error);
+    const { output } = await recommendationPrompt(input);
+    
+    if (!output || !output.recommendations) {
+        console.warn("Style recommendation AI returned invalid or empty output.");
         return defaultRecommendation;
     }
+    
+    return output;
   }
 );

@@ -20,18 +20,26 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
     startTransition(async () => {
       setError(null);
       try {
-        const history = JSON.parse(sessionStorage.getItem('browsingHistory') || '[]');
+        let history = [];
+        try {
+          history = JSON.parse(sessionStorage.getItem('browsingHistory') || '[]');
+        } catch (e) {
+          console.error("Failed to parse browsing history, proceeding with empty history.", e);
+        }
+
         const result = await generateProductRecommendations({
           currentProductId,
           browsingHistory: history,
           count: 4,
         });
 
-        if (result.productIds) {
+        if (result && result.productIds) {
           const recommendedProducts = result.productIds
             .map(id => getProductById(id))
             .filter((p): p is Product => !!p);
           setRecommendations(recommendedProducts);
+        } else {
+          setRecommendations([]);
         }
       } catch (error) {
         console.error('Failed to generate product recommendations:', error);
