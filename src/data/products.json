@@ -11,12 +11,12 @@
   },
   {
     "id": "2",
-    "name": "Artisan Ceramic Mug",
-    "description": "Start your day with a touch of handmade charm. Each mug is wheel-thrown and hand-glazed by local artisans, making every piece unique. Its ergonomic handle and earthy tones provide a comforting coffee experience.",
-    "price": 35.00,
-    "imageUrl": "https://placehold.co/600x600",
+    "name": "Relaxed Fit Blue Jeans",
+    "description": "Effortlessly cool and endlessly versatile, these relaxed fit blue jeans are a wardrobe essential. Made from high-quality denim, they offer both comfort and style for any casual occasion.",
+    "price": 89.99,
+    "imageUrl": "https://i4.codibook.net/files/1982112685804/edabfea5b35cf5fe/152972137.jpg",
     "purchaseUrl": "https://example.com/buy/2",
-    "category": "Homeware"
+    "category": "Apparel"
   },
   {
     "id": "3",
