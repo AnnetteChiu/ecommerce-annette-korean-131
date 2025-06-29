@@ -125,5 +125,14 @@
     "imageUrl": "https://i4.codibook.net/files/1982120421002/5d93fa7365d7311f/1601351912.jpg",
     "purchaseUrl": "https://example.com/buy/14",
     "category": "Apparel"
+  },
+  {
+    "id": "15",
+    "name": "Stylish V-Neck Sweater",
+    "description": "A classic V-neck sweater that combines comfort and style. Its versatile design makes it a perfect addition to any wardrobe, easily paired with jeans or trousers.",
+    "price": 98.00,
+    "imageUrl": "https://i3.codibook.net/files/1981080878873/58/2107639184.jpg",
+    "purchaseUrl": "https://example.com/buy/15",
+    "category": "Apparel"
   }
 ]
