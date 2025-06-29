@@ -47,12 +47,12 @@
   },
   {
     "id": "6",
-    "name": "Linen Throw Blanket",
-    "description": "Drape your sofa or bed with this incredibly soft, pre-washed linen throw. Its natural texture and lightweight warmth make it ideal for any season. The subtle, earthy color palette complements any interior style.",
-    "price": 125.00,
-    "imageUrl": "https://placehold.co/600x600",
+    "name": "Classic White Blouse",
+    "description": "A versatile and timeless white blouse. Perfect for both casual and formal looks, offering a crisp and clean style that pairs effortlessly with any wardrobe.",
+    "price": 79.99,
+    "imageUrl": "https://i3.codibook.net/files/1982111037202/d26e3ac3c73dda18/516944500.jpg",
     "purchaseUrl": "https://example.com/buy/6",
-    "category": "Homeware"
+    "category": "Apparel"
   },
   {
     "id": "7",
