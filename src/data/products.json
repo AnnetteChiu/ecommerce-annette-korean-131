@@ -1,10 +1,11 @@
+
 [
   {
     "id": "1",
     "name": "The Minimalist Tote",
     "description": "Crafted from vegan leather, this tote combines sleek design with everyday functionality. Its spacious interior and minimalist aesthetic make it a versatile accessory for any occasion, from the office to a weekend getaway.",
     "price": 149.99,
-    "imageUrl": "https://placehold.co/600x600",
+    "imageUrl": "https://i3.codibook.net/files/1982110569605/7fcb6ef8a658d6ef/1454816676.jpg",
     "purchaseUrl": "https://example.com/buy/1",
     "category": "Bags"
   },
