@@ -14,9 +14,11 @@ type RecommendedProductsProps = {
 export function RecommendedProducts({ currentProductId }: RecommendedProductsProps) {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     startTransition(async () => {
+      setError(null);
       try {
         const history = JSON.parse(sessionStorage.getItem('browsingHistory') || '[]');
         const result = await generateProductRecommendations({
@@ -33,6 +35,7 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
         }
       } catch (error) {
         console.error('Failed to generate product recommendations:', error);
+        setError("Could not load recommendations.");
       }
     });
   }, [currentProductId]);
@@ -42,6 +45,18 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
         <p className="text-muted-foreground">Finding recommendations for you...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mt-16 pt-8 border-t">
+        <h2 className="text-3xl font-headline font-bold mb-8 text-center">You Might Also Like</h2>
+        <div className="text-center text-muted-foreground bg-accent p-6 rounded-lg max-w-2xl mx-auto">
+          <p className="font-semibold text-destructive mb-2">Could Not Load Recommendations</p>
+          <p>There was an error fetching recommendations. This can happen if the AI service isn't configured correctly on the server (e.g., missing an API key in the production environment).</p>
+        </div>
       </div>
     );
   }
