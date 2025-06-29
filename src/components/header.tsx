@@ -1,5 +1,12 @@
 import Link from 'next/link';
 import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export function Header() {
   return (
@@ -7,13 +14,24 @@ export function Header() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="text-2xl font-bold font-headline text-primary">
-            CommerceKit
+            CodiStyle
           </Link>
           <nav>
-            <Link href="/search-by-image" className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
-              <Search className="mr-2 h-4 w-4" />
-              Search by Image
-            </Link>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href="/search-by-image">
+                      <Search className="h-5 w-5" />
+                      <span className="sr-only">Search by Image</span>
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Search by Image</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </nav>
         </div>
       </div>
