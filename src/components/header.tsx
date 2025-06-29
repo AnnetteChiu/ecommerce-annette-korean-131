@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Search } from 'lucide-react';
 
 export function Header() {
   return (
@@ -9,7 +10,10 @@ export function Header() {
             CommerceKit
           </Link>
           <nav>
-            {/* Future navigation links can go here */}
+            <Link href="/search-by-image" className="flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              <Search className="mr-2 h-4 w-4" />
+              Search by Image
+            </Link>
           </nav>
         </div>
       </div>
