@@ -58,8 +58,8 @@ export async function generateProductRecommendations(input: GenerateProductRecom
     });
     return result;
   } catch (error) {
-    console.error("Critical error in generateProductRecommendations:", error);
-    return defaultRecommendation;
+    console.error("Error in generateProductRecommendations:", error);
+    throw error;
   }
 }
 
@@ -95,16 +95,11 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !output.productIds) {
-          console.warn("Product recommendation AI returned invalid or empty output. Using default.");
-          return defaultRecommendation;
-      }
-      return output;
-    } catch (e) {
-      console.error("Error within productRecommendationFlow, returning default.", e);
-      return defaultRecommendation;
+    const { output } = await recommendationPrompt(input);
+    if (!output || !output.productIds) {
+        console.warn("Product recommendation AI returned invalid or empty output. Using default.");
+        return defaultRecommendation;
     }
+    return output;
   }
 );

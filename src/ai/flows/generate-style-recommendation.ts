@@ -30,8 +30,8 @@ export async function generateStyleRecommendation(input: GenerateStyleRecommenda
   try {
     return await styleRecommendationFlow(input);
   } catch (error) {
-    console.error("Critical error in generateStyleRecommendation:", error);
-    return defaultRecommendation;
+    console.error("Error in generateStyleRecommendation:", error);
+    throw error;
   }
 }
 
@@ -54,16 +54,11 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !output.recommendations) {
-          console.warn("Style recommendation AI returned invalid or empty output. Using default.");
-          return defaultRecommendation;
-      }
-      return output;
-    } catch (e) {
-      console.error("Error within styleRecommendationFlow, returning default.", e);
-      return defaultRecommendation;
+    const { output } = await recommendationPrompt(input);
+    if (!output || !output.recommendations) {
+        console.warn("Style recommendation AI returned invalid or empty output. Using default.");
+        return defaultRecommendation;
     }
+    return output;
   }
 );

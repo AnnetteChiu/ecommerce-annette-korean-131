@@ -53,8 +53,8 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
       availableProducts,
     });
   } catch (error) {
-    console.error("Critical error in findSimilarProducts:", error);
-    return defaultResponse;
+    console.error("Error in findSimilarProducts:", error);
+    throw error;
   }
 }
 
@@ -80,16 +80,11 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !output.productIds) {
-        console.warn("Find similar products AI returned invalid or empty output. Using default.");
-        return defaultResponse;
-      }
-      return output;
-    } catch (e) {
-      console.error("Error within findSimilarProductsFlow, returning default.", e);
+    const { output } = await recommendationPrompt(input);
+    if (!output || !output.productIds) {
+      console.warn("Find similar products AI returned invalid or empty output. Using default.");
       return defaultResponse;
     }
+    return output;
   }
 );
