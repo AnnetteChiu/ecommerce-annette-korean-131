@@ -6,7 +6,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 import {getProducts} from '@/lib/products';
 
 const BrowsingHistoryItemSchema = z.object({

@@ -6,7 +6,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import {z} from 'zod';
 
 const GenerateStyleRecommendationInputSchema = z.object({
   browsingHistory: z.string().describe('A comma-separated list of product names the user has viewed.'),
