@@ -9,6 +9,7 @@
     "purchaseUrl": "https://example.com/buy/1",
     "category": "Bags",
     "impressions": 2345,
+    "stock": 25,
     "details": {
       "material": "100% Vegan Leather, Cotton lining",
       "fit": "Dimensions: 15\" W x 12\" H x 5\" D",
@@ -24,6 +25,7 @@
     "purchaseUrl": "https://example.com/buy/2",
     "category": "Apparel",
     "impressions": 5821,
+    "stock": 0,
     "details": {
       "material": "98% Cotton, 2% Elastane",
       "fit": "Relaxed fit with a straight leg. Model is 6'1\" and wearing a size 32.",
@@ -39,6 +41,7 @@
     "purchaseUrl": "https://example.com/buy/3",
     "category": "Apparel",
     "impressions": 8934,
+    "stock": 88,
     "details": {
       "material": "100% GOTS-certified organic cotton",
       "fit": "Classic crewneck fit. True to size.",
@@ -54,6 +57,7 @@
     "purchaseUrl": "https://example.com/buy/4",
     "category": "Apparel",
     "impressions": 3128,
+    "stock": 12,
     "details": {
       "material": "60% Wool, 40% Polyester",
       "fit": "Tailored fit, single-breasted design.",
@@ -69,6 +73,7 @@
     "purchaseUrl": "https://example.com/buy/5",
     "category": "Apparel",
     "impressions": 4578,
+    "stock": 5,
     "details": {
       "material": "95% Viscose, 5% Spandex",
       "fit": "A-line silhouette, hits just above the knee.",
@@ -84,6 +89,7 @@
     "purchaseUrl": "https://example.com/buy/6",
     "category": "Apparel",
     "impressions": 6231,
+    "stock": 42,
     "details": {
       "material": "100% Cotton Poplin",
       "fit": "Slightly oversized fit with buttoned cuffs.",
@@ -99,6 +105,7 @@
     "purchaseUrl": "https://example.com/buy/7",
     "category": "Apparel",
     "impressions": 2987,
+    "stock": 0,
     "details": {
       "material": "50% Merino Wool, 30% Nylon, 20% Acrylic",
       "fit": "Open-front, longline silhouette.",
@@ -114,6 +121,7 @@
     "purchaseUrl": "https://example.com/buy/8",
     "category": "Apparel",
     "impressions": 4123,
+    "stock": 8,
     "details": {
       "material": "70% Merino Wool, 30% Alpaca",
       "fit": "Relaxed, slightly cropped fit.",
@@ -129,6 +137,7 @@
     "purchaseUrl": "https://example.com/buy/9",
     "category": "Bags",
     "impressions": 1890,
+    "stock": 15,
     "details": {
       "material": "Genuine Leather, Microsuede lining",
       "fit": "Dimensions: 13\" W x 10\" H x 6\" D. Includes detachable shoulder strap.",
@@ -144,6 +153,7 @@
     "purchaseUrl": "https://example.com/buy/10",
     "category": "Apparel",
     "impressions": 7894,
+    "stock": 67,
     "details": {
       "material": "65% Recycled Polyester, 32% Viscose, 3% Elastane",
       "fit": "Slim fit, high-waisted design with a front crease.",
@@ -159,6 +169,7 @@
     "purchaseUrl": "https://example.com/buy/13",
     "category": "Apparel",
     "impressions": 4321,
+    "stock": 33,
     "details": {
       "material": "100% Cotton Flannel",
       "fit": "Regular fit. Can be worn as a shirt or light jacket.",
@@ -174,6 +185,7 @@
     "purchaseUrl": "https://example.com/buy/14",
     "category": "Apparel",
     "impressions": 3987,
+    "stock": 9,
     "details": {
       "material": "80% Acrylic, 20% Wool",
       "fit": "Slim fit, perfect for layering.",
@@ -189,6 +201,7 @@
     "purchaseUrl": "https://example.com/buy/15",
     "category": "Apparel",
     "impressions": 5123,
+    "stock": 1,
     "details": {
       "material": "100% Cashmere",
       "fit": "Classic fit. Ribbed hem and cuffs.",
@@ -204,6 +217,7 @@
     "purchaseUrl": "https://example.com/buy/16",
     "category": "Apparel",
     "impressions": 4876,
+    "stock": 18,
     "details": {
       "material": "Water-resistant cotton blend",
       "fit": "Double-breasted with a waist belt for a customizable fit.",
@@ -213,12 +227,13 @@
   {
     "id": "17",
     "name": "Casual Zip-Up Hoodie",
-    "description": "A versatile zip-up hoodie perfect for layering. Its relaxed fit and soft fabric provide all-day comfort, making it an essential for casual outings or lounging at home.",
+    "description": "A versatile zip-up hoodie perfect for layering. Its relaxed fit and a soft fabric provide all-day comfort, making it an essential for casual outings or lounging at home.",
     "price": 125.00,
     "imageUrl": "https://i3.codibook.net/files/1982020612009/9ef1ac681413d2ae/582552392.jpg",
     "purchaseUrl": "https://example.com/buy/17",
     "category": "Apparel",
     "impressions": 6789,
+    "stock": 55,
     "details": {
       "material": "80% Cotton, 20% Polyester Fleece",
       "fit": "Relaxed fit with a drawstring hood.",
@@ -234,6 +249,7 @@
     "purchaseUrl": "https://example.com/buy/18",
     "category": "Apparel",
     "impressions": 7123,
+    "stock": 0,
     "details": {
       "material": "100% French Terry Cotton",
       "fit": "Standard fit with kangaroo pocket.",

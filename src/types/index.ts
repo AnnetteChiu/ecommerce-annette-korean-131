@@ -7,6 +7,7 @@ export interface Product {
   purchaseUrl: string;
   category: string;
   impressions: number;
+  stock: number;
   details?: {
     material?: string;
     fit?: string;

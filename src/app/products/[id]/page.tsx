@@ -27,6 +27,16 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   const hasDetails = product.details && (product.details.material || product.details.fit || product.details.care);
 
+  const getStockDisplay = () => {
+    if (product.stock === 0) {
+      return <p className="font-semibold text-destructive">Out of Stock</p>;
+    }
+    if (product.stock <= 10) {
+      return <p className="font-bold text-primary">Low Stock - Only {product.stock} left!</p>;
+    }
+    return <p className="text-muted-foreground">In Stock</p>;
+  };
+
   return (
     <>
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
@@ -44,13 +54,16 @@ export default function ProductPage({ params }: ProductPageProps) {
           <Badge variant="secondary" className="w-fit mb-2">{product.category}</Badge>
           <h1 className="text-4xl lg:text-5xl font-bold font-headline mb-4">{product.name}</h1>
           <p className="text-muted-foreground text-lg mb-6">{product.description}</p>
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-2">
             <span className="text-4xl font-bold text-primary">${product.price.toFixed(2)}</span>
           </div>
-          <Button asChild size="lg" className="w-full md:w-auto">
+          <div className="min-h-[24px] mb-6">
+            {getStockDisplay()}
+          </div>
+          <Button asChild size="lg" className="w-full md:w-auto" disabled={product.stock === 0}>
             <a href={product.purchaseUrl} target="_blank" rel="noopener noreferrer">
-              Buy Now
-              <ExternalLink className="ml-2" />
+              {product.stock === 0 ? 'Out of Stock' : 'Buy Now'}
+              {product.stock > 0 && <ExternalLink className="ml-2" />}
             </a>
           </Button>
 
