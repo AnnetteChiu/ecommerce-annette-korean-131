@@ -34,50 +34,33 @@ export default function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoggingIn(true);
-    // In a real app, this would be a secure API call.
-    // For this prototype, we'll use a hardcoded password.
-    if (password.trim() === 'admin123') {
-      try {
-        localStorage.setItem('isAdminLoggedIn', 'true');
-        setIsAuthenticated(true);
-        toast({
-          title: 'Login Successful',
-          description: 'Welcome to the admin dashboard!',
-        });
-      } catch (error) {
-        toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: 'Could not access local storage. Please enable it in your browser.',
-        });
-      }
-    } else {
+
+    if (password.trim() !== 'admin123') {
       toast({
         variant: 'destructive',
         title: 'Login Failed',
         description: 'Incorrect password. Please try again.',
       });
+      setPassword('');
+      return;
     }
-    setIsLoggingIn(false);
-    setPassword('');
-  };
-
-  const handleGenerateReport = async () => {
-    setIsGenerating(true);
-    setReport(null);
+    
+    setIsLoggingIn(true);
     try {
-      const result = await generateAdminReport();
-      setReport(result);
+      localStorage.setItem('isAdminLoggedIn', 'true');
+      setIsAuthenticated(true);
+      toast({
+        title: 'Login Successful',
+        description: 'Welcome to the admin dashboard!',
+      });
     } catch (error) {
-      console.error('Failed to generate report:', error);
       toast({
         variant: 'destructive',
-        title: 'Report Generation Failed',
-        description: 'An error occurred while generating the report. Please try again.',
+        title: 'Login Failed',
+        description: 'Could not access local storage. Please enable it in your browser.',
       });
+      setIsLoggingIn(false);
     }
-    setIsGenerating(false);
   };
   
   // Login View
