@@ -62,6 +62,24 @@ export default function AdminPage() {
       setIsLoggingIn(false);
     }
   };
+
+  const handleGenerateReport = async () => {
+    setIsGenerating(true);
+    setReport(null);
+    try {
+      const result = await generateAdminReport();
+      setReport(result);
+    } catch (error) {
+      console.error('Failed to generate report:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Report Generation Failed',
+        description: 'The AI report could not be generated. Please try again later.',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
   
   // Login View
   if (!isAuthenticated) {
