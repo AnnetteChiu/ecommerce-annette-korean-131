@@ -10,7 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const VirtualTryOnInputSchema = z.object({
+const VirtualTryOnInputSchema = z.object({
   userPhotoDataUri: z
     .string()
     .describe(
@@ -24,7 +24,7 @@ export const VirtualTryOnInputSchema = z.object({
 });
 export type VirtualTryOnInput = z.infer<typeof VirtualTryOnInputSchema>;
 
-export const VirtualTryOnOutputSchema = z.object({
+const VirtualTryOnOutputSchema = z.object({
   generatedImageDataUri: z.string().describe('The generated image as a data URI.'),
 });
 export type VirtualTryOnOutput = z.infer<typeof VirtualTryOnOutputSchema>;
