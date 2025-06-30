@@ -20,6 +20,10 @@ export default function Home() {
         src="https://i4.codibook.net/files/1982120615601/bcb491b3c8b53337/271340960.jpg"
         alt="New Collection Banner"
         data-ai-hint="fashion collection"
+        title="New Collection"
+        description="Discover the latest trends and styles"
+        buttonText="Shop Now"
+        buttonLink="#collection"
       />
 
       <ImageBanner 
