@@ -47,13 +47,9 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    // Use the structured output feature of Genkit prompts.
-    // Let any errors propagate up to the client component to be handled.
+    // Let Genkit's structured output handle validation.
+    // An error will be thrown automatically if the output doesn't match the schema.
     const { output } = await recommendationPrompt(input);
-    if (!output || typeof output.recommendations !== 'string') {
-        console.error("Style recommendation AI returned invalid output. Output:", output);
-        throw new Error("Style recommendation AI returned invalid output.");
-    }
-    return output;
+    return output!;
   }
 );

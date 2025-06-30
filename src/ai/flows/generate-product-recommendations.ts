@@ -88,13 +88,9 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    // Use the structured output feature of Genkit prompts.
-    // Let any errors propagate up to the client component to be handled.
+    // Let Genkit's structured output handle validation.
+    // An error will be thrown automatically if the output doesn't match the schema.
     const { output } = await recommendationPrompt(input);
-    if (!output || !Array.isArray(output.productIds)) {
-        console.error("Product recommendation AI returned invalid output. Output:", output);
-        throw new Error("Product recommendation AI returned invalid output.");
-    }
-    return output;
+    return output!;
   }
 );
