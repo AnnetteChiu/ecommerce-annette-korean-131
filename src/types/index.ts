@@ -6,6 +6,7 @@ export interface Product {
   imageUrl: string;
   purchaseUrl: string;
   category: string;
+  impressions: number;
   details?: {
     material?: string;
     fit?: string;

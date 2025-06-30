@@ -8,6 +8,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982110569605/7fcb6ef8a658d6ef/1454816676.jpg",
     "purchaseUrl": "https://example.com/buy/1",
     "category": "Bags",
+    "impressions": 2345,
     "details": {
       "material": "100% Vegan Leather, Cotton lining",
       "fit": "Dimensions: 15\" W x 12\" H x 5\" D",
@@ -22,6 +23,7 @@
     "imageUrl": "https://i4.codibook.net/files/1982112685804/edabfea5b35cf5fe/152972137.jpg",
     "purchaseUrl": "https://example.com/buy/2",
     "category": "Apparel",
+    "impressions": 5821,
     "details": {
       "material": "98% Cotton, 2% Elastane",
       "fit": "Relaxed fit with a straight leg. Model is 6'1\" and wearing a size 32.",
@@ -36,6 +38,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982102326425/f4e9d7b4c9211c72/1814420628.jpg",
     "purchaseUrl": "https://example.com/buy/3",
     "category": "Apparel",
+    "impressions": 8934,
     "details": {
       "material": "100% GOTS-certified organic cotton",
       "fit": "Classic crewneck fit. True to size.",
@@ -50,6 +53,7 @@
     "imageUrl": "https://i4.codibook.net/files/198211264802/a6bdedca4eceb1ef/1791833231.jpg",
     "purchaseUrl": "https://example.com/buy/4",
     "category": "Apparel",
+    "impressions": 3128,
     "details": {
       "material": "60% Wool, 40% Polyester",
       "fit": "Tailored fit, single-breasted design.",
@@ -64,6 +68,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982103119162/5f/1463450168.jpg",
     "purchaseUrl": "https://example.com/buy/5",
     "category": "Apparel",
+    "impressions": 4578,
     "details": {
       "material": "95% Viscose, 5% Spandex",
       "fit": "A-line silhouette, hits just above the knee.",
@@ -78,6 +83,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982111037202/d26e3ac3c73dda18/516944500.jpg",
     "purchaseUrl": "https://example.com/buy/6",
     "category": "Apparel",
+    "impressions": 6231,
     "details": {
       "material": "100% Cotton Poplin",
       "fit": "Slightly oversized fit with buttoned cuffs.",
@@ -92,6 +98,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982111046201/9d1bb9a33effcc85/2023912575.jpg",
     "purchaseUrl": "https://example.com/buy/7",
     "category": "Apparel",
+    "impressions": 2987,
     "details": {
       "material": "50% Merino Wool, 30% Nylon, 20% Acrylic",
       "fit": "Open-front, longline silhouette.",
@@ -106,6 +113,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982111057001/628075af5aea531d/556922438.jpg",
     "purchaseUrl": "https://example.com/buy/8",
     "category": "Apparel",
+    "impressions": 4123,
     "details": {
       "material": "70% Merino Wool, 30% Alpaca",
       "fit": "Relaxed, slightly cropped fit.",
@@ -120,6 +128,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982100285804/9c1b366c15143216/983095673.jpg",
     "purchaseUrl": "https://example.com/buy/9",
     "category": "Bags",
+    "impressions": 1890,
     "details": {
       "material": "Genuine Leather, Microsuede lining",
       "fit": "Dimensions: 13\" W x 10\" H x 6\" D. Includes detachable shoulder strap.",
@@ -134,6 +143,7 @@
     "imageUrl": "https://i4.codibook.net/files/1982112817488/bef9178d8d54aa30/340216035.jpg",
     "purchaseUrl": "https://example.com/buy/10",
     "category": "Apparel",
+    "impressions": 7894,
     "details": {
       "material": "65% Recycled Polyester, 32% Viscose, 3% Elastane",
       "fit": "Slim fit, high-waisted design with a front crease.",
@@ -148,6 +158,7 @@
     "imageUrl": "https://i4.codibook.net/files/1982111958801/8aa2bb557fb9ac3e/611526659.jpg",
     "purchaseUrl": "https://example.com/buy/13",
     "category": "Apparel",
+    "impressions": 4321,
     "details": {
       "material": "100% Cotton Flannel",
       "fit": "Regular fit. Can be worn as a shirt or light jacket.",
@@ -162,6 +173,7 @@
     "imageUrl": "https://i4.codibook.net/files/1982120421002/5d93fa7365d7311f/1601351912.jpg",
     "purchaseUrl": "https://example.com/buy/14",
     "category": "Apparel",
+    "impressions": 3987,
     "details": {
       "material": "80% Acrylic, 20% Wool",
       "fit": "Slim fit, perfect for layering.",
@@ -176,6 +188,7 @@
     "imageUrl": "https://i3.codibook.net/files/1981080878873/58/2107639184.jpg",
     "purchaseUrl": "https://example.com/buy/15",
     "category": "Apparel",
+    "impressions": 5123,
     "details": {
       "material": "100% Cashmere",
       "fit": "Classic fit. Ribbed hem and cuffs.",
@@ -190,6 +203,7 @@
     "imageUrl": "https://i4.codibook.net/files/1982111976805/33e76a122d46837d/1138209628.jpg",
     "purchaseUrl": "https://example.com/buy/16",
     "category": "Apparel",
+    "impressions": 4876,
     "details": {
       "material": "Water-resistant cotton blend",
       "fit": "Double-breasted with a waist belt for a customizable fit.",
@@ -204,6 +218,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982020612009/9ef1ac681413d2ae/582552392.jpg",
     "purchaseUrl": "https://example.com/buy/17",
     "category": "Apparel",
+    "impressions": 6789,
     "details": {
       "material": "80% Cotton, 20% Polyester Fleece",
       "fit": "Relaxed fit with a drawstring hood.",
@@ -218,6 +233,7 @@
     "imageUrl": "https://i3.codibook.net/files/1982100581063/88/1139720143.jpg",
     "purchaseUrl": "https://example.com/buy/18",
     "category": "Apparel",
+    "impressions": 7123,
     "details": {
       "material": "100% French Terry Cotton",
       "fit": "Standard fit with kangaroo pocket.",

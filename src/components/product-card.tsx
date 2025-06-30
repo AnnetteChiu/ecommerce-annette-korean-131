@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Product } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Eye } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -25,9 +26,15 @@ export function ProductCard({ product }: ProductCardProps) {
         </CardHeader>
         <CardContent className="p-4">
           <CardTitle className="text-lg font-headline leading-tight mb-1">{product.name}</CardTitle>
-          <p className="text-primary font-semibold text-lg">
-            ${product.price.toFixed(2)}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-primary font-semibold text-lg">
+              ${product.price.toFixed(2)}
+            </p>
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Eye className="w-4 h-4" />
+              <span>{product.impressions.toLocaleString()}</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </Link>
