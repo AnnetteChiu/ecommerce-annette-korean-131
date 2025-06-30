@@ -7,6 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { CartIcon } from './cart-icon';
 
 export function Header() {
   return (
@@ -56,6 +57,14 @@ export function Header() {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Documentation</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CartIcon />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Shopping Cart</p>
                   </TooltipContent>
                 </Tooltip>
               </div>

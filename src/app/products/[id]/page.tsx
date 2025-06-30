@@ -1,10 +1,15 @@
+'use client';
+
+import { useState } from 'react';
 import { getProductById } from '@/lib/products';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ShoppingCart, Plus, Minus } from 'lucide-react';
 import { RecommendedProducts } from '@/components/recommended-products';
+import { useCart } from '@/context/cart-context';
 import {
   Accordion,
   AccordionContent,
@@ -19,10 +24,27 @@ type ProductPageProps = {
 };
 
 export default function ProductPage({ params }: ProductPageProps) {
+  const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
   const product = getProductById(params.id);
 
   if (!product) {
     notFound();
+  }
+  
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, quantity);
+    }
+  };
+
+  const handleQuantityChange = (amount: number) => {
+    setQuantity(prev => {
+        const newQuantity = prev + amount;
+        if (newQuantity < 1) return 1;
+        if (product && newQuantity > product.stock) return product.stock;
+        return newQuantity;
+    })
   }
 
   const hasDetails = product.details && (product.details.material || product.details.fit || product.details.care);
@@ -60,12 +82,34 @@ export default function ProductPage({ params }: ProductPageProps) {
           <div className="min-h-[24px] mb-6">
             {getStockDisplay()}
           </div>
-          <Button asChild size="lg" className="w-full md:w-auto" disabled={product.stock === 0}>
-            <a href={product.purchaseUrl} target="_blank" rel="noopener noreferrer">
-              {product.stock === 0 ? 'Out of Stock' : 'Buy Now'}
-              {product.stock > 0 && <ExternalLink className="ml-2" />}
-            </a>
-          </Button>
+          
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center border rounded-md">
+              <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
+                <Minus />
+              </Button>
+              <Input
+                type="number"
+                className="w-16 text-center border-0 focus-visible:ring-0"
+                value={quantity}
+                onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value) && value >= 1 && product && value <= product.stock) {
+                        setQuantity(value);
+                    }
+                }}
+                min="1"
+                max={product.stock}
+              />
+              <Button variant="ghost" size="icon" onClick={() => handleQuantityChange(1)} disabled={!product || quantity >= product.stock}>
+                <Plus />
+              </Button>
+            </div>
+            <Button size="lg" className="flex-grow" onClick={handleAddToCart} disabled={product.stock === 0}>
+              <ShoppingCart className="mr-2" />
+              Add to Cart
+            </Button>
+          </div>
 
           {hasDetails && (
             <Accordion type="single" collapsible className="w-full mt-8">
