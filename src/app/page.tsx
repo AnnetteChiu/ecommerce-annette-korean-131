@@ -5,6 +5,8 @@ import { StoryThumbnail } from '@/components/story-thumbnail';
 import { BrandWeek } from '@/components/brand-week';
 import { SaleBanner } from '@/components/sale-banner';
 import { ImageBanner } from '@/components/image-banner';
+import { SideBanner } from '@/components/side-banner';
+import { StyleRecommender } from '@/components/style-recommender';
 
 export default function Home() {
   const products = getProducts();
@@ -16,29 +18,38 @@ export default function Home() {
 
       <ImageBanner />
 
-      <BrandWeek />
+      <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
+        <main className="lg:col-span-3 space-y-16 lg:order-last">
+          <BrandWeek />
       
-      {stories.length > 0 && (
-        <section>
-          <h2 className="text-3xl font-headline font-bold mb-8 text-center">Style Stories</h2>
-          <div className="flex justify-center items-start gap-x-6 md:gap-x-8 overflow-x-auto pb-4">
-            {stories.map((story) => (
-              <div key={story.id} className="flex-shrink-0">
-                <StoryThumbnail story={story} />
+          {stories.length > 0 && (
+            <section>
+              <h2 className="text-3xl font-headline font-bold mb-8 text-center">Style Stories</h2>
+              <div className="flex justify-center items-start gap-x-6 md:gap-x-8 overflow-x-auto pb-4">
+                {stories.map((story) => (
+                  <div key={story.id} className="flex-shrink-0">
+                    <StoryThumbnail story={story} />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </section>
-      )}
+            </section>
+          )}
 
-      <section id="collection">
-        <h2 className="text-4xl font-headline font-bold mb-8 text-center">Our Collection</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      </section>
+          <section id="collection">
+            <h2 className="text-4xl font-headline font-bold mb-8 text-center">Our Collection</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </section>
+        </main>
+        
+        <aside className="lg:col-span-1 space-y-8 sticky top-24 self-start">
+          <SideBanner />
+          <StyleRecommender />
+        </aside>
+      </div>
     </div>
   );
 }
