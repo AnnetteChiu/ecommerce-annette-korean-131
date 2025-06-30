@@ -22,7 +22,7 @@ const FlowInputSchema = z.object({
   photoDataUri: z
     .string()
     .describe(
-      "A photo to search with, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "A photo to search with, as a a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
   count: z.number().optional().default(4).describe('The number of recommendations to return.'),
   availableProducts: z.array(ProductForPromptSchema).describe('The catalog of available products to recommend from.'),
@@ -80,11 +80,15 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    if (!output || !output.productIds) {
-      console.warn("Find similar products AI returned invalid or empty output. Using default.");
-      return defaultResponse;
+    try {
+      const { output } = await recommendationPrompt(input);
+      if (!output || !output.productIds) {
+        throw new Error("Find similar products AI returned invalid or empty output.");
+      }
+      return output;
+    } catch (e) {
+      console.error("Error in findSimilarProductsFlow", e);
+      throw e;
     }
-    return output;
   }
 );

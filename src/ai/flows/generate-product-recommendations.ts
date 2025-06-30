@@ -52,11 +52,10 @@ export async function generateProductRecommendations(input: GenerateProductRecom
       return defaultRecommendation;
     }
     
-    const result = await productRecommendationFlow({ 
+    return await productRecommendationFlow({ 
       ...input, 
       availableProducts,
     });
-    return result;
   } catch (error) {
     console.error("Error in generateProductRecommendations:", error);
     throw error;
@@ -95,11 +94,15 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    if (!output || !output.productIds) {
-        console.warn("Product recommendation AI returned invalid or empty output. Using default.");
-        return defaultRecommendation;
+    try {
+      const { output } = await recommendationPrompt(input);
+      if (!output || !output.productIds) {
+          throw new Error("Product recommendation AI returned invalid or empty output.");
+      }
+      return output;
+    } catch(e) {
+        console.error("Error in productRecommendationFlow", e);
+        throw e;
     }
-    return output;
   }
 );

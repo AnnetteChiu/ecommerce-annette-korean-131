@@ -20,8 +20,6 @@ const GenerateStyleRecommendationOutputSchema = z.object({
 export type GenerateStyleRecommendationInput = z.infer<typeof GenerateStyleRecommendationInputSchema>;
 export type GenerateStyleRecommendationOutput = z.infer<typeof GenerateStyleRecommendationOutputSchema>;
 
-const defaultRecommendation = { recommendations: 'Could not generate a recommendation at this time. Please browse some items and try again.' };
-
 export async function generateStyleRecommendation(input: GenerateStyleRecommendationInput): Promise<GenerateStyleRecommendationOutput> {
   if (!input.browsingHistory || input.browsingHistory.trim() === '') {
       return { recommendations: 'Browse some products first to get a personalized style recommendation.' };
@@ -54,11 +52,15 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    if (!output || !output.recommendations) {
-        console.warn("Style recommendation AI returned invalid or empty output. Using default.");
-        return defaultRecommendation;
+    try {
+      const { output } = await recommendationPrompt(input);
+      if (!output || !output.recommendations) {
+          throw new Error("Style recommendation AI returned invalid or empty output.");
+      }
+      return output;
+    } catch (e) {
+      console.error("Error in styleRecommendationFlow", e);
+      throw e;
     }
-    return output;
   }
 );
