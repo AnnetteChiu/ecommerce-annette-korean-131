@@ -1,15 +1,21 @@
 import Image from 'next/image';
 
-export function ImageBanner() {
+interface ImageBannerProps {
+  src: string;
+  alt: string;
+  'data-ai-hint': string;
+}
+
+export function ImageBanner({ src, alt, 'data-ai-hint': dataAiHint }: ImageBannerProps) {
   return (
     <section>
       <div className="relative aspect-[3/1] w-full overflow-hidden rounded-lg shadow-lg">
         <Image
-          src="https://i4.codibook.net/files/1982120751817/d87a70fe9b9ff7/1124494606.jpg"
-          alt="New Collection Banner"
+          src={src}
+          alt={alt}
           fill
           className="object-cover"
-          data-ai-hint="fashion collection"
+          data-ai-hint={dataAiHint}
         />
       </div>
     </section>

@@ -16,7 +16,17 @@ export default function Home() {
     <div className="space-y-16">
       <SaleBanner />
 
-      <ImageBanner />
+      <ImageBanner 
+        src="https://i4.codibook.net/files/1982120751817/d87a70fe9b9ff7/1124494606.jpg"
+        alt="New Collection Banner"
+        data-ai-hint="fashion collection"
+      />
+
+      <ImageBanner
+        src="https://i4.codibook.net/files/1982120526402/61ee365c50a1aba5/1199807170.jpg"
+        alt="Stylish fashion banner"
+        data-ai-hint="fashion style"
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
         <main className="lg:col-span-3 space-y-16 lg:order-last">
