@@ -95,8 +95,8 @@ const productRecommendationFlow = ai.defineFlow(
     try {
       // Use the structured output feature of Genkit prompts.
       const { output } = await recommendationPrompt(input);
-      if (!output) {
-          throw new Error("Product recommendation AI returned empty output.");
+      if (!output || !Array.isArray(output.productIds)) {
+          throw new Error("Product recommendation AI returned invalid output.");
       }
       return output;
     } catch (e) {

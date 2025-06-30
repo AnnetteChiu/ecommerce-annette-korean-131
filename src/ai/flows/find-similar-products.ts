@@ -81,8 +81,8 @@ const findSimilarProductsFlow = ai.defineFlow(
     try {
       // Use the structured output feature of Genkit prompts.
       const { output } = await recommendationPrompt(input);
-      if (!output) {
-        throw new Error("Find similar products AI returned empty output.");
+      if (!output || !Array.isArray(output.productIds)) {
+        throw new Error("Find similar products AI returned invalid output.");
       }
       return output;
     } catch (e) {
