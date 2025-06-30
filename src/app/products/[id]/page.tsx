@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ProductViewTracker } from '@/components/product-view-tracker';
 import { ExternalLink } from 'lucide-react';
 import { RecommendedProducts } from '@/components/recommended-products';
 import {
@@ -30,7 +29,6 @@ export default function ProductPage({ params }: ProductPageProps) {
 
   return (
     <>
-      <ProductViewTracker productId={product.id} productName={product.name} />
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="overflow-hidden rounded-lg">
           <Image
@@ -87,7 +85,7 @@ export default function ProductPage({ params }: ProductPageProps) {
 
         </div>
       </div>
-      <RecommendedProducts currentProductId={product.id} />
+      <RecommendedProducts currentProductId={product.id} currentProductName={product.name} />
     </>
   );
 }

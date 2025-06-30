@@ -9,9 +9,16 @@ import { Loader2 } from 'lucide-react';
 
 type RecommendedProductsProps = {
   currentProductId: string;
+  currentProductName: string;
 };
 
-export function RecommendedProducts({ currentProductId }: RecommendedProductsProps) {
+const defaultHistory = [
+  { id: '2', name: 'Relaxed Fit Blue Jeans' },
+  { id: '3', name: 'Organic Cotton Tee' },
+  { id: '17', name: 'Casual Zip-Up Hoodie' },
+];
+
+export function RecommendedProducts({ currentProductId, currentProductName }: RecommendedProductsProps) {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +29,31 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
       try {
         let history = [];
         try {
-          history = JSON.parse(sessionStorage.getItem('browsingHistory') || '[]');
+          let historyString = sessionStorage.getItem('browsingHistory');
+      
+          // If no history exists, preload with default data for a better "first run" experience
+          if (!historyString) {
+            sessionStorage.setItem('browsingHistory', JSON.stringify(defaultHistory));
+            historyString = sessionStorage.getItem('browsingHistory');
+          }
+      
+          const parsedHistory = JSON.parse(historyString || '[]');
+
+          const MAX_HISTORY = 10;
+          const productInHistory = parsedHistory.find((item: { id: string }) => item.id === currentProductId);
+          
+          let updatedHistory = parsedHistory;
+          if (!productInHistory) {
+            updatedHistory = [...parsedHistory, { id: currentProductId, name: currentProductName }];
+            if (updatedHistory.length > MAX_HISTORY) {
+              updatedHistory.shift(); 
+            }
+            sessionStorage.setItem('browsingHistory', JSON.stringify(updatedHistory));
+          }
+          history = updatedHistory;
+
         } catch (e) {
-          console.error("Failed to parse browsing history, proceeding with empty history.", e);
+          console.error("Could not update/read browsing history, proceeding with empty history.", e);
         }
 
         const result = await generateProductRecommendations({
@@ -46,7 +75,7 @@ export function RecommendedProducts({ currentProductId }: RecommendedProductsPro
         setError("Could not load recommendations.");
       }
     });
-  }, [currentProductId]);
+  }, [currentProductId, currentProductName]);
 
   if (isPending && recommendations.length === 0) {
     return (
