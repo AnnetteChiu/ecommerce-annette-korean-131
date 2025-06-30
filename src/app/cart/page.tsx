@@ -96,8 +96,10 @@ export default function CartPage() {
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">
-            <Button size="lg" className="w-full" onClick={() => alert('Proceeding to checkout!')}>
-              Proceed to Checkout
+            <Button size="lg" className="w-full" asChild>
+              <Link href="/checkout">
+                Proceed to Checkout
+              </Link>
             </Button>
             <Button variant="outline" className="w-full" onClick={clearCart}>
                 Clear Cart
