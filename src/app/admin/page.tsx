@@ -87,13 +87,18 @@ export default function AdminPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-center text-muted-foreground">
+                  Hint: The password is 'admin123'
+                </p>
+              </div>
               <Button type="submit" className="w-full" disabled={isLoggingIn}>
                 {isLoggingIn ? <Loader2 className="animate-spin" /> : <KeyRound />}
                 Log In
