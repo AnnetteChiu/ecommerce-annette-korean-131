@@ -4,6 +4,7 @@ import { ProductCard } from '@/components/product-card';
 import { StoryThumbnail } from '@/components/story-thumbnail';
 import { BrandWeek } from '@/components/brand-week';
 import { SaleBanner } from '@/components/sale-banner';
+import { ImageBanner } from '@/components/image-banner';
 
 export default function Home() {
   const products = getProducts();
@@ -12,6 +13,8 @@ export default function Home() {
   return (
     <div className="space-y-16">
       <SaleBanner />
+
+      <ImageBanner />
 
       <BrandWeek />
       
