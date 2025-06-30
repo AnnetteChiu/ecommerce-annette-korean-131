@@ -3,8 +3,6 @@
  * @fileOverview An AI agent for finding similar products based on an image.
  *
  * - findSimilarProducts - A function that finds products similar to what's in a given image.
- * - FindSimilarProductsInput - The input type for the exported function.
- * - FindSimilarProductsOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -81,11 +79,19 @@ const findSimilarProductsFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !output.productIds) {
+      const response = await recommendationPrompt.generate(input);
+      const rawText = response.text();
+
+      // Clean up potential markdown formatting around the JSON response.
+      const cleanedText = rawText.replace(/```json|```/g, '').trim();
+
+      const parsed = JSON.parse(cleanedText);
+      const validatedOutput = FindSimilarProductsOutputSchema.parse(parsed);
+
+      if (!validatedOutput || !validatedOutput.productIds) {
         throw new Error("Find similar products AI returned invalid or empty output.");
       }
-      return output;
+      return validatedOutput;
     } catch (e) {
       console.error("Error in findSimilarProductsFlow", e);
       throw e;

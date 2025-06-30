@@ -3,8 +3,6 @@
  * @fileOverview An AI agent for generating product recommendations.
  *
  * - generateProductRecommendations - A function that generates product recommendations based on browsing history and the current product.
- * - GenerateProductRecommendationsInput - The input type for the exported function.
- * - GenerateProductRecommendationsOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -95,11 +93,19 @@ const productRecommendationFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !output.productIds) {
-          throw new Error("Product recommendation AI returned invalid or empty output.");
+      const response = await recommendationPrompt.generate(input);
+      const rawText = response.text();
+
+      // Clean up potential markdown formatting around the JSON response.
+      const cleanedText = rawText.replace(/```json|```/g, '').trim();
+
+      const parsed = JSON.parse(cleanedText);
+      const validatedOutput = GenerateProductRecommendationsOutputSchema.parse(parsed);
+
+      if (!validatedOutput || !validatedOutput.productIds) {
+        throw new Error("Product recommendation AI returned invalid or empty output.");
       }
-      return output;
+      return validatedOutput;
     } catch(e) {
         console.error("Error in productRecommendationFlow", e);
         throw e;

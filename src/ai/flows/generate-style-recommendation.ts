@@ -3,8 +3,6 @@
  * @fileOverview An AI agent for generating style recommendations.
  *
  * - generateStyleRecommendation - A function that generates style recommendations based on browsing history.
- * - GenerateStyleRecommendationInput - The input type for the exported function.
- * - GenerateStyleRecommendationOutput - The return type for the function.
  */
 
 import {ai} from '@/ai/genkit';
@@ -37,12 +35,13 @@ const recommendationPrompt = ai.definePrompt({
     name: 'styleRecommendationPrompt',
     input: { schema: GenerateStyleRecommendationInputSchema },
     output: { schema: GenerateStyleRecommendationOutputSchema },
+    system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
     prompt: `You are an e-commerce style advisor. Your goal is to provide a short, personalized style recommendation to a user based on their browsing history.
 
 The user has viewed the following products:
 {{browsingHistory}}
 
-Based on these items, generate a brief (2-3 sentences) style recommendation. For example, if they viewed dresses and heels, you could suggest a "chic, evening look." If they viewed jeans and t-shirts, you could suggest a "classic, casual style."`
+Based on these items, generate a brief (2-3 sentences) style recommendation.`
 });
 
 const styleRecommendationFlow = ai.defineFlow(
@@ -53,11 +52,19 @@ const styleRecommendationFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const { output } = await recommendationPrompt(input);
-      if (!output || !output.recommendations) {
+      const response = await recommendationPrompt.generate(input);
+      const rawText = response.text();
+
+      // Clean up potential markdown formatting around the JSON response.
+      const cleanedText = rawText.replace(/```json|```/g, '').trim();
+      
+      const parsed = JSON.parse(cleanedText);
+      const validatedOutput = GenerateStyleRecommendationOutputSchema.parse(parsed);
+
+      if (!validatedOutput || !validatedOutput.recommendations) {
           throw new Error("Style recommendation AI returned invalid or empty output.");
       }
-      return output;
+      return validatedOutput;
     } catch (e) {
       console.error("Error in styleRecommendationFlow", e);
       throw e;
