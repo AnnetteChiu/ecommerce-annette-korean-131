@@ -39,6 +39,12 @@ export default function Home() {
         data-ai-hint="fashion style"
       />
 
+      <ImageBanner 
+        src="https://placehold.co/1200x800.png"
+        alt="Collage of a fashion model in two different stylish outfits"
+        data-ai-hint="fashion collage"
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
         <main className="lg:col-span-3 space-y-16 lg:order-last">
           <BrandWeek />
