@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { getProductById } from '@/lib/products';
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,15 +17,10 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-type ProductPageProps = {
-  params: {
-    id: string;
-  };
-};
-
-export default function ProductPage({ params }: ProductPageProps) {
+export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const params = useParams<{ id: string }>();
   const product = getProductById(params.id);
 
   if (!product) {
