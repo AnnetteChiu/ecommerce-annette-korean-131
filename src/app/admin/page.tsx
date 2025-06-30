@@ -37,10 +37,14 @@ export default function AdminPage() {
     setIsLoggingIn(true);
     // In a real app, this would be a secure API call.
     // For this prototype, we'll use a hardcoded password.
-    if (password === 'admin123') {
+    if (password.trim() === 'admin123') {
       try {
         localStorage.setItem('isAdminLoggedIn', 'true');
         setIsAuthenticated(true);
+        toast({
+          title: 'Login Successful',
+          description: 'Welcome to the admin dashboard!',
+        });
       } catch (error) {
         toast({
           variant: 'destructive',
