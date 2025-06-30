@@ -24,6 +24,7 @@ export default function Home() {
         description="Discover the latest trends and styles"
         buttonText="Shop Now"
         buttonLink="#collection"
+        layout="left"
       />
 
       <ImageBanner 
