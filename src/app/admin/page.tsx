@@ -24,11 +24,11 @@ export default function AdminPage() {
   // Check auth status on mount
   useEffect(() => {
     try {
-      if (sessionStorage.getItem('isAdminLoggedIn') === 'true') {
+      if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         setIsAuthenticated(true);
       }
     } catch (error) {
-      console.error('Could not access sessionStorage.', error);
+      console.error('Could not access localStorage.', error);
     }
   }, []);
 
@@ -39,13 +39,13 @@ export default function AdminPage() {
     // For this prototype, we'll use a hardcoded password.
     if (password === 'admin123') {
       try {
-        sessionStorage.setItem('isAdminLoggedIn', 'true');
+        localStorage.setItem('isAdminLoggedIn', 'true');
         setIsAuthenticated(true);
       } catch (error) {
         toast({
           variant: 'destructive',
           title: 'Login Failed',
-          description: 'Could not access session storage. Please enable it in your browser.',
+          description: 'Could not access local storage. Please enable it in your browser.',
         });
       }
     } else {
