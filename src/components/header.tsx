@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Search } from 'lucide-react';
+import { Search, Book } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -30,6 +30,19 @@ export function Header() {
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Search by Image</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild>
+                      <Link href="/docs">
+                        <Book className="h-5 w-5" />
+                        <span className="sr-only">Documentation</span>
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Documentation</p>
                   </TooltipContent>
                 </Tooltip>
               </div>
