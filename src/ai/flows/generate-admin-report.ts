@@ -17,18 +17,18 @@ const AdminReportOutputSchema = z.object({
     name: z.string(), 
     impressions: z.number(), 
     reason: z.string().describe('A brief explanation for why this product is performing well.') 
-  })).length(3).describe('The top 3 performing products by impressions.'),
+  })).describe('The top performing products by impressions (up to 3).'),
   underperforming: z.array(z.object({ 
     productId: z.string(), 
     name: z.string(), 
     impressions: z.number(), 
     reason: z.string().describe('A brief explanation for why this product might be underperforming.')
-  })).length(3).describe('The 3 products with the lowest impressions.'),
+  })).describe('The products with the lowest impressions (up to 3).'),
   categoryPerformance: z.array(z.object({ 
     category: z.string(), 
     totalImpressions: z.number() 
   })).describe('An array summarizing total impressions for each product category.'),
-  suggestions: z.array(z.string()).length(3).describe('Three actionable marketing or inventory suggestions based on the data.'),
+  suggestions: z.array(z.string()).describe('A list of actionable marketing or inventory suggestions based on the data.'),
 });
 
 export type AdminReportOutput = z.infer<typeof AdminReportOutputSchema>;
@@ -58,8 +58,8 @@ const reportPrompt = ai.definePrompt({
     system: "You are a business intelligence analyst for an e-commerce fashion store. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
     prompt: `Analyze the following product data, which includes product ID, name, category, and impression count.
 Generate a concise business report.
-Identify top and underperforming products. Sum up impressions by category.
-Provide a brief summary and three actionable suggestions for marketing or inventory based on your analysis.
+Identify top and underperforming products (around 3 of each). Sum up impressions by category.
+Provide a brief summary and a few actionable suggestions for marketing or inventory based on your analysis.
 
 Product Data:
 {{#each products}}
