@@ -17,7 +17,7 @@ export default function Home() {
       <SaleBanner />
 
       <ImageBanner 
-        src="https://i4.codibook.net/files/1982120751817/d87a70fe9b9ff7/1124494606.jpg"
+        src="https://i4.codibook.net/files/1982120615601/bcb491b3c8b53337/271340960.jpg"
         alt="New Collection Banner"
         data-ai-hint="fashion collection"
       />
