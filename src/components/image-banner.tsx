@@ -9,7 +9,7 @@ interface ImageBannerProps {
 export function ImageBanner({ src, alt, 'data-ai-hint': dataAiHint }: ImageBannerProps) {
   return (
     <section>
-      <div className="relative aspect-[3/1] w-full overflow-hidden rounded-lg shadow-lg">
+      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-lg shadow-lg">
         <Image
           src={src}
           alt={alt}
