@@ -79,21 +79,15 @@ const findSimilarProductsFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      const response = await recommendationPrompt.generate(input);
-      const rawText = response.text();
-
-      // Clean up potential markdown formatting around the JSON response.
-      const cleanedText = rawText.replace(/```json|```/g, '').trim();
-
-      const parsed = JSON.parse(cleanedText);
-      const validatedOutput = FindSimilarProductsOutputSchema.parse(parsed);
-
-      if (!validatedOutput || !validatedOutput.productIds) {
-        throw new Error("Find similar products AI returned invalid or empty output.");
+      // Use the structured output feature of Genkit prompts.
+      const { output } = await recommendationPrompt(input);
+      if (!output) {
+        throw new Error("Find similar products AI returned empty output.");
       }
-      return validatedOutput;
+      return output;
     } catch (e) {
       console.error("Error in findSimilarProductsFlow", e);
+      // Re-throw the error to be caught by the UI component
       throw e;
     }
   }
