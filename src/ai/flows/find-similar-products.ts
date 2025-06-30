@@ -37,23 +37,19 @@ export type FindSimilarProductsOutput = z.infer<typeof FindSimilarProductsOutput
 const defaultResponse = { productIds: [] };
 
 export async function findSimilarProducts(input: FindSimilarProductsInput): Promise<FindSimilarProductsOutput> {
-  try {
-    const allProducts = getProducts();
-    const availableProducts = allProducts
-      .map(({ id, name, description, category }) => ({ id, name, description, category }));
-  
-    if (availableProducts.length === 0) {
-      return defaultResponse;
-    }
-    
-    return await findSimilarProductsFlow({ 
-      ...input, 
-      availableProducts,
-    });
-  } catch (error) {
-    console.error("Error in findSimilarProducts:", error);
-    throw error;
+  const allProducts = getProducts();
+  const availableProducts = allProducts
+    .map(({ id, name, description, category }) => ({ id, name, description, category }));
+
+  if (availableProducts.length === 0) {
+    return defaultResponse;
   }
+  
+  // Let errors from the flow propagate up to the calling component.
+  return await findSimilarProductsFlow({ 
+    ...input, 
+    availableProducts,
+  });
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -78,17 +74,13 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    try {
-      // Use the structured output feature of Genkit prompts.
-      const { output } = await recommendationPrompt(input);
-      if (!output || !Array.isArray(output.productIds)) {
-        throw new Error("Find similar products AI returned invalid output.");
-      }
-      return output;
-    } catch (e) {
-      console.error("Error in findSimilarProductsFlow", e);
-      // Re-throw the error to be caught by the UI component
-      throw e;
+    // Use the structured output feature of Genkit prompts.
+    // Let any errors propagate up to the client component to be handled.
+    const { output } = await recommendationPrompt(input);
+    if (!output || !Array.isArray(output.productIds)) {
+      console.error("Find similar products AI returned invalid output. Output:", output);
+      throw new Error("Find similar products AI returned invalid output.");
     }
+    return output;
   }
 );

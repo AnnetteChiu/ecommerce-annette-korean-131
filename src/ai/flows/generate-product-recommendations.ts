@@ -39,7 +39,6 @@ export type GenerateProductRecommendationsOutput = z.infer<typeof GenerateProduc
 const defaultRecommendation = { productIds: [] };
 
 export async function generateProductRecommendations(input: GenerateProductRecommendationsInput): Promise<GenerateProductRecommendationsOutput> {
-  try {
     const allProducts = getProducts();
     
     const availableProducts = allProducts
@@ -50,14 +49,11 @@ export async function generateProductRecommendations(input: GenerateProductRecom
       return defaultRecommendation;
     }
     
+    // Let errors from the flow propagate up to the calling component.
     return await productRecommendationFlow({ 
       ...input, 
       availableProducts,
     });
-  } catch (error) {
-    console.error("Error in generateProductRecommendations:", error);
-    throw error;
-  }
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -92,17 +88,13 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    try {
-      // Use the structured output feature of Genkit prompts.
-      const { output } = await recommendationPrompt(input);
-      if (!output || !Array.isArray(output.productIds)) {
-          throw new Error("Product recommendation AI returned invalid output.");
-      }
-      return output;
-    } catch (e) {
-      console.error("Error in productRecommendationFlow", e);
-      // Re-throw the error to be caught by the UI component
-      throw e;
+    // Use the structured output feature of Genkit prompts.
+    // Let any errors propagate up to the client component to be handled.
+    const { output } = await recommendationPrompt(input);
+    if (!output || !Array.isArray(output.productIds)) {
+        console.error("Product recommendation AI returned invalid output. Output:", output);
+        throw new Error("Product recommendation AI returned invalid output.");
     }
+    return output;
   }
 );

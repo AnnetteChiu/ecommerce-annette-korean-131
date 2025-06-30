@@ -23,12 +23,8 @@ export async function generateStyleRecommendation(input: GenerateStyleRecommenda
       return { recommendations: 'Browse some products first to get a personalized style recommendation.' };
   }
 
-  try {
-    return await styleRecommendationFlow(input);
-  } catch (error) {
-    console.error("Error in generateStyleRecommendation:", error);
-    throw error;
-  }
+  // Let errors from the flow propagate up to the calling component.
+  return await styleRecommendationFlow(input);
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -51,17 +47,13 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    try {
-      // Use the structured output feature of Genkit prompts.
-      const { output } = await recommendationPrompt(input);
-      if (!output || typeof output.recommendations !== 'string') {
-          throw new Error("Style recommendation AI returned invalid output.");
-      }
-      return output;
-    } catch (e) {
-      console.error("Error in styleRecommendationFlow", e);
-      // Re-throw the error to be caught by the UI component
-      throw e;
+    // Use the structured output feature of Genkit prompts.
+    // Let any errors propagate up to the client component to be handled.
+    const { output } = await recommendationPrompt(input);
+    if (!output || typeof output.recommendations !== 'string') {
+        console.error("Style recommendation AI returned invalid output. Output:", output);
+        throw new Error("Style recommendation AI returned invalid output.");
     }
+    return output;
   }
 );
