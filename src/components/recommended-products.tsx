@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
@@ -6,6 +7,7 @@ import { getProductById } from '@/lib/products';
 import { ProductCard } from './product-card';
 import type { Product } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 type RecommendedProductsProps = {
   currentProductId: string;
@@ -15,6 +17,7 @@ type RecommendedProductsProps = {
 export function RecommendedProducts({ currentProductId, currentProductName }: RecommendedProductsProps) {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
 
   useEffect(() => {
     startTransition(async () => {
@@ -27,14 +30,12 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
           console.error("Could not read browsing history, proceeding with empty history.", e);
         }
 
-        // The server flow is now self-healing and will always return product IDs.
         const result = await generateProductRecommendations({
           currentProductId,
           browsingHistory: history,
           count: 4,
         });
 
-        // We can be confident the server returned valid IDs, so we just map them.
         const recommendedProducts = result.productIds
           .map(id => getProductById(id))
           .filter((p): p is Product => !!p);
@@ -42,13 +43,22 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
         setRecommendations(recommendedProducts);
 
       } catch (error) {
-        // This catch block is now only for catastrophic errors (e.g., network failure).
-        // In this case, we'll just log the error and show nothing.
-        console.error('Failed to fetch recommendations due to a server or network error:', error);
-        setRecommendations([]); // Ensure no stale recommendations are shown
+        console.error('Failed to fetch recommendations:', error);
+        let description = "We couldn't find recommendations at this time.";
+        if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
+            description = 'The Google AI API key is not configured correctly. Please see the documentation for instructions.';
+        }
+        
+        toast({
+          variant: 'destructive',
+          title: 'Could Not Load Recommendations',
+          description: description,
+        });
+        
+        setRecommendations([]);
       }
     });
-  }, [currentProductId, currentProductName]);
+  }, [currentProductId, currentProductName, toast]);
 
   if (isPending && recommendations.length === 0) {
     return (
