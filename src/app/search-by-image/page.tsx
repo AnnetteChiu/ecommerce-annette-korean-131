@@ -72,7 +72,7 @@ export default function SearchByImagePage() {
       const savedSearch = localStorage.getItem('visualSearch');
       if (savedSearch) {
         const { imageDataUri: savedImageDataUri, recommendationIds } = JSON.parse(savedSearch);
-        if (savedImageDataUri && recommendationIds && Array.isArray(recommendationIds) && recommendationIds.length > 0) {
+        if (savedImageDataUri && Array.isArray(recommendationIds) && recommendationIds.length > 0) {
           setImagePreview(savedImageDataUri);
           setImageDataUri(savedImageDataUri);
 
@@ -86,6 +86,8 @@ export default function SearchByImagePage() {
           } else {
             localStorage.removeItem('visualSearch');
           }
+        } else {
+          localStorage.removeItem('visualSearch');
         }
       }
     } catch (error) {
@@ -107,11 +109,11 @@ export default function SearchByImagePage() {
       }
       
       // Clear previous search from state and storage
-      localStorage.removeItem('visualSearch');
       setRecommendations([]);
       setSearchPerformed(false);
       setImageDataUri(null); // Reset data URI while processing
       setImagePreview(URL.createObjectURL(file)); // Show preview immediately
+      localStorage.removeItem('visualSearch');
 
       try {
         const compressedDataUri = await resizeAndCompressImage(file);
@@ -128,6 +130,17 @@ export default function SearchByImagePage() {
       }
     }
   };
+  
+  const showFallback = (message: string) => {
+    toast({
+        variant: 'destructive',
+        title: 'Search Unavailable',
+        description: message,
+    });
+    const fallbackProducts = getProducts().slice(0, 4);
+    setRecommendations(fallbackProducts);
+    localStorage.removeItem('visualSearch');
+  }
 
   const handleSearch = () => {
     if (!imageDataUri) {
@@ -146,46 +159,37 @@ export default function SearchByImagePage() {
           count: 4,
         });
         
-        // We can now trust the server to always return a valid list of product IDs.
-        const recommendedProducts = result.productIds
-          .map(id => getProductById(id))
-          .filter((p): p is Product => !!p); // Filter is a final safeguard.
-        
-        // This condition should now be unreachable, but we leave the UI just in case.
-        if (recommendedProducts.length === 0) {
-            // This is unexpected, as the server should always return valid IDs or fallbacks.
-            console.error("Client received an empty list of recommendations from a supposedly robust endpoint.");
-            toast({
-                variant: 'destructive',
-                title: 'An Unexpected Error Occurred',
-                description: 'Please try again. Displaying popular items as a fallback.',
-            });
-            const fallbackProducts = getProducts().slice(0, 4);
-            setRecommendations(fallbackProducts);
+        // This is our primary safety net. If the server returns anything
+        // other than a valid list of product IDs, we show the fallback.
+        if (result?.productIds && result.productIds.length > 0) {
+          const recommendedProducts = result.productIds
+            .map(id => getProductById(id))
+            .filter((p): p is Product => !!p); // Filter is a final safeguard.
+          
+          if (recommendedProducts.length > 0) {
+            setRecommendations(recommendedProducts);
+            // Save the successful search
+            try {
+              localStorage.setItem('visualSearch', JSON.stringify({
+                imageDataUri: imageDataUri,
+                recommendationIds: result.productIds,
+              }));
+            } catch (e) {
+              console.error("Failed to save visual search results to localStorage", e);
+            }
+          } else {
+            // This case handles when the AI returns only invalid IDs.
+            showFallback('Our AI stylist could not find a match. Please try another image.');
+          }
         } else {
-             setRecommendations(recommendedProducts);
-        }
-
-        try {
-          // Save the results that were actually found and returned by the server
-          localStorage.setItem('visualSearch', JSON.stringify({
-            imageDataUri: imageDataUri,
-            recommendationIds: result.productIds,
-          }));
-        } catch (e) {
-          console.error("Failed to save visual search results to localStorage", e);
+          // This case handles a null response, empty productIds, etc.
+          showFallback('The server returned an unexpected response. Please try again.');
         }
 
       } catch (error) {
         // This catch block is for catastrophic failures like network errors.
         console.error('Visual search request failed catastrophically:', error);
-        toast({
-          variant: 'destructive',
-          title: 'Search Unavailable',
-          description: 'Could not connect to the server. Showing some popular items instead.',
-        });
-        const fallbackProducts = getProducts().slice(0, 4);
-        setRecommendations(fallbackProducts);
+        showFallback('Could not connect to the server. Showing popular items instead.');
       }
     });
   };
@@ -240,7 +244,8 @@ export default function SearchByImagePage() {
             <p className="text-muted-foreground">Analyzing your image...</p>
         </div>
       )}
-
+      
+      {/* This "No Matches" UI is now effectively unreachable, because recommendations will always be populated with a fallback. We leave it as a deep failsafe. */}
       {searchPerformed && !isPending && recommendations.length === 0 && (
         <div className="w-full mt-8 text-center border rounded-lg p-12 bg-muted/50">
           <ImageOff className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
@@ -251,7 +256,9 @@ export default function SearchByImagePage() {
 
       {recommendations.length > 0 && (
         <div className="w-full mt-8">
-            <h2 className="text-3xl font-headline font-bold mb-8 text-center">Our Recommendations</h2>
+            <h2 className="text-3xl font-headline font-bold mb-8 text-center">
+              { searchPerformed ? "Our Recommendations" : "Your Previous Search Results" }
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {recommendations.map(product => (
                 <ProductCard key={product.id} product={product} />
