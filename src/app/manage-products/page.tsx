@@ -116,14 +116,11 @@ export default function ManageProductsPage() {
         }
       } catch (error) {
         console.error('Failed to generate description', error);
-        let description = 'Could not generate a description at this time.';
-        if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
-            description = "The Google AI API key is not configured correctly. Please see the documentation for instructions.";
-        }
+        const description = error instanceof Error ? error.message : "An unknown error occurred.";
         toast({
           variant: 'destructive',
           title: 'Generation Failed',
-          description: description,
+          description,
         });
       }
     });

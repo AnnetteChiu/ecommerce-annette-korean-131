@@ -32,14 +32,11 @@ export function StyleRecommender() {
         setRecommendations(result.recommendations);
       } catch (error) {
         console.error('Failed to generate style recommendations:', error);
-        let description = 'We could not generate recommendations at this time. Please try again later.';
-        if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
-            description = "The Google AI API key is not configured correctly. Please see the documentation for instructions.";
-        }
+        const description = error instanceof Error ? error.message : "An unknown error occurred.";
         toast({
           variant: 'destructive',
           title: 'An Error Occurred',
-          description: description,
+          description,
         });
         setRecommendations('');
       }

@@ -30,9 +30,9 @@ console.log('Browsing history has been updated. New history:', JSON.parse(sessio
 console.log('Please refresh the page to see the changes take effect.');
   `.trim();
   
-  const envSnippet = `
-# In a new file named .env.local at the root of your project
-GOOGLE_API_KEY='YOUR_GOOGLE_API_KEY_HERE'
+  const apiKeySnippet = `
+// In the file: src/ai/config.ts
+export const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
   `.trim();
 
   return (
@@ -46,7 +46,7 @@ GOOGLE_API_KEY='YOUR_GOOGLE_API_KEY_HERE'
             <CardTitle>How to Enable AI Features</CardTitle>
           </div>
           <CardDescription>
-            To activate the AI features, you need to provide your Google AI API key as an environment variable.
+            To activate the AI features, you need to provide your Google AI API key in the configuration file.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -60,23 +60,17 @@ GOOGLE_API_KEY='YOUR_GOOGLE_API_KEY_HERE'
             </Button>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">2. Add Your Key to a `.env.local` file</h3>
+            <h3 className="font-semibold mb-2">2. Add Your Key to `src/ai/config.ts`</h3>
             <p className="text-muted-foreground mb-4">
-              Create a new file named <code>.env.local</code> in the root of your project. This file is kept private and is not checked into version control. Add your key to this file.
+              Open the file at <code>src/ai/config.ts</code> and replace the placeholder string with your key.
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="font-code text-sm text-muted-foreground">
-                {envSnippet}
+                {apiKeySnippet}
               </code>
             </pre>
              <p className="text-muted-foreground mt-4">
               <strong>Important:</strong> After saving the file, you must stop and restart your development server for the changes to take effect.
-            </p>
-          </div>
-          <div>
-            <h3 className="font-semibold mb-2">3. Production Deployment</h3>
-            <p className="text-muted-foreground">
-              For your live application, you must configure the <code>GOOGLE_API_KEY</code> as a secret in your hosting provider's settings (e.g., Firebase App Hosting).
             </p>
           </div>
         </CardContent>

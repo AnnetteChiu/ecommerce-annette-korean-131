@@ -45,14 +45,11 @@ export default function GraphicDesignerPage() {
                 }
             } catch (err) {
                 console.error('Graphic design generation failed:', err);
-                let description = "We couldn't generate a new design. Please try a different prompt.";
-                if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
-                    description = 'The Google AI API key is not configured correctly. Please see the documentation for instructions.';
-                }
+                const description = err instanceof Error ? err.message : "An unknown error occurred.";
                 toast({
                     variant: 'destructive',
                     title: 'Generation Failed',
-                    description: description,
+                    description,
                 });
             }
         });
@@ -70,7 +67,7 @@ export default function GraphicDesignerPage() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      The Google AI API key is missing. Please create a <code>.env.local</code> file and add your key to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
+                      The Google AI API key is missing. Please add your key to the <code>src/ai/config.ts</code> file to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
                     </AlertDescription>
                 </Alert>
             ) : null}
@@ -125,7 +122,7 @@ export default function GraphicDesignerPage() {
                                 <p className="text-center p-4">Your result will appear here.</p>
                             )}
                         </div>
-                        {generatedImage && isAiEnabled && (
+                        {generatedImage && (
                             <Button asChild className="w-full">
                                 <a href={generatedImage} download={`codistyle-design-${Date.now()}.png`}>
                                     <Download className="mr-2" />

@@ -44,15 +44,12 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
 
       } catch (error) {
         console.error('Failed to fetch recommendations:', error);
-        let description = "We couldn't find recommendations at this time.";
-        if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
-            description = 'The Google AI API key is not configured correctly. Please see the documentation for instructions.';
-        }
+        const description = error instanceof Error ? error.message : "An unknown error occurred.";
         
         toast({
           variant: 'destructive',
           title: 'Could Not Load Recommendations',
-          description: description,
+          description,
         });
         
         setRecommendations([]);

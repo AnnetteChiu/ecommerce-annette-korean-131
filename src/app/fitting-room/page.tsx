@@ -157,19 +157,16 @@ export default function FittingRoomPage() {
                     toast({
                         variant: 'destructive',
                         title: 'Generation Failed',
-                        description: "The AI may have had trouble with this combination. Please try a different item or photo.",
+                        description: "The AI did not return an image. Please try a different prompt.",
                     });
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
-                let description = "We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.";
-                if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
-                    description = 'The Google AI API key is not configured correctly. Please see the documentation for instructions.';
-                }
+                const description = error instanceof Error ? error.message : "An unknown error occurred.";
                 toast({
                     variant: 'destructive',
                     title: 'Generation Failed',
-                    description: description,
+                    description,
                 });
             }
         });
@@ -226,7 +223,7 @@ export default function FittingRoomPage() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      The Google AI API key is missing. Please create a <code>.env.local</code> file and add your key to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
+                      The Google AI API key is missing. Please add your key to the <code>src/ai/config.ts</code> file to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
                     </AlertDescription>
                 </Alert>
             )}
@@ -322,7 +319,7 @@ export default function FittingRoomPage() {
                             ) : generatedImage ? (
                                 <Image src={generatedImage} alt="Virtual try-on result" fill className={cn("object-cover", isGenerating && "opacity-50")} />
                             ) : (
-                                <p className="text-center p-4">Your result will always appear here.</p>
+                                <p className="text-center p-4">Your result will appear here.</p>
                             )}
                         </div>
 

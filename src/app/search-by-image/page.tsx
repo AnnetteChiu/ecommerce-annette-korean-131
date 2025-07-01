@@ -178,23 +178,25 @@ export default function SearchByImagePage() {
         }
       } catch (error) {
         console.error("Visual search error:", error);
+        const description = error instanceof Error ? error.message : "An unknown error occurred.";
         
-        if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
-            toast({
-                variant: "destructive",
-                title: "Visual Search Failed",
-                description: "The Google AI API key is not configured correctly. Please see the documentation for instructions.",
-            });
-            setRecommendations([]);
-        } else {
-            // Client-side fallback for other errors
-            toast({
+        // Use a client-side fallback if the AI fails for any reason other than a misconfigured key
+        if (!description.includes('API key')) {
+             toast({
                 variant: "destructive",
                 title: "Visual Search Unsuccessful",
                 description: "We couldn't find a match, but here are some of our popular items!",
             });
             const fallbackProducts = getProducts().sort(() => 0.5 - Math.random()).slice(0, 4);
             setRecommendations(fallbackProducts);
+        } else {
+            // Show the specific API key error
+            toast({
+                variant: "destructive",
+                title: "Visual Search Failed",
+                description: description,
+            });
+            setRecommendations([]);
         }
         
         localStorage.removeItem('visualSearch');
@@ -215,7 +217,7 @@ export default function SearchByImagePage() {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>AI Feature Disabled</AlertTitle>
                 <AlertDescription>
-                  The Google AI API key is missing. Please create a <code>.env.local</code> file and add your key to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
+                  The Google AI API key is missing. Please add your key to the <code>src/ai/config.ts</code> file to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
                 </AlertDescription>
             </Alert>
           )}

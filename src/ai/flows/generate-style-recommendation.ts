@@ -18,14 +18,11 @@ const GenerateStyleRecommendationOutputSchema = z.object({
 export type GenerateStyleRecommendationInput = z.infer<typeof GenerateStyleRecommendationInputSchema>;
 export type GenerateStyleRecommendationOutput = z.infer<typeof GenerateStyleRecommendationOutputSchema>;
 
-const defaultResponse = { recommendations: 'We could not generate a recommendation at this time. Please try browsing more items.' };
-
 export async function generateStyleRecommendation(input: GenerateStyleRecommendationInput): Promise<GenerateStyleRecommendationOutput> {
   if (!input.browsingHistory || input.browsingHistory.trim() === '') {
-      return { recommendations: 'Browse some products first to get a personalized style recommendation.' };
+      throw new Error('Browse some products first to get a personalized style recommendation.');
   }
 
-  // Let errors from the flow propagate up to the calling component.
   return await styleRecommendationFlow(input);
 }
 
@@ -71,11 +68,16 @@ const styleRecommendationFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      // If the model fails to generate valid JSON, return a default response.
-      return output || defaultResponse;
-    } catch (error) {
-      console.error('Error in styleRecommendationFlow:', error);
-      return defaultResponse;
+      if (!output) {
+          throw new Error('The AI model did not return a valid recommendation.');
+      }
+      return output;
+    } catch (err) {
+      console.error('Error in styleRecommendationFlow:', err);
+      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
+        throw new Error('The Google AI API key is not configured correctly. Please add your key to `src/ai/config.ts`.');
+      }
+      throw new Error("Could not generate a recommendation at this time. Please try again.");
     }
   }
 );

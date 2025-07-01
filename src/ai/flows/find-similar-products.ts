@@ -39,7 +39,6 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
   const availableProducts = allProducts
     .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
-  // The flow is self-healing. We trust it to handle all cases, including an empty product catalog.
   return await findSimilarProductsFlow({ 
     ...input, 
     availableProducts,
@@ -113,18 +112,6 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    // This is the fallback function, to be used whenever the primary flow fails.
-    const generateFallback = () => {
-        console.error('Visual search failed or returned invalid data. Using server-side fallback.');
-        if (input.availableProducts.length === 0) {
-            return { productIds: [] };
-        }
-        const fallbackProducts = [...input.availableProducts].sort(() => 0.5 - Math.random());
-        const fallbackIds = fallbackProducts.slice(0, input.count).map(p => p.id);
-        return { productIds: fallbackIds };
-    };
-
-    // Handle case where there are no products to search from.
     if (input.availableProducts.length === 0) {
       return { productIds: [] };
     }
@@ -132,31 +119,26 @@ const findSimilarProductsFlow = ai.defineFlow(
     try {
       const { output } = await recommendationPrompt(input);
       
-      // Robust check: ensure output and productIds exist.
       if (!output?.productIds) {
-        return generateFallback();
+        throw new Error('The AI model did not return any product IDs.');
       }
       
-      // Further validation: ensure the IDs are valid products.
       const availableProductIds = new Set(input.availableProducts.map(p => p.id));
       const validIds = output.productIds.filter(id => availableProductIds.has(id));
       
-      // If we don't get enough valid IDs, use the fallback to ensure consistency.
-      if (validIds.length < input.count) {
-          console.warn(`AI returned only ${validIds.length}/${input.count} valid products. Augmenting with fallback.`);
-          const fallback = generateFallback();
-          // Combine valid results with fallback, avoiding duplicates, and trim to count.
-          const combinedIds = [...new Set([...validIds, ...fallback.productIds])];
-          return { productIds: combinedIds.slice(0, input.count) };
+      if (validIds.length === 0) {
+          throw new Error('The AI model returned product IDs that do not exist in the catalog.');
       }
       
-      // Success case: we have enough valid IDs.
       return { productIds: validIds };
 
-    } catch (error) {
-      // Fallback for any catastrophic error (e.g., Genkit/network failure).
-      console.error('A catastrophic error occurred during the visual search flow:', error);
-      return generateFallback();
+    } catch (err) {
+      console.error('Error in findSimilarProductsFlow:', err);
+      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
+        throw new Error('The Google AI API key is not configured correctly. Please add your key to `src/ai/config.ts`.');
+      }
+      // Re-throw other errors to be handled by the client
+      throw err;
     }
   }
 );

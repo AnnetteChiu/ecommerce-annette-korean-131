@@ -58,9 +58,9 @@ const generateProductDescriptionFlow = ai.defineFlow(
     } catch (err) {
       console.error('Error in generateProductDescriptionFlow:', err);
       if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
-        throw new Error('The Google AI API key is not configured correctly. Please see the documentation for instructions.');
+        throw new Error('The Google AI API key is not configured correctly. Please add your key to `src/ai/config.ts`.');
       }
-      throw new Error("Could not generate a description at this time.");
+      throw new Error("Could not generate a description at this time. Please try again.");
     }
   }
 );

@@ -7,8 +7,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import {getProducts, getProductById} from '@/lib/products';
-import type { Product } from '@/types';
+import {getProducts} from '@/lib/products';
 
 const BrowsingHistoryItemSchema = z.object({
   id: z.string(),
@@ -48,7 +47,6 @@ export async function generateProductRecommendations(input: GenerateProductRecom
       return { productIds: [] };
     }
     
-    // The flow is now self-healing and guaranteed to return a result.
     return await productRecommendationFlow({ 
       ...input, 
       availableProducts,
@@ -110,49 +108,18 @@ const productRecommendationFlow = ai.defineFlow(
     try {
       const { output } = await recommendationPrompt(input);
       
-      // Validate the output
-      if (output?.productIds && output.productIds.length > 0) {
-        const allProductIds = new Set(input.availableProducts.map(p => p.id));
-        const validIds = output.productIds.filter(id => allProductIds.has(id));
-
-        if (validIds.length > 0) {
-          // Return valid IDs, ensuring the count is met if possible, but don't fail.
-          return { productIds: validIds.slice(0, input.count) };
-        }
+      if (!output?.productIds) {
+          throw new Error("AI failed to return valid recommendations.");
       }
       
-      // If we reach here, AI failed or returned invalid data.
-      throw new Error("AI returned no valid recommendations.");
+      return output;
 
-    } catch (error) {
-      console.error('AI recommendations failed, using server-side fallback:', error);
-        
-        // Server-Side Fallback Logic
-        const allProducts = getProducts();
-        const currentProduct = getProductById(input.currentProductId);
-        
-        let fallbackRecs: Product[] = [];
-
-        if (currentProduct) {
-          // 1. Try to get products from the same category
-          fallbackRecs = allProducts.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id);
-        }
-        
-        // 2. If not enough recommendations, fill with other products
-        const otherProducts = allProducts.filter(
-            p => p.id !== input.currentProductId && !fallbackRecs.find(fr => fr.id === p.id)
-        );
-
-        // Shuffle the remaining products to ensure variety
-        const shuffledOthers = otherProducts.sort(() => 0.5 - Math.random());
-
-        // Add products until we have the required count
-        while (fallbackRecs.length < input.count && shuffledOthers.length > 0) {
-            fallbackRecs.push(shuffledOthers.shift()!);
-        }
-
-        const fallbackIds = fallbackRecs.slice(0, input.count).map(p => p.id);
-        return { productIds: fallbackIds };
+    } catch (err) {
+      console.error('Error in productRecommendationFlow:', err);
+      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
+        throw new Error('The Google AI API key is not configured correctly. Please add your key to `src/ai/config.ts`.');
+      }
+      throw new Error("Could not generate recommendations at this time. Please try again.");
     }
   }
 );
