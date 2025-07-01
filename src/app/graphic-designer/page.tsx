@@ -17,7 +17,6 @@ export default function GraphicDesignerPage() {
     const { isAiEnabled } = useAi();
     const [prompt, setPrompt] = useState('');
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
     const [isGenerating, startTransition] = useTransition();
     const { toast } = useToast();
 
@@ -30,8 +29,6 @@ export default function GraphicDesignerPage() {
             });
             return;
         }
-
-        setError(null);
         
         startTransition(async () => {
             try {
@@ -43,9 +40,11 @@ export default function GraphicDesignerPage() {
                 }
             } catch (err) {
                 console.error('Graphic design generation failed:', err);
-                const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
-                setError(`We couldn't generate the graphic design. The AI may have had trouble with this prompt. Please try a different one. Error: ${errorMessage}`);
-                setGeneratedImage(null);
+                toast({
+                    variant: 'destructive',
+                    title: 'Generation Failed',
+                    description: "We couldn't generate a new design. Please try a different prompt.",
+                });
             }
         });
     };
@@ -117,15 +116,6 @@ export default function GraphicDesignerPage() {
                                 <p className="text-center p-4">Your result will appear here.</p>
                             )}
                         </div>
-                        {error && (
-                            <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4" />
-                                <AlertTitle>Generation Failed</AlertTitle>
-                                <AlertDescription>
-                                    {error}
-                                </AlertDescription>
-                            </Alert>
-                        )}
                         {generatedImage && isAiEnabled && (
                             <Button asChild className="w-full">
                                 <a href={generatedImage} download={`codistyle-design-${Date.now()}.png`}>
