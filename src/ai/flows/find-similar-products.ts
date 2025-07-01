@@ -57,14 +57,10 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are an expert fashion stylist. Your goal is to find products from a catalog that stylistically match a user's uploaded photo.
+    prompt: `You are a fashion expert. Find up to {{count}} products from the provided catalog that stylistically match the user's photo.
+Analyze the photo for garment type, style, color, and pattern. Then, compare those elements to the product descriptions to find the best matches.
 
-1.  **Analyze the Photo:** Carefully examine the user's photo to identify key fashion elements like the type of garment, style (e.g., casual, formal, bohemian), color, pattern, and material.
-2.  **Match with Catalog:** Compare these visual elements to the text descriptions of the products in the provided catalog.
-3.  **Select Best Matches:** Choose up to {{count}} products that are the closest stylistic match to the photo.
-4.  **CRITICAL FALLBACK:** If you cannot find any products that are a good stylistic match, **do not return an empty list.** Instead, as a fallback, select the first {{count}} product IDs from the catalog provided. Your primary goal is to always provide recommendations.
-
-You MUST return a JSON object with a 'productIds' array containing the selected product IDs. Prioritize good matches, but use the fallback if necessary to ensure the list is never empty.
+Return a JSON object with a 'productIds' array containing the selected product IDs. If you cannot find any good matches, it is acceptable to return an empty 'productIds' array.
 
 **User's Photo to Analyze:**
 {{media url=photoDataUri}}
@@ -110,13 +106,23 @@ const findSimilarProductsFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      // If the model fails to generate valid JSON or returns nothing, we return a default response.
-      return output || defaultResponse;
+      // If the model returns a valid response with at least one product, use it.
+      if (output?.productIds?.length) {
+        return output;
+      }
+      // If we are here, the model either failed to return a valid object,
+      // or it returned an empty list of product IDs.
+      // We will proceed to our fallback logic.
+      console.log('AI returned no recommendations, using code-based fallback.');
     } catch (error) {
-        console.error('Error in findSimilarProductsFlow:', error);
-        // Return a default empty response to the client to avoid a crash.
-        // The UI will gracefully handle the empty list of recommendations.
-        return defaultResponse;
+        console.error('Error in findSimilarProductsFlow, using code-based fallback:', error);
+        // An error occurred, so we proceed to our fallback logic.
     }
+
+    // **Code-based Fallback**
+    // The AI has failed to provide a recommendation.
+    // Return the first `count` products from the catalog as a reliable fallback.
+    const fallbackIds = input.availableProducts.slice(0, input.count).map(p => p.id);
+    return { productIds: fallbackIds };
   }
 );
