@@ -66,7 +66,7 @@ export default function GraphicDesignerPage() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      The Google AI API key is missing. Please add it in <code>src/ai/config.ts</code> to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
+                      The Google AI API key is missing. Please create a <code>.env.local</code> file and add your key to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
                     </AlertDescription>
                 </Alert>
             ) : null}
