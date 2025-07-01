@@ -64,7 +64,7 @@ export default function GraphicDesignerPage() {
                     <Sparkles className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      To use this feature, add your Google AI API key to the{' '}
+                      Add your Google AI API key to the{' '}
                       <code className="font-mono bg-muted p-1 rounded-md">.env.local</code> file and restart the server.
                     </AlertDescription>
                 </Alert>
