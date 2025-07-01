@@ -57,7 +57,6 @@ export default function FittingRoomPage() {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
-    const [generationError, setGenerationError] = useState<string | null>(null);
     const [isGenerating, startTransition] = useTransition();
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -134,8 +133,6 @@ export default function FittingRoomPage() {
         }
 
         startTransition(async () => {
-            setGeneratedImage(null);
-            setGenerationError(null);
             try {
                 const productImageDataUri = await convertImageUrlToDataUri(productToTryOn.imageUrl);
                 const resizedCapturedImage = await resizeImage(capturedImage);
@@ -156,13 +153,19 @@ export default function FittingRoomPage() {
                         console.error("Failed to save fitting room state to sessionStorage", e);
                     }
                 } else {
-                    setGenerationError("We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.");
-                    setGeneratedImage(null);
+                    toast({
+                        variant: 'destructive',
+                        title: 'Generation Failed',
+                        description: "The AI may have had trouble with this combination. Please try a different item or photo.",
+                    });
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
-                setGenerationError("We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.");
-                setGeneratedImage(null);
+                toast({
+                    variant: 'destructive',
+                    title: 'Generation Failed',
+                    description: "We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.",
+                });
             }
         });
     }, [isAiEnabled, capturedImage, startTransition, toast]);
@@ -195,7 +198,6 @@ export default function FittingRoomPage() {
                 setCapturedImage(null);
             }
             setGeneratedImage(null);
-            setGenerationError(null);
             sessionStorage.removeItem('fittingRoomResult');
         }
     };
@@ -203,7 +205,6 @@ export default function FittingRoomPage() {
     const handleRetake = () => {
         setCapturedImage(null);
         setGeneratedImage(null);
-        setGenerationError(null);
         setSelectedProduct(null);
         sessionStorage.removeItem('fittingRoomResult');
     };
@@ -320,15 +321,6 @@ export default function FittingRoomPage() {
                             )}
                         </div>
 
-                        {generationError && (
-                            <Alert variant="destructive">
-                                <AlertTriangle className="h-4 w-4" />
-                                <AlertTitle>Generation Failed</AlertTitle>
-                                <AlertDescription>
-                                    {generationError}
-                                </AlertDescription>
-                            </Alert>
-                        )}
                     </CardContent>
                 </Card>
             </div>
