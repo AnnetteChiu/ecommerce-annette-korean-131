@@ -14,48 +14,6 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-// Helper function to fetch an image, compress it, and convert it to a data URI
-async function urlToDataUri(url: string, maxSize = 1024, quality = 0.8): Promise<string> {
-    return new Promise((resolve, reject) => {
-        const img = new window.Image();
-        img.crossOrigin = "Anonymous"; // This is crucial for fetching images from other domains
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            let { width, height } = img;
-
-            // Resize logic to maintain aspect ratio
-            if (width > height) {
-                if (width > maxSize) {
-                    height *= maxSize / width;
-                    width = maxSize;
-                }
-            } else {
-                if (height > maxSize) {
-                    width *= maxSize / height;
-                    height = maxSize;
-                }
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) {
-                return reject(new Error('Failed to get canvas context'));
-            }
-            ctx.drawImage(img, 0, 0, width, height);
-            
-            // Resolve with the compressed image data URI
-            resolve(canvas.toDataURL('image/jpeg', quality));
-        };
-        img.onerror = (err) => {
-            console.error('Image load error:', err);
-            reject(new Error('Could not load product image. This might be a cross-origin issue.'));
-        };
-        img.src = url;
-    });
-}
-
-
 export default function FittingRoomPage() {
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -135,11 +93,9 @@ export default function FittingRoomPage() {
         startTransition(async () => {
             setGeneratedImage(null);
             try {
-                const productImageDataUri = await urlToDataUri(selectedProduct.imageUrl);
-
                 const result = await virtualTryOn({
                     userPhotoDataUri: capturedImage,
-                    productImageDataUri: productImageDataUri,
+                    productImageUrl: selectedProduct.imageUrl,
                 });
 
                 if (result.generatedImageDataUri) {
