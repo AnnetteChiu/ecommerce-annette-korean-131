@@ -32,9 +32,7 @@ export default function GraphicDesignerPage() {
         }
 
         setError(null);
-        const previousImage = generatedImage;
-        // Keep previous image visible during generation by not setting it to null here.
-
+        
         startTransition(async () => {
             try {
                 const result = await generateGraphicDesign({ prompt });
@@ -47,7 +45,7 @@ export default function GraphicDesignerPage() {
                 console.error('Graphic design generation failed:', err);
                 const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
                 setError(`We couldn't generate the graphic design. The AI may have had trouble with this prompt. Please try a different one. Error: ${errorMessage}`);
-                setGeneratedImage(previousImage);
+                setGeneratedImage(null);
             }
         });
     };
@@ -101,12 +99,13 @@ export default function GraphicDesignerPage() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="relative aspect-square w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
-                            {isGenerating ? (
+                            {isGenerating && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/50 z-10">
                                     <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                                     <p>Generating your vision...</p>
                                 </div>
-                             ) : !isAiEnabled ? (
+                             )}
+                             {!isAiEnabled && !isGenerating ? (
                                 <div className="flex flex-col items-center text-center p-4">
                                     <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
                                     <p className="font-semibold text-destructive">Feature Disabled</p>
@@ -114,7 +113,7 @@ export default function GraphicDesignerPage() {
                                 </div>
                             ) : generatedImage ? (
                                 <Image src={generatedImage} alt="Generated graphic design" fill className="object-contain" />
-                            ) : (
+                            ) : !isGenerating && (
                                 <p className="text-center p-4">Your result will appear here.</p>
                             )}
                         </div>
