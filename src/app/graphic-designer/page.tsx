@@ -67,7 +67,7 @@ export default function GraphicDesignerPage() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      Your Google AI API key is not configured. Please add it to <code>src/ai/config.ts</code> to enable this feature.
+                      Please add your Google AI API key to <code>src/ai/config.ts</code> to enable this feature.
                     </AlertDescription>
                 </Alert>
             ) : null}
@@ -115,7 +115,7 @@ export default function GraphicDesignerPage() {
                                     <Alert variant="destructive">
                                         <AlertTriangle className="h-4 w-4" />
                                         <AlertTitle>AI Feature Disabled</AlertTitle>
-                                        <AlertDescription>Your Google AI API key is not configured. Please add it to <code>src/ai/config.ts</code> to enable this feature.</AlertDescription>
+                                        <AlertDescription>Please add your Google AI API key to <code>src/ai/config.ts</code> to enable this feature.</AlertDescription>
                                     </Alert>
                                 </div>
                              ) : generatedImage ? (
