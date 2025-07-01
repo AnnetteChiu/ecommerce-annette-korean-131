@@ -1,21 +1,26 @@
 # Firebase Studio
 
-This is a NextJS starter in Firebase Studio.
+This is a NextJS starter in Firebase Studio. To get started, take a look at `src/app/page.tsx`.
 
-To get started, take a look at src/app/page.tsx.
+## How to Enable AI Features (Optional)
 
-## Environment Setup for AI Features
+This application includes advanced AI features powered by Google's Generative AI. To turn them on, you need to provide a Google AI API key. The app is fully functional without it.
 
-This application uses Google's Generative AI. To enable the AI-powered features (like product recommendations, style analysis, and the virtual fitting room), you need to provide a Google AI API key.
+### For Local Development
 
-1.  **Get an API Key:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey). Click the "**Create API key**" button to generate a new key.
+1.  **Generate your key:**
+    *   Visit [Google AI Studio](https://aistudio.google.com/app/apikey).
+    *   Click the **"Create API key"** button to get your new key.
 
-2.  **Create an Environment File:** In the root directory of your project, create a new file named `.env.local`.
+2.  **Set up your environment:**
+    *   In the root directory of your project, create a new file named `.env.local`.
+    *   Add your API key to this file like so:
+        ```
+        GOOGLE_API_KEY=YOUR_API_KEY_HERE
+        ```
 
-3.  **Add the API Key:** Open the `.env.local` file and add your API key like this:
+3.  **Restart your app:** Stop and restart the local development server for the changes to take effect.
 
-    ```
-    GOOGLE_API_KEY=YOUR_API_KEY_HERE
-    ```
+### For Production Deployment
 
-4.  **Deployment:** When you deploy your application to a hosting provider (like Vercel, Netlify, or Firebase App Hosting), you must also set the `GOOGLE_API_KEY` as an environment variable in your provider's project settings. This ensures the AI features will work in your live application.
+When you publish your app, do not include the `.env.local` file. Instead, set the `GOOGLE_API_KEY` as an environment variable (or "secret") in your hosting provider's project settings (e.g., Firebase App Hosting, Vercel, Netlify). This securely enables the AI features in your live application.
