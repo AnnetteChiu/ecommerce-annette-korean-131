@@ -22,23 +22,9 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
         let history = [];
         try {
           const historyString = sessionStorage.getItem('browsingHistory');
-          const parsedHistory = JSON.parse(historyString || '[]');
-
-          const MAX_HISTORY = 10;
-          const productInHistory = parsedHistory.find((item: { id: string }) => item.id === currentProductId);
-          
-          let updatedHistory = parsedHistory;
-          if (!productInHistory) {
-            updatedHistory = [...parsedHistory, { id: currentProductId, name: currentProductName }];
-            if (updatedHistory.length > MAX_HISTORY) {
-              updatedHistory.shift(); 
-            }
-            sessionStorage.setItem('browsingHistory', JSON.stringify(updatedHistory));
-          }
-          history = updatedHistory;
-
+          history = JSON.parse(historyString || '[]');
         } catch (e) {
-          console.error("Could not update/read browsing history, proceeding with empty history.", e);
+          console.error("Could not read browsing history, proceeding with empty history.", e);
         }
 
         const result = await generateProductRecommendations({

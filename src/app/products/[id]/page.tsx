@@ -16,6 +16,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { ProductViewTracker } from '@/components/product-view-tracker';
 
 export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
@@ -69,6 +70,7 @@ export default function ProductPage() {
 
   return (
     <>
+      {product && <ProductViewTracker productId={product.id} productName={product.name} />}
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="overflow-hidden rounded-lg">
           <Image
