@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent for finding similar products based on an image.
@@ -134,8 +135,8 @@ const findSimilarProductsFlow = ai.defineFlow(
 
     } catch (err) {
       console.error('Error in findSimilarProductsFlow:', err);
-      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
-        throw new Error('The Google AI API key is not configured correctly. Please add your key to `src/ai/config.ts`.');
+      if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
+        throw new Error('The Google AI API key is invalid or not configured in your environment. Please see the documentation for instructions.');
       }
       // Re-throw other errors to be handled by the client
       throw err;

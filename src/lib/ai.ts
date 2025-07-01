@@ -1,11 +1,9 @@
-import { GOOGLE_API_KEY } from "@/ai/config";
-
 /**
- * Checks if AI features are enabled by verifying if the API key has been
- * changed from its default placeholder value.
+ * Checks if AI features are enabled by verifying if the server-side
+ * GOOGLE_API_KEY environment variable is set.
  * @returns {boolean} True if the API key is set, false otherwise.
  */
 export function isAiEnabled(): boolean {
-  // The key is considered "not set" if it's the placeholder string or empty.
-  return !!GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_API_KEY_HERE';
+  // The key is considered "not set" if it's undefined, null, or an empty string.
+  return !!process.env.GOOGLE_API_KEY;
 }

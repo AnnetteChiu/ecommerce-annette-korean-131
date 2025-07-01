@@ -30,9 +30,9 @@ console.log('Browsing history has been updated. New history:', JSON.parse(sessio
 console.log('Please refresh the page to see the changes take effect.');
   `.trim();
   
-  const apiKeySnippet = `
-// In the file: src/ai/config.ts
-export const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
+  const envSnippet = `
+# In a new file at the root of your project named .env.local
+GOOGLE_API_KEY="YOUR_GOOGLE_AI_API_KEY_HERE"
   `.trim();
 
   return (
@@ -46,7 +46,7 @@ export const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
             <CardTitle>How to Enable AI Features</CardTitle>
           </div>
           <CardDescription>
-            To activate the AI features, you need to provide your Google AI API key in the configuration file.
+            To activate the AI features, you need to provide your Google AI API key as a secure environment variable.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -60,17 +60,17 @@ export const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
             </Button>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">2. Add Your Key to `src/ai/config.ts`</h3>
+            <h3 className="font-semibold mb-2">2. Add Your Key to a `.env.local` File</h3>
             <p className="text-muted-foreground mb-4">
-              Open the file at <code>src/ai/config.ts</code> and replace the placeholder string with your key.
+              Create a new file named <code>.env.local</code> in the root directory of your project. Then, add your API key to it.
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="font-code text-sm text-muted-foreground">
-                {apiKeySnippet}
+                {envSnippet}
               </code>
             </pre>
              <p className="text-muted-foreground mt-4">
-              <strong>Important:</strong> After saving the file, you must stop and restart your development server for the changes to take effect.
+              <strong>Important:</strong> After creating the file and adding your key, you must stop and restart your development server for the changes to take effect.
             </p>
           </div>
         </CardContent>

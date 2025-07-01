@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent for generating style recommendations.
@@ -74,8 +75,8 @@ const styleRecommendationFlow = ai.defineFlow(
       return output;
     } catch (err) {
       console.error('Error in styleRecommendationFlow:', err);
-      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
-        throw new Error('The Google AI API key is not configured correctly. Please add your key to `src/ai/config.ts`.');
+      if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
+        throw new Error('The Google AI API key is invalid or not configured in your environment. Please see the documentation for instructions.');
       }
       throw new Error("Could not generate a recommendation at this time. Please try again.");
     }

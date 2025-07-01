@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
@@ -180,7 +181,7 @@ export default function SearchByImagePage() {
         const description = error instanceof Error ? error.message : "An unknown error occurred.";
         
         // Use a client-side fallback if the AI fails for any reason other than a misconfigured key
-        if (!description.includes('API key')) {
+        if (!description.includes('API key') && !description.includes('API_KEY_INVALID')) {
              toast({
                 variant: "destructive",
                 title: "Visual Search Unsuccessful",
@@ -216,7 +217,7 @@ export default function SearchByImagePage() {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Google AI API Key Required</AlertTitle>
                 <AlertDescription>
-                  To enable this feature, please add your key to <code>src/ai/config.ts</code>.
+                  This feature is disabled. To enable it, set your Google AI API key in a <code>.env.local</code> file. See the <Link href="/docs" className="underline">documentation</Link> for details.
                 </AlertDescription>
             </Alert>
           )}

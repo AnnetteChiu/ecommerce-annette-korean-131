@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition } from 'react';
@@ -66,7 +67,7 @@ export default function GraphicDesignerPage() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Google AI API Key Required</AlertTitle>
                     <AlertDescription>
-                      To enable this feature, please add your key to <code>src/ai/config.ts</code>.
+                      This feature is disabled. To enable it, set your Google AI API key in a <code>.env.local</code> file. See the <Link href="/docs" className="underline">documentation</Link> for details.
                     </AlertDescription>
                 </Alert>
             ) : null}
@@ -114,7 +115,9 @@ export default function GraphicDesignerPage() {
                                     <Alert variant="destructive">
                                         <AlertTriangle className="h-4 w-4" />
                                         <AlertTitle>Google AI API Key Required</AlertTitle>
-                                        <AlertDescription>To enable this feature, please add your key to <code>src/ai/config.ts</code>.</AlertDescription>
+                                        <AlertDescription>
+                                            This feature is disabled. To enable it, set your Google AI API key in a <code>.env.local</code> file. See the <Link href="/docs" className="underline">documentation</Link> for details.
+                                        </AlertDescription>
                                     </Alert>
                                 </div>
                              ) : generatedImage ? (
