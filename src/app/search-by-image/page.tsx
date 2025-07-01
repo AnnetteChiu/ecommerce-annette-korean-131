@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { findSimilarProducts } from '@/ai/flows/find-similar-products';
 import { getProductById, getProducts } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
@@ -9,7 +10,7 @@ import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, Upload, Info } from 'lucide-react';
+import { Loader2, Search, Upload, Info, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAi } from '@/context/ai-context';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
@@ -205,11 +206,11 @@ export default function SearchByImagePage() {
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
           {!isAiEnabled && (
-            <Alert>
-                <Info className="h-4 w-4" />
+            <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>AI Feature Disabled</AlertTitle>
                 <AlertDescription>
-                    Add your Google AI API key to the .env.local file and restart the server.
+                    The Google AI API key is missing. Please add it to your <code>.env.local</code> file (for local development) or configure it as a secret for your deployed app. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
                 </AlertDescription>
             </Alert>
           )}

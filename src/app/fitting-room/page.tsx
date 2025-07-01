@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useTransition, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getProducts } from '@/lib/products';
 import type { Product } from '@/types';
 import { virtualTryOn } from '@/ai/flows/virtual-try-on';
@@ -215,11 +216,11 @@ export default function FittingRoomPage() {
             </div>
 
             {!isAiEnabled && (
-                <Alert>
-                    <Info className="h-4 w-4" />
+                <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      Add your Google AI API key to the .env.local file and restart the server.
+                      The Google AI API key is missing. Please add it to your <code>.env.local</code> file (for local development) or configure it as a secret for your deployed app. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
                     </AlertDescription>
                 </Alert>
             )}
@@ -269,11 +270,11 @@ export default function FittingRoomPage() {
                 <Card className="sticky top-24">
                     <CardHeader>
                          <CardTitle className="flex items-center gap-2"><PersonStanding /> Step 2: Select & See</CardTitle>
-                        <CardDescription>Choose an item. Your new look will generate automatically.</CardDescription>
+                        <CardDescription>{isAiEnabled ? "Choose an item. Your new look will generate automatically." : "This feature is disabled until the API key is configured."}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <ScrollArea className="w-full">
-                            <div className="flex space-x-4 pb-4">
+                            <div className={cn("flex space-x-4 pb-4", !isAiEnabled && "opacity-50 pointer-events-none")}>
                                 {apparelProducts.map(product => (
                                     <div 
                                         key={product.id} 
@@ -301,14 +302,18 @@ export default function FittingRoomPage() {
                         </ScrollArea>
                         
                         <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
-                            {isGenerating && (
+                            {isGenerating ? (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/50 z-10">
                                     <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                                     <p>Generating your new look...</p>
                                 </div>
-                            )}
-
-                            {generatedImage ? (
+                            ) : !isAiEnabled ? (
+                                <div className="flex flex-col items-center text-center p-4">
+                                    <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
+                                    <p className="font-semibold text-destructive">Feature Disabled</p>
+                                    <p className="text-sm">API key is not configured.</p>
+                                </div>
+                            ) : generatedImage ? (
                                 <Image src={generatedImage} alt="Virtual try-on result" fill className={cn("object-cover", isGenerating && "opacity-50")} />
                             ) : (
                                 <p className="text-center p-4">Your result will always appear here.</p>
