@@ -103,8 +103,15 @@ export default function FittingRoomPage() {
         }
     }, [toast]);
 
-    const handleVirtualTryOn = useCallback(() => {
-        if (!isAiEnabled || !capturedImage || !selectedProduct) {
+    const handleVirtualTryOn = useCallback((productToTryOn: Product) => {
+        if (!isAiEnabled || !capturedImage) {
+            if (isAiEnabled && !capturedImage) {
+                toast({
+                    variant: 'destructive',
+                    title: 'No Photo Captured',
+                    description: 'Please capture a photo first, then select an item to try on.',
+                });
+            }
             return;
         }
 
@@ -112,7 +119,7 @@ export default function FittingRoomPage() {
             setGeneratedImage(null);
             setGenerationError(null);
             try {
-                const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
+                const productImageDataUri = await convertImageUrlToDataUri(productToTryOn.imageUrl);
                 const resizedCapturedImage = await resizeImage(capturedImage);
                 const result = await virtualTryOn({
                     userPhotoDataUri: resizedCapturedImage,
@@ -130,11 +137,12 @@ export default function FittingRoomPage() {
                 setGenerationError("We couldn't generate the image, but here's your original photo. The AI may have had trouble with this combination. Please try a different item or photo.");
             }
         });
-    }, [isAiEnabled, capturedImage, selectedProduct, startTransition]);
-
-    useEffect(() => {
-        handleVirtualTryOn();
-    }, [handleVirtualTryOn]);
+    }, [isAiEnabled, capturedImage, startTransition, toast]);
+    
+    const handleSelectProduct = (product: Product) => {
+        setSelectedProduct(product);
+        handleVirtualTryOn(product);
+    };
 
     const handleCapturePhoto = async () => {
         if (videoRef.current && canvasRef.current) {
@@ -161,10 +169,6 @@ export default function FittingRoomPage() {
             setGeneratedImage(null);
             setGenerationError(null);
         }
-    };
-
-    const handleSelectProduct = (product: Product) => {
-        setSelectedProduct(product);
     };
 
     const handleRetake = () => {
