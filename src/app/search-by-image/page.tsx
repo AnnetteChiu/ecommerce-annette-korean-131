@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
@@ -94,16 +95,6 @@ export default function SearchByImagePage() {
     }
   }, []); // Run only on mount
   
-  const displayFallbackResults = () => {
-    toast({
-      variant: 'default',
-      title: 'Visual Search Unavailable',
-      description: 'We had trouble analyzing your image, but here are some popular items!',
-    });
-    const fallbackProducts = getProducts().slice(0, 4);
-    setRecommendations(fallbackProducts);
-  };
-
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -155,34 +146,40 @@ export default function SearchByImagePage() {
           photoDataUri: imageDataUri,
           count: 4,
         });
-
-        if (result?.productIds?.length > 0) {
-          const recommendedProducts = result.productIds
-            .map(id => getProductById(id))
-            .filter((p): p is Product => !!p);
-          
-          if (recommendedProducts.length > 0) {
-            setRecommendations(recommendedProducts);
-            try {
-              localStorage.setItem('visualSearch', JSON.stringify({
-                imageDataUri: imageDataUri,
-                recommendationIds: result.productIds,
-              }));
-            } catch (e) {
-              console.error("Failed to save visual search results to localStorage", e);
-            }
-          } else {
-            // This can happen if product IDs from AI are no longer valid.
-            displayFallbackResults();
-          }
-        } else {
-          // AI returned no results, use fallback.
-          displayFallbackResults();
+        
+        // The server flow has its own robust fallback, but we validate here as a final safeguard.
+        if (!result || !result.productIds || result.productIds.length === 0) {
+          throw new Error('Server returned no product IDs.');
         }
+
+        const recommendedProducts = result.productIds
+          .map(id => getProductById(id))
+          .filter((p): p is Product => !!p);
+        
+        if (recommendedProducts.length === 0) {
+           throw new Error('Server returned only invalid product IDs.');
+        }
+
+        setRecommendations(recommendedProducts);
+        try {
+          localStorage.setItem('visualSearch', JSON.stringify({
+            imageDataUri: imageDataUri,
+            recommendationIds: result.productIds,
+          }));
+        } catch (e) {
+          console.error("Failed to save visual search results to localStorage", e);
+        }
+
       } catch (error) {
-        console.error('Failed to find similar products:', error);
-        // An error occurred, use fallback.
-        displayFallbackResults();
+        // This is the new, robust fallback. Any failure in the try block will land here.
+        console.error('Visual search failed, using client-side fallback:', error);
+        toast({
+          variant: 'default',
+          title: 'Visual Search Unavailable',
+          description: 'We had trouble analyzing your image, but here are some popular items!',
+        });
+        const fallbackProducts = getProducts().slice(0, 4);
+        setRecommendations(fallbackProducts);
       }
     });
   };
@@ -239,7 +236,6 @@ export default function SearchByImagePage() {
       )}
 
       {searchPerformed && !isPending && recommendations.length === 0 && (
-        // This state should ideally not be reached due to the fallback, but kept as a safeguard.
         <div className="w-full mt-8 text-center border rounded-lg p-12 bg-muted/50">
           <ImageOff className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
           <h2 className="text-2xl font-headline font-bold">No Matches Found</h2>
