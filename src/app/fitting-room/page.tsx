@@ -151,8 +151,8 @@ export default function FittingRoomPage() {
             return;
         }
 
-        setGenerationError(null);
         setShowAiNotice(false);
+        setGenerationError(null);
 
         if (!isAiEnabled) {
             setGeneratedImage(capturedImage);
@@ -161,7 +161,6 @@ export default function FittingRoomPage() {
         }
 
         startTransition(async () => {
-            setGeneratedImage(null);
             try {
                 const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
 

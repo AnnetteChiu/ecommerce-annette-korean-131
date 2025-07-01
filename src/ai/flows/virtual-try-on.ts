@@ -47,7 +47,7 @@ const virtualTryOnFlow = ai.defineFlow(
       prompt: [
         { media: { url: userPhotoDataUri } },
         { media: { url: productImageDataUri } },
-        { text: "You are a virtual fitting room assistant. Your task is to realistically place the clothing item from the second image onto the person in the first image. Ensure the clothing fits the person's body shape and pose. The background of the first image should be preserved. Do not include any text or logos in the output image." },
+        { text: "Take the clothing item from the second image and realistically place it onto the person in the first image. The person's pose and the background of the first image must be preserved exactly as they are. The output must be only the final image, with no added text or logos." },
       ],
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
