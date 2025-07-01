@@ -61,7 +61,7 @@ export default function GraphicDesignerPage() {
 
             {!isAiEnabled ? (
                 <Alert>
-                    <Sparkles className="h-4 w-4" />
+                    <Info className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
                       Add your Google AI API key to the .env.local file and restart the server.

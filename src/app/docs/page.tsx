@@ -51,9 +51,9 @@ console.log('Please refresh the page to see the changes take effect.');
       ) : (
           <Alert variant="destructive">
             <Info className="h-4 w-4" />
-            <AlertTitle>AI Features are Disabled</AlertTitle>
+            <AlertTitle>AI Feature Disabled</AlertTitle>
             <AlertDescription>
-              To use features like Virtual Try-On and the Graphic Designer, you need to provide a Google AI API key. Follow the instructions below to get started.
+              Add your Google AI API key to the .env.local file and restart the server.
             </AlertDescription>
           </Alert>
       )}
