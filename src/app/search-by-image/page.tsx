@@ -9,8 +9,10 @@ import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, Upload } from 'lucide-react';
+import { Loader2, Search, Upload, Info } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAi } from '@/context/ai-context';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 // Helper to resize and compress the image
 const resizeAndCompressImage = (file: File, maxSize = 1024, quality = 0.8): Promise<string> => {
@@ -57,6 +59,7 @@ const resizeAndCompressImage = (file: File, maxSize = 1024, quality = 0.8): Prom
 };
 
 export default function SearchByImagePage() {
+  const { isAiEnabled } = useAi();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<Product[]>([]);
@@ -67,6 +70,7 @@ export default function SearchByImagePage() {
 
   // Load previous search from localStorage on mount
   useEffect(() => {
+    if (!isAiEnabled) return;
     try {
       const savedSearch = localStorage.getItem('visualSearch');
       if (savedSearch) {
@@ -93,7 +97,7 @@ export default function SearchByImagePage() {
       console.error('Failed to load visual search from localStorage', error);
       localStorage.removeItem('visualSearch'); // Clear corrupted data
     }
-  }, []); // Run only on mount
+  }, [isAiEnabled]); // Run only on mount
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -200,8 +204,17 @@ export default function SearchByImagePage() {
           <CardDescription>Upload an image to find products with a similar look.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-4">
+          {!isAiEnabled && (
+            <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>AI Feature Disabled</AlertTitle>
+                <AlertDescription>
+                    Add your Google AI API key to the .env.local file and restart the server.
+                </AlertDescription>
+            </Alert>
+          )}
           <div className="w-full flex justify-center">
-            <Button onClick={() => fileInputRef.current?.click()} variant="outline" size="lg">
+            <Button onClick={() => fileInputRef.current?.click()} variant="outline" size="lg" disabled={!isAiEnabled}>
               <Upload className="mr-2" />
               Upload Image
             </Button>
@@ -211,6 +224,7 @@ export default function SearchByImagePage() {
               onChange={handleImageUpload}
               className="hidden"
               accept="image/png, image/jpeg, image/webp"
+              disabled={!isAiEnabled}
             />
           </div>
 
@@ -223,7 +237,7 @@ export default function SearchByImagePage() {
                     height={400}
                     className="rounded-md object-contain max-h-96 w-auto"
                 />
-                <Button onClick={handleSearch} disabled={isPending || !imageDataUri} size="lg" className="w-full">
+                <Button onClick={handleSearch} disabled={isPending || !imageDataUri || !isAiEnabled} size="lg" className="w-full">
                 {isPending ? (
                     <Loader2 className="mr-2 animate-spin" />
                 ) : (
