@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getProductById } from '@/lib/products';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
@@ -22,6 +22,19 @@ export default function ProductPage() {
   const { addToCart } = useCart();
   const params = useParams<{ id: string }>();
   const product = getProductById(params.id);
+
+  useEffect(() => {
+    if (product) {
+      try {
+        const impressionsString = localStorage.getItem('productImpressions');
+        const impressions = impressionsString ? JSON.parse(impressionsString) : {};
+        impressions[product.id] = (impressions[product.id] || 0) + 1;
+        localStorage.setItem('productImpressions', JSON.stringify(impressions));
+      } catch (error) {
+        console.error("Could not update impressions in localStorage:", error);
+      }
+    }
+  }, [product]);
 
   if (!product) {
     notFound();
