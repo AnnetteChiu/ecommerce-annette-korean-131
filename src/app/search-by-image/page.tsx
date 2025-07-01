@@ -142,57 +142,52 @@ export default function SearchByImagePage() {
 
     setSearchPerformed(true);
     startTransition(async () => {
-      try {
-        const result = await findSimilarProducts({
-          photoDataUri: imageDataUri,
-          count: 4,
-        });
+      const result = await findSimilarProducts({
+        photoDataUri: imageDataUri,
+        count: 4,
+      });
 
-        const productIds = result?.productIds;
+      const productIds = result?.productIds;
 
-        // This is a robust client-side safety net. If the server returns nothing, we throw to trigger the fallback.
-        if (!productIds || productIds.length === 0) {
-          throw new Error("Server returned no recommendations.");
-        }
-        
+      // SUCCESS CASE: We received a valid list of product IDs.
+      if (productIds && productIds.length > 0) {
         const recommendedProducts = productIds
           .map(id => getProductById(id))
           .filter((p): p is Product => !!p);
         
-        // Final check: if mapping IDs resulted in no valid products, also use the fallback.
-        if (recommendedProducts.length === 0) {
-            throw new Error("Server returned only invalid product IDs.");
+        // Final check to ensure we could map IDs to actual products.
+        if (recommendedProducts.length > 0) {
+          setRecommendations(recommendedProducts);
+          // Save the successful search results to localStorage.
+          try {
+            localStorage.setItem('visualSearch', JSON.stringify({
+              imageDataUri: imageDataUri,
+              recommendationIds: result.productIds,
+            }));
+          } catch (e) {
+            console.error("Failed to save visual search results to localStorage", e);
+          }
+          // Exit here, as the success case is handled.
+          return;
         }
-
-        setRecommendations(recommendedProducts);
-
-        // Save the successful search results to localStorage.
-        try {
-          localStorage.setItem('visualSearch', JSON.stringify({
-            imageDataUri: imageDataUri,
-            recommendationIds: result.productIds,
-          }));
-        } catch (e) {
-          console.error("Failed to save visual search results to localStorage", e);
-        }
-
-      } catch (error) {
-        // This is the client-side fallback. It will trigger if the try block fails for ANY reason,
-        // guaranteeing the user never sees an empty state.
-        console.error('Visual search failed, activating robust client-side fallback:', error);
-        
-        const allProducts = getProducts();
-        const fallbackProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
-        setRecommendations(fallbackProducts);
-
-        toast({
-          variant: 'default',
-          title: 'Displaying Popular Items',
-          description: 'We had trouble with the visual search, but here are some popular products for you.',
-        });
-        
-        localStorage.removeItem('visualSearch');
       }
+
+      // --- FALLBACK CASE ---
+      // This block runs if the server-side call failed, returned null/undefined,
+      // or returned empty/invalid product IDs. This is our safety net.
+      console.error('Visual search failed or returned empty data, activating client-side fallback.');
+      
+      const allProducts = getProducts();
+      const fallbackProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
+      setRecommendations(fallbackProducts);
+
+      toast({
+        variant: 'default',
+        title: 'Displaying Popular Items',
+        description: 'We had trouble with the visual search, but here are some popular products for you.',
+      });
+      
+      localStorage.removeItem('visualSearch');
     });
   };
 
