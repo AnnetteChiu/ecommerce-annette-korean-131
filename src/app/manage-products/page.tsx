@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import Image from 'next/image';
 import { getProducts } from '@/lib/products';
 import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Table,
   TableBody,
@@ -36,9 +37,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Edit, Trash2, Info } from 'lucide-react';
+import { Edit, Trash2, Info, Sparkles, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { generateProductDescription } from '@/ai/flows/generate-product-description';
+import { useAi } from '@/context/ai-context';
 
 const ADMIN_PASSWORD = 'admin123';
 
@@ -48,7 +51,9 @@ export default function ManageProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [isGeneratingDesc, startDescTransition] = useTransition();
   const { toast } = useToast();
+  const { isAiEnabled } = useAi();
 
   useEffect(() => {
     // Check login status from localStorage
@@ -95,6 +100,30 @@ export default function ManageProductsPage() {
     toast({ title: 'Product Deleted', description: 'The product has been removed.' });
   };
   
+  const handleGenerateDescription = () => {
+    if (!editingProduct) return;
+
+    startDescTransition(async () => {
+      try {
+        const result = await generateProductDescription({
+          name: editingProduct.name,
+          category: editingProduct.category,
+        });
+        if (result.description) {
+          setEditingProduct({ ...editingProduct, description: result.description });
+          toast({ title: 'Description Generated!', description: 'The new description has been added.' });
+        }
+      } catch (error) {
+        console.error('Failed to generate description', error);
+        toast({
+          variant: 'destructive',
+          title: 'Generation Failed',
+          description: 'Could not generate a description at this time.',
+        });
+      }
+    });
+  };
+
   const getStockBadge = (stock: number) => {
     if (stock === 0) {
       return <Badge variant="destructive">Out of Stock</Badge>;
@@ -231,6 +260,27 @@ export default function ManageProductsPage() {
                   onChange={(e) => setEditingProduct({ ...editingProduct, name: e.target.value })}
                   className="col-span-3"
                 />
+              </div>
+               <div className="grid grid-cols-4 items-start gap-4">
+                <Label htmlFor="description" className="text-right pt-2">
+                  Description
+                </Label>
+                <div className="col-span-3 space-y-2">
+                  <Textarea
+                    id="description"
+                    value={editingProduct.description}
+                    onChange={(e) => setEditingProduct({ ...editingProduct, description: e.target.value })}
+                    rows={5}
+                  />
+                  {isAiEnabled && (
+                    <div className="flex justify-end">
+                      <Button type="button" variant="ghost" size="sm" onClick={handleGenerateDescription} disabled={isGeneratingDesc}>
+                        {isGeneratingDesc ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                        Generate with AI
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="category" className="text-right">
