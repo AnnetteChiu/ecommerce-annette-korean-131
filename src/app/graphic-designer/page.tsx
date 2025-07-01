@@ -64,8 +64,8 @@ export default function GraphicDesignerPage() {
                     <Sparkles className="h-4 w-4" />
                     <AlertTitle>AI Feature Inactive</AlertTitle>
                     <AlertDescription>
-                      A Google AI API key is required. Please add your key to the
-                      {' '}<code className="font-mono bg-muted p-1 rounded-md">.env.local</code> file and restart the server.
+                      Please add your key to the{' '}
+                      <code className="font-mono bg-muted p-1 rounded-md">.env.local</code> file and restart the server.
                       See the{' '}
                       <Link href="/docs" className="font-medium text-primary underline">
                         documentation
