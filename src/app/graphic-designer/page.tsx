@@ -37,10 +37,10 @@ export default function GraphicDesignerPage() {
                 if (result.generatedImageDataUri) {
                     setGeneratedImage(result.generatedImageDataUri);
                 } else {
-                    toast({
+                     toast({
                         variant: 'destructive',
                         title: 'Generation Failed',
-                        description: "The AI did not return an image. Please try a different prompt.",
+                        description: "The AI could not return an image. Please try a different prompt.",
                     });
                 }
             } catch (err) {
@@ -113,8 +113,8 @@ export default function GraphicDesignerPage() {
                              {!isAiEnabled && !isGenerating ? (
                                 <div className="flex flex-col items-center text-center p-4">
                                     <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
-                                    <p className="font-semibold text-destructive">Feature Disabled</p>
-                                    <p className="text-sm">API key is not configured.</p>
+                                    <p className="font-semibold">AI Feature Disabled</p>
+                                    <p className="text-sm text-muted-foreground">Add your API key to <code>src/ai/config.ts</code>.</p>
                                 </div>
                             ) : generatedImage ? (
                                 <Image src={generatedImage} alt="Generated graphic design" fill className="object-contain" />
