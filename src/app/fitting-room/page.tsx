@@ -47,6 +47,11 @@ export default function FittingRoomPage() {
             }
           } else {
             setHasCameraPermission(false);
+            toast({
+                variant: 'destructive',
+                title: 'Camera Not Supported',
+                description: 'Your browser does not seem to support camera access.',
+            });
           }
         };
 
@@ -127,25 +132,33 @@ export default function FittingRoomPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden">
-                                <video ref={videoRef} className={cn("w-full h-full object-cover", capturedImage ? 'hidden' : 'block')} autoPlay muted playsInline />
+                            <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                                <video ref={videoRef} className={cn("w-full h-full object-cover", capturedImage || hasCameraPermission !== true ? 'hidden' : 'block')} autoPlay muted playsInline />
                                 {capturedImage && (
                                     <Image src={capturedImage} alt="Captured photo" fill className="object-cover" />
                                 )}
-                                {hasCameraPermission === false && (
-                                     <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+                                
+                                {hasCameraPermission === null && !capturedImage && (
+                                    <div className="text-center text-muted-foreground p-4">
+                                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                                        <p>Requesting camera access...</p>
+                                    </div>
+                                )}
+
+                                {hasCameraPermission === false && !capturedImage && (
+                                    <div className="p-4">
                                         <Alert variant="destructive">
                                             <AlertTriangle className="h-4 w-4" />
                                             <AlertTitle>Camera Access Required</AlertTitle>
                                             <AlertDescription>
-                                                Please allow camera access in your browser to use this feature.
+                                                Please allow camera access in your browser to use this feature. You may need to check your browser's site settings.
                                             </AlertDescription>
                                         </Alert>
                                     </div>
                                 )}
                             </div>
                             <canvas ref={canvasRef} className="hidden" />
-                            <Button onClick={handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
+                            <Button onClick={capturedImage ? () => setCapturedImage(null) : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
                                 <Camera className="mr-2"/>
                                 {capturedImage ? 'Retake Photo' : 'Capture Photo'}
                             </Button>
