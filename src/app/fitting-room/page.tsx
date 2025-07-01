@@ -58,7 +58,6 @@ export default function FittingRoomPage() {
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
     const [generationError, setGenerationError] = useState<string | null>(null);
-    const [showAiNotice, setShowAiNotice] = useState(false);
     const [isGenerating, startTransition] = useTransition();
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -131,7 +130,6 @@ export default function FittingRoomPage() {
 
             setGeneratedImage(null); // Clear previous results
             setGenerationError(null);
-            setShowAiNotice(false);
         }
     };
 
@@ -151,14 +149,8 @@ export default function FittingRoomPage() {
             return;
         }
 
-        setShowAiNotice(false);
         setGenerationError(null);
         setGeneratedImage(null); // Clear previous results before starting
-
-        if (!isAiEnabled) {
-            setShowAiNotice(true);
-            return;
-        }
 
         startTransition(async () => {
             try {
@@ -196,6 +188,16 @@ export default function FittingRoomPage() {
                 <h1 className="text-4xl font-headline font-bold">AI Fitting Room</h1>
                 <p className="text-muted-foreground mt-2">Virtually try on our collection from the comfort of your home.</p>
             </div>
+
+            {!isAiEnabled && (
+                <Alert>
+                    <Sparkles className="h-4 w-4" />
+                    <AlertTitle>AI Feature Disabled</AlertTitle>
+                    <AlertDescription>
+                      Add your Google AI API key to the .env.local file and restart the server.
+                    </AlertDescription>
+                </Alert>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-8">
@@ -286,7 +288,7 @@ export default function FittingRoomPage() {
                         <CardDescription>Once you have your photo and selected an item, generate your new look!</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                         <Button onClick={handleVirtualTryOn} disabled={!capturedImage || !selectedProduct || isGenerating} className="w-full" size="lg">
+                         <Button onClick={handleVirtualTryOn} disabled={!isAiEnabled || !capturedImage || !selectedProduct || isGenerating} className="w-full" size="lg">
                             {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
                             {isGenerating ? 'Generating...' : 'Virtually Try It On'}
                         </Button>
@@ -320,15 +322,6 @@ export default function FittingRoomPage() {
                                 </>
                             )}
                         </div>
-                        {showAiNotice && (
-                            <Alert>
-                                <Sparkles className="h-4 w-4" />
-                                <AlertTitle>AI Feature Disabled</AlertTitle>
-                                <AlertDescription>
-                                  Add your Google AI API key to the .env.local file and restart the server.
-                                </AlertDescription>
-                            </Alert>
-                        )}
                         {generationError && (
                             <Alert variant="destructive">
                                 <AlertTriangle className="h-4 w-4" />
