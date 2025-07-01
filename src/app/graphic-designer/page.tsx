@@ -65,7 +65,7 @@ export default function GraphicDesignerPage() {
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
                         <div className="space-y-4">
-                             <p>Enable the AI to generate unique designs from a text prompt.</p>
+                             <p>The Graphic Designer feature requires AI to be enabled.</p>
                             <Button asChild variant="secondary" size="sm" className="w-full md:w-auto">
                                 <Link href="/docs">
                                     <Info className="mr-2 h-4 w-4" />

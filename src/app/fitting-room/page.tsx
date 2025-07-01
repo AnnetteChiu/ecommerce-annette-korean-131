@@ -328,7 +328,7 @@ export default function FittingRoomPage() {
                                 <AlertTitle>AI Feature Disabled</AlertTitle>
                                 <AlertDescription>
                                   <div className="space-y-4">
-                                    <p>Enable the AI to see this product virtually placed on you.</p>
+                                    <p>The Virtual Try-On feature requires AI to be enabled.</p>
                                     <Button asChild variant="secondary" size="sm" className="w-full">
                                       <Link href="/docs">
                                         <Info className="mr-2 h-4 w-4" />
