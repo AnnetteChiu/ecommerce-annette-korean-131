@@ -44,11 +44,19 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
     return { productIds: [] };
   }
   
-  // Let errors from the flow propagate up to the calling component.
-  return await findSimilarProductsFlow({ 
-    ...input, 
-    availableProducts,
-  });
+  try {
+    // Let errors from the flow propagate up to be caught here.
+    return await findSimilarProductsFlow({ 
+      ...input, 
+      availableProducts,
+    });
+  } catch (error) {
+    console.error('Visual search flow failed, using server-side fallback:', error);
+    // If the AI fails for any reason, return the first few products as a fallback.
+    // This provides a final, robust safety net.
+    const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
+    return { productIds: fallbackIds };
+  }
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -107,28 +115,21 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      
-      if (!output?.productIds || output.productIds.length === 0) {
-        throw new Error("AI returned no product IDs despite being instructed to.");
-      }
-      
-      const allProductIds = getProducts().map(p => p.id);
-      const validProductIds = output.productIds.filter(id => allProductIds.includes(id));
-      
-      if (validProductIds.length === 0) {
-        throw new Error(`AI returned only invalid product IDs: ${output.productIds.join(', ')}`);
-      }
-      
-      return { productIds: validProductIds };
-
-    } catch (error) {
-      console.error('Visual search flow failed, using server-side fallback:', error);
-      // If the AI fails for any reason, return the first few products as a fallback.
-      // This prevents the client from ever seeing a "No Matches" state.
-      const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
-      return { productIds: fallbackIds };
+    // This flow now only contains the "happy path".
+    // Any errors will be thrown and caught by the exported wrapper function.
+    const { output } = await recommendationPrompt(input);
+    
+    if (!output?.productIds || output.productIds.length === 0) {
+      throw new Error("AI returned no product IDs despite being instructed to.");
     }
+    
+    const allProductIds = getProducts().map(p => p.id);
+    const validProductIds = output.productIds.filter(id => allProductIds.includes(id));
+    
+    if (validProductIds.length === 0) {
+      throw new Error(`AI returned only invalid product IDs: ${output.productIds.join(', ')}`);
+    }
+    
+    return { productIds: validProductIds };
   }
 );
