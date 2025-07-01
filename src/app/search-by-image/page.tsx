@@ -12,6 +12,51 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Search, Upload, ImageOff } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
+// Helper to resize and compress the image
+const resizeAndCompressImage = (file: File, maxSize = 1024, quality = 0.8): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = document.createElement('img');
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+
+        if (width > height) {
+          if (width > maxSize) {
+            height *= maxSize / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width *= maxSize / height;
+            height = maxSize;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          return reject(new Error('Failed to get canvas context'));
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        // Use JPEG for compression
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = (err) => reject(new Error('Image load error'));
+      if (event.target?.result) {
+        img.src = event.target.result as string;
+      } else {
+        reject(new Error('FileReader did not return a result.'));
+      }
+    };
+    reader.onerror = (err) => reject(new Error('FileReader error'));
+    reader.readAsDataURL(file);
+  });
+};
+
+
 export default function SearchByImagePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
@@ -21,35 +66,44 @@ export default function SearchByImagePage() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      if (file.size > 4 * 1024 * 1024) { // 4MB limit
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
         toast({
           variant: 'destructive',
           title: 'Image too large',
-          description: 'Please upload an image smaller than 4MB.',
+          description: 'Please upload an image smaller than 10MB.',
         });
         return;
       }
+      
+      setRecommendations([]);
+      setSearchPerformed(false);
+      setImageDataUri(null); // Reset data URI while processing
+      setImagePreview(URL.createObjectURL(file)); // Show preview immediately
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(URL.createObjectURL(file));
-        setImageDataUri(result);
-        setRecommendations([]); // Clear previous recommendations
-        setSearchPerformed(false); // Reset on new image
-      };
-      reader.readAsDataURL(file);
+      try {
+        const compressedDataUri = await resizeAndCompressImage(file);
+        setImageDataUri(compressedDataUri);
+      } catch (error) {
+        console.error('Image processing failed:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Image Processing Failed',
+          description: 'Could not process the uploaded image. Please try a different one.',
+        });
+        setImagePreview(null);
+        setImageDataUri(null);
+      }
     }
   };
 
   const handleSearch = () => {
     if (!imageDataUri) {
       toast({
-        title: 'No Image Selected',
-        description: 'Please upload an image to find similar products.',
+        title: 'Image is still processing',
+        description: 'Please wait a moment for the image to be prepared for search.',
       });
       return;
     }
@@ -113,13 +167,13 @@ export default function SearchByImagePage() {
                     height={400}
                     className="rounded-md object-contain max-h-96 w-auto"
                 />
-                <Button onClick={handleSearch} disabled={isPending} size="lg" className="w-full">
+                <Button onClick={handleSearch} disabled={isPending || !imageDataUri} size="lg" className="w-full">
                 {isPending ? (
                     <Loader2 className="mr-2 animate-spin" />
                 ) : (
                     <Search className="mr-2" />
                 )}
-                {isPending ? 'Analyzing...' : 'Find Similar Products'}
+                {isPending ? 'Analyzing...' : !imageDataUri ? 'Processing Image...' : 'Find Similar Products'}
                 </Button>
             </div>
           )}
