@@ -67,7 +67,7 @@ const generateGraphicDesignFlow = ai.defineFlow(
     } catch (err) {
       console.error('Error in generateGraphicDesignFlow:', err);
       if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        throw new Error('The Google AI API key is invalid or not configured in your environment. Please see the documentation for instructions.');
+        throw err;
       }
       throw new Error("We couldn't generate a new design. The AI may have had an issue with your prompt. Please try again.");
     }

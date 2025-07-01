@@ -61,7 +61,7 @@ const resizeAndCompressImage = (file: File, maxSize = 1024, quality = 0.8): Prom
 };
 
 export default function SearchByImagePage() {
-  const { isAiEnabled } = useAi();
+  const { isAiEnabled, disableAi } = useAi();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<Product[]>([]);
@@ -180,8 +180,15 @@ export default function SearchByImagePage() {
         console.error("Visual search error:", error);
         const description = error instanceof Error ? error.message : "An unknown error occurred.";
         
-        // Use a client-side fallback if the AI fails for any reason other than a misconfigured key
-        if (!description.includes('API key') && !description.includes('API_KEY_INVALID')) {
+        if (description.includes('API key') || description.includes('API_KEY_INVALID')) {
+            disableAi();
+            toast({
+                variant: "destructive",
+                title: "Google AI Key Invalid",
+                description: "Your API key is invalid. All AI features have been disabled.",
+            });
+            setRecommendations([]);
+        } else {
              toast({
                 variant: "destructive",
                 title: "Visual Search Unsuccessful",
@@ -189,14 +196,6 @@ export default function SearchByImagePage() {
             });
             const fallbackProducts = getProducts().sort(() => 0.5 - Math.random()).slice(0, 4);
             setRecommendations(fallbackProducts);
-        } else {
-            // Show the specific API key error
-            toast({
-                variant: "destructive",
-                title: "Visual Search Failed",
-                description: description,
-            });
-            setRecommendations([]);
         }
         
         localStorage.removeItem('visualSearch');

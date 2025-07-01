@@ -8,6 +8,7 @@ import { ProductCard } from './product-card';
 import type { Product } from '@/types';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAi } from '@/context/ai-context';
 
 type RecommendedProductsProps = {
   currentProductId: string;
@@ -18,6 +19,7 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const { disableAi } = useAi();
 
   useEffect(() => {
     startTransition(async () => {
@@ -46,16 +48,25 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
         console.error('Failed to fetch recommendations:', error);
         const description = error instanceof Error ? error.message : "An unknown error occurred.";
         
-        toast({
-          variant: 'destructive',
-          title: 'Could Not Load Recommendations',
-          description,
-        });
+        if (description.includes('API key') || description.includes('API_KEY_INVALID')) {
+            disableAi();
+            toast({
+                variant: 'destructive',
+                title: 'Google AI Key Invalid',
+                description: 'Your API key is invalid. All AI features have been disabled.',
+            });
+        } else {
+            toast({
+              variant: 'destructive',
+              title: 'Could Not Load Recommendations',
+              description,
+            });
+        }
         
         setRecommendations([]);
       }
     });
-  }, [currentProductId, currentProductName, toast]);
+  }, [currentProductId, currentProductName, toast, disableAi]);
 
   if (isPending && recommendations.length === 0) {
     return (

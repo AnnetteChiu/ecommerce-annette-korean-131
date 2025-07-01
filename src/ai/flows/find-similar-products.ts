@@ -135,10 +135,7 @@ const findSimilarProductsFlow = ai.defineFlow(
 
     } catch (err) {
       console.error('Error in findSimilarProductsFlow:', err);
-      if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        throw new Error('The Google AI API key is invalid or not configured in your environment. Please see the documentation for instructions.');
-      }
-      // Re-throw other errors to be handled by the client
+      // Re-throw the original error to be handled by the client
       throw err;
     }
   }

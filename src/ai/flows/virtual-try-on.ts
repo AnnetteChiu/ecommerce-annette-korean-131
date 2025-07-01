@@ -79,8 +79,8 @@ const virtualTryOnFlow = ai.defineFlow(
       return { generatedImageDataUri: media.url };
     } catch (err) {
       console.error('Error in virtualTryOnFlow:', err);
-      if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        throw new Error('The Google AI API key is invalid or not configured in your environment. Please see the documentation for instructions.');
+       if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
+        throw err;
       }
       throw new Error("We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.");
     }

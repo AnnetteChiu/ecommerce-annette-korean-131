@@ -1,16 +1,26 @@
+
 'use client';
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 
 interface AiContextType {
   isAiEnabled: boolean;
+  disableAi: () => void;
 }
 
 const AiContext = createContext<AiContextType | undefined>(undefined);
 
 export function AiProvider({ children, enabled }: { children: ReactNode; enabled: boolean }) {
+  const [isEffectivelyEnabled, setIsEffectivelyEnabled] = useState(enabled);
+
+  const disableAi = useCallback(() => {
+    setIsEffectivelyEnabled(false);
+  }, []);
+
+  const value = { isAiEnabled: isEffectivelyEnabled, disableAi };
+
   return (
-    <AiContext.Provider value={{ isAiEnabled: enabled }}>
+    <AiContext.Provider value={value}>
       {children}
     </AiContext.Provider>
   );

@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wand2, Loader2 } from 'lucide-react';
+import { useAi } from '@/context/ai-context';
 
 export function StyleRecommender() {
   const [recommendations, setRecommendations] = useState('');
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const { disableAi } = useAi();
 
   const handleGetRecommendations = () => {
     startTransition(async () => {
@@ -33,11 +35,20 @@ export function StyleRecommender() {
       } catch (error) {
         console.error('Failed to generate style recommendations:', error);
         const description = error instanceof Error ? error.message : "An unknown error occurred.";
-        toast({
-          variant: 'destructive',
-          title: 'An Error Occurred',
-          description,
-        });
+        if (description.includes('API key') || description.includes('API_KEY_INVALID')) {
+            disableAi();
+            toast({
+                variant: 'destructive',
+                title: 'Google AI Key Invalid',
+                description: 'Your API key is invalid. All AI features have been disabled.',
+            });
+        } else {
+            toast({
+              variant: 'destructive',
+              title: 'An Error Occurred',
+              description,
+            });
+        }
         setRecommendations('');
       }
     });

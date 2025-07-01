@@ -53,7 +53,7 @@ const resizeImage = (dataUri: string, maxSize = 1024, quality = 0.9): Promise<st
 };
 
 export default function FittingRoomPage() {
-    const { isAiEnabled } = useAi();
+    const { isAiEnabled, disableAi } = useAi();
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -157,14 +157,23 @@ export default function FittingRoomPage() {
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
                 const description = error instanceof Error ? error.message : "An unknown error occurred.";
-                toast({
-                    variant: 'destructive',
-                    title: 'Generation Failed',
-                    description,
-                });
+                if (description.includes('API key') || description.includes('API_KEY_INVALID')) {
+                    disableAi();
+                    toast({
+                        variant: 'destructive',
+                        title: 'Google AI Key Invalid',
+                        description: 'Your API key is invalid. All AI features have been disabled.',
+                    });
+                } else {
+                    toast({
+                        variant: 'destructive',
+                        title: 'Generation Failed',
+                        description,
+                    });
+                }
             }
         });
-    }, [isAiEnabled, capturedImage, startTransition, toast]);
+    }, [isAiEnabled, capturedImage, startTransition, toast, disableAi]);
     
     const handleSelectProduct = (product: Product) => {
         setSelectedProduct(product);
