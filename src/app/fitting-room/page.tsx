@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useTransition } from 'react';
+import { useState, useEffect, useRef, useTransition, useCallback } from 'react';
 import Image from 'next/image';
 import { getProducts } from '@/lib/products';
 import type { Product } from '@/types';
 import { virtualTryOn } from '@/ai/flows/virtual-try-on';
 import { useAi } from '@/context/ai-context';
-import Link from 'next/link';
 import { convertImageUrlToDataUri } from '@/app/actions';
 
 import { Button } from '@/components/ui/button';
@@ -97,13 +96,45 @@ export default function FittingRoomPage() {
         getCameraPermission();
         
         return () => {
-            // Stop camera stream on component unmount
             if (videoRef.current && videoRef.current.srcObject) {
                 const stream = videoRef.current.srcObject as MediaStream;
                 stream.getTracks().forEach(track => track.stop());
             }
         }
     }, [toast]);
+
+    const handleVirtualTryOn = useCallback(() => {
+        if (!isAiEnabled || !capturedImage || !selectedProduct) {
+            return;
+        }
+
+        startTransition(async () => {
+            setGeneratedImage(null);
+            setGenerationError(null);
+            try {
+                const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
+                const resizedCapturedImage = await resizeImage(capturedImage);
+                const result = await virtualTryOn({
+                    userPhotoDataUri: resizedCapturedImage,
+                    productImageDataUri: productImageDataUri,
+                });
+
+                if (result.generatedImageDataUri) {
+                    setGeneratedImage(result.generatedImageDataUri);
+                } else {
+                    throw new Error("AI did not return an image.");
+                }
+            } catch (error) {
+                console.error('Virtual try-on failed:', error);
+                setGeneratedImage(capturedImage);
+                setGenerationError("We couldn't generate the image, but here's your original photo. The AI may have had trouble with this combination. Please try a different item or photo.");
+            }
+        });
+    }, [isAiEnabled, capturedImage, selectedProduct, startTransition]);
+
+    useEffect(() => {
+        handleVirtualTryOn();
+    }, [handleVirtualTryOn]);
 
     const handleCapturePhoto = async () => {
         if (videoRef.current && canvasRef.current) {
@@ -127,53 +158,13 @@ export default function FittingRoomPage() {
                 });
                 setCapturedImage(null);
             }
-
-            setGeneratedImage(null); // Clear previous results
+            setGeneratedImage(null);
             setGenerationError(null);
         }
     };
 
     const handleSelectProduct = (product: Product) => {
         setSelectedProduct(product);
-        setGenerationError(null);
-        setGeneratedImage(null);
-    };
-
-    const handleVirtualTryOn = () => {
-        if (!capturedImage || !selectedProduct) {
-            toast({
-                variant: 'destructive',
-                title: 'Missing Information',
-                description: 'Please capture a photo and select a product to try on.',
-            });
-            return;
-        }
-
-        setGenerationError(null);
-        setGeneratedImage(null); // Clear previous results before starting
-
-        startTransition(async () => {
-            try {
-                const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
-                
-                const resizedCapturedImage = await resizeImage(capturedImage);
-
-                const result = await virtualTryOn({
-                    userPhotoDataUri: resizedCapturedImage,
-                    productImageDataUri: productImageDataUri,
-                });
-
-                if (result.generatedImageDataUri) {
-                    setGeneratedImage(result.generatedImageDataUri);
-                } else {
-                    throw new Error("AI did not return an image.");
-                }
-            } catch (error) {
-                console.error('Virtual try-on failed:', error);
-                setGeneratedImage(capturedImage); 
-                setGenerationError("We couldn't generate the image, but here's your original photo. The AI may have had trouble with this combination. Please try a different item or photo.");
-            }
-        });
     };
 
     const handleRetake = () => {
@@ -181,6 +172,8 @@ export default function FittingRoomPage() {
         setGeneratedImage(null);
         setGenerationError(null);
     };
+    
+    const resultImage = generatedImage || capturedImage;
 
     return (
         <div className="space-y-8">
@@ -200,128 +193,96 @@ export default function FittingRoomPage() {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                <div className="space-y-8">
-                    {/* Step 1: Capture Photo */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Camera /> Step 1: Your Photo</CardTitle>
-                            <CardDescription>
-                                {capturedImage ? "Retake your photo or proceed to the next step." : "Position yourself in the frame and capture a photo."}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                                <video ref={videoRef} className={cn("w-full h-full object-cover", { 'hidden': !!capturedImage })} autoPlay muted playsInline />
-                                {capturedImage && (
-                                    <Image src={capturedImage} alt="Captured photo" fill className="object-cover" />
-                                )}
-                                
-                                {hasCameraPermission === null && !capturedImage && (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-muted-foreground p-4 bg-background/80 backdrop-blur-sm z-10">
-                                        <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                                        <p>Requesting camera access...</p>
-                                    </div>
-                                )}
-
-                                {hasCameraPermission === false && !capturedImage && (
-                                    <div className="absolute inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-10">
-                                        <Alert variant="destructive">
-                                            <AlertTriangle className="h-4 w-4" />
-                                            <AlertTitle>Camera Access Required</AlertTitle>
-                                            <AlertDescription>
-                                                Please allow camera access in your browser to use the virtual try-on. You may need to check your browser's site settings.
-                                            </AlertDescription>
-                                        </Alert>
-                                    </div>
-                                )}
-                            </div>
-                            <canvas ref={canvasRef} className="hidden" />
-                            <Button onClick={capturedImage ? handleRetake : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
-                                <Camera className="mr-2"/>
-                                {capturedImage ? 'Retake Photo' : 'Capture Photo'}
-                            </Button>
-                        </CardContent>
-                    </Card>
-
-                    {/* Step 2: Select Product */}
-                    <Card>
-                        <CardHeader>
-                             <CardTitle className="flex items-center gap-2"><PersonStanding /> Step 2: Select an Item</CardTitle>
-                            <CardDescription>Choose a piece of clothing to try on.</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ScrollArea className="w-full">
-                                <div className="flex space-x-4 pb-4">
-                                    {apparelProducts.map(product => (
-                                        <div 
-                                            key={product.id} 
-                                            className="flex-shrink-0 cursor-pointer" 
-                                            onClick={() => handleSelectProduct(product)}
-                                        >
-                                            <div className={cn(
-                                                "rounded-lg overflow-hidden border-2 transition-all",
-                                                selectedProduct?.id === product.id ? 'border-primary shadow-lg' : 'border-transparent'
-                                            )}>
-                                                <Image 
-                                                    src={product.imageUrl} 
-                                                    alt={product.name} 
-                                                    width={150} 
-                                                    height={200} 
-                                                    className="object-cover w-[150px] h-[200px]"
-                                                    data-ai-hint={`${product.category} product`}
-                                                />
-                                            </div>
-                                            <p className="text-xs mt-1 text-center font-medium w-[150px] truncate">{product.name}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                                <ScrollBar orientation="horizontal" />
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
-                </div>
-                
-                {/* Step 3: Generate & Result */}
-                <Card className="sticky top-24">
+                <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><Sparkles /> Step 3: See Your Look</CardTitle>
-                        <CardDescription>Once you have your photo and selected an item, generate your new look!</CardDescription>
+                        <CardTitle className="flex items-center gap-2"><Camera /> Step 1: Your Photo</CardTitle>
+                        <CardDescription>
+                            {capturedImage ? "Your photo is ready. Retake or proceed to step 2." : "Position yourself in the frame and capture a photo."}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                         <Button onClick={handleVirtualTryOn} disabled={!isAiEnabled || !capturedImage || !selectedProduct || isGenerating} className="w-full" size="lg">
-                            {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
-                            {isGenerating ? 'Generating...' : 'Virtually Try It On'}
-                        </Button>
-                        <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
-                            {isGenerating ? (
-                                <>
-                                    {generatedImage ? (
-                                        <>
-                                            <Image src={generatedImage} alt="Virtual try-on result" fill className="object-cover opacity-50" />
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/50 z-10">
-                                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                                                <p>Generating new look...</p>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="text-center">
-                                            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                                            <p>Our AI is styling you...</p>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    {generatedImage ? (
-                                        <Image src={generatedImage} alt="Virtual try-on result" fill className="object-cover" />
-                                    ) : capturedImage ? (
-                                        <Image src={capturedImage} alt="Your captured photo" fill className="object-cover" />
-                                    ) : (
-                                        <p>Your result will appear here.</p>
-                                    )}
-                                </>
+                        <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center">
+                            <video ref={videoRef} className={cn("w-full h-full object-cover", { 'hidden': !!capturedImage })} autoPlay muted playsInline />
+                            {capturedImage && (
+                                <Image src={capturedImage} alt="Captured photo" fill className="object-cover" />
+                            )}
+                            
+                            {hasCameraPermission === null && !capturedImage && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-muted-foreground p-4 bg-background/80 backdrop-blur-sm z-10">
+                                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                                    <p>Requesting camera access...</p>
+                                </div>
+                            )}
+
+                            {hasCameraPermission === false && !capturedImage && (
+                                <div className="absolute inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-10">
+                                    <Alert variant="destructive">
+                                        <AlertTriangle className="h-4 w-4" />
+                                        <AlertTitle>Camera Access Required</AlertTitle>
+                                        <AlertDescription>
+                                            Please allow camera access in your browser to use the virtual try-on. You may need to check your browser's site settings.
+                                        </AlertDescription>
+                                    </Alert>
+                                </div>
                             )}
                         </div>
+                        <canvas ref={canvasRef} className="hidden" />
+                        <Button onClick={capturedImage ? handleRetake : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
+                            <Camera className="mr-2"/>
+                            {capturedImage ? 'Retake Photo' : 'Capture Photo'}
+                        </Button>
+                    </CardContent>
+                </Card>
+                
+                <Card className="sticky top-24">
+                    <CardHeader>
+                         <CardTitle className="flex items-center gap-2"><PersonStanding /> Step 2: Select & See</CardTitle>
+                        <CardDescription>Choose an item. Your new look will generate automatically.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <ScrollArea className="w-full">
+                            <div className="flex space-x-4 pb-4">
+                                {apparelProducts.map(product => (
+                                    <div 
+                                        key={product.id} 
+                                        className="flex-shrink-0 cursor-pointer" 
+                                        onClick={() => handleSelectProduct(product)}
+                                    >
+                                        <div className={cn(
+                                            "rounded-lg overflow-hidden border-2 transition-all",
+                                            selectedProduct?.id === product.id ? 'border-primary shadow-lg' : 'border-transparent'
+                                        )}>
+                                            <Image 
+                                                src={product.imageUrl} 
+                                                alt={product.name} 
+                                                width={150} 
+                                                height={200} 
+                                                className="object-cover w-[150px] h-[200px]"
+                                                data-ai-hint={`${product.category} product`}
+                                            />
+                                        </div>
+                                        <p className="text-xs mt-1 text-center font-medium w-[150px] truncate">{product.name}</p>
+                                    </div>
+                                ))}
+                            </div>
+                            <ScrollBar orientation="horizontal" />
+                        </ScrollArea>
+                        
+                        <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
+                            {isGenerating && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/50 z-10">
+                                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                                    <p>Generating your new look...</p>
+                                </div>
+                            )}
+
+                            {resultImage ? (
+                                <Image src={resultImage} alt="Virtual try-on result" fill className={cn("object-cover", isGenerating && "opacity-50")} />
+                            ) : (
+                                <p className="text-center p-4">Capture a photo and select an item. Your result will appear here.</p>
+                            )}
+                        </div>
+
                         {generationError && (
                             <Alert variant="destructive">
                                 <AlertTriangle className="h-4 w-4" />
