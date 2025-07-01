@@ -3,24 +3,61 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/cart-context';
+import { useAi } from '@/context/ai-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Trash2, Search, LayoutGrid } from 'lucide-react';
 
 export default function CartPage() {
   const { cartItems, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
+  const { isAiEnabled } = useAi();
 
   if (cartItems.length === 0) {
     return (
-      <div className="text-center py-20">
+      <div className="text-center py-12">
         <ShoppingCart className="mx-auto h-16 w-16 text-muted-foreground" />
-        <h1 className="mt-4 text-3xl font-bold font-headline">Your Cart is Empty</h1>
-        <p className="mt-2 text-muted-foreground">Looks like you haven't added anything to your cart yet.</p>
-        <Button asChild className="mt-6">
-          <Link href="/">Continue Shopping</Link>
-        </Button>
+        <h1 className="mt-4 text-4xl font-bold font-headline">Your Cart is Empty</h1>
+        <p className="mt-2 text-muted-foreground max-w-md mx-auto">Looks like you haven't added anything yet. Explore our collections or try our visual search to find something you'll love.</p>
+        
+        <div className={`mt-10 grid gap-8 max-w-4xl mx-auto ${isAiEnabled ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}`}>
+            <Card className="text-left">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <LayoutGrid />
+                        Browse Collections
+                    </CardTitle>
+                    <CardDescription>
+                        Explore our curated collections and find your next favorite piece.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Button asChild className="w-full">
+                        <Link href="/">Continue Shopping</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+
+            {isAiEnabled && (
+                <Card className="text-left">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Search />
+                            Find Your Style
+                        </CardTitle>
+                        <CardDescription>
+                            Have something in mind? Use an image to find similar items in our store.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Button asChild variant="secondary" className="w-full">
+                            <Link href="/search-by-image">Search with an Image</Link>
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
+        </div>
       </div>
     );
   }
