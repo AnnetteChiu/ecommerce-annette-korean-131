@@ -14,7 +14,6 @@ const ProductForPromptSchema = z.object({
   name: z.string(),
   description: z.string(),
   category: z.string(),
-  imageUrl: z.string().url(),
 });
 
 const FlowInputSchema = z.object({
@@ -40,7 +39,7 @@ const defaultResponse = { productIds: [] };
 export async function findSimilarProducts(input: FindSimilarProductsInput): Promise<FindSimilarProductsOutput> {
   const allProducts = getProducts();
   const availableProducts = allProducts
-    .map(({ id, name, description, category, imageUrl }) => ({ id, name, description, category, imageUrl }));
+    .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
   if (availableProducts.length === 0) {
     return defaultResponse;
@@ -58,23 +57,24 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are a visual search expert. Your task is to find products from the catalog that are visually similar to the user's photo.
+    prompt: `You are an expert fashion stylist acting as a visual search engine.
+Analyze the provided user's photo to understand its key visual characteristics: clothing type, style (e.g., minimalist, bohemian, sporty), color palette, patterns, and fabric texture.
 
-Analyze the key visual elements in the user's photo (e.g., clothing type, color, pattern, style).
+Then, read through the product catalog. Based on your visual analysis of the user's photo, find up to {{count}} products from the catalog whose descriptions and names suggest they are the best stylistic match.
 
-Then, find up to {{count}} products from the "Product Catalog" below that are the best visual match. You MUST return product IDs, even if the match is not perfect.
+You MUST return product IDs. Prioritize finding the closest possible matches, even if they are not a perfect fit. Do not return an empty list if there are products in the catalog.
 
-**User's Photo:**
+**User's Photo to Analyze:**
 {{media url=photoDataUri}}
 
 ---
 
-**Product Catalog:**
+**Product Catalog (Text Descriptions):**
 {{#each availableProducts}}
 Product ID: {{this.id}}
 Name: {{this.name}}
 Description: {{this.description}}
-Image: {{media url=this.imageUrl}}
+Category: {{this.category}}
 ---
 {{/each}}`,
     config: {
