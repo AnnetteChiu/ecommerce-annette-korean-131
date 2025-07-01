@@ -44,15 +44,14 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
   }
   
   try {
-    // Let errors from the flow propagate up to be caught here.
+    // This flow is now architected to be self-healing and will always return valid product IDs.
+    // This catch block is for catastrophic failures (e.g., AI service is completely offline).
     return await findSimilarProductsFlow({ 
       ...input, 
       availableProducts,
     });
   } catch (error) {
-    console.error('Visual search flow failed, using server-side fallback:', error);
-    // If the AI fails for any reason, return the first few products as a fallback.
-    // This provides a final, robust safety net.
+    console.error('Visual search flow failed catastrophically:', error);
     const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
     return { productIds: fallbackIds };
   }
@@ -63,20 +62,11 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are a fashion expert and a visual search engine. Your task is to find products from a catalog that are visually and stylistically similar to the user's uploaded image.
+    prompt: `You are a visual search engine. You will be given a user's image and a product catalog. Your task is to find products from the catalog that are visually similar to the user's image.
 
-You will be given a photo provided by the user. Analyze the photo carefully. Identify key visual elements:
-- Garment type (e.g., dress, jeans, tote bag)
-- Style (e.g., minimalist, bohemian, professional, casual)
-- Color and pattern
-- Material/texture (e.g., denim, leather, knit)
-- Overall aesthetic and mood.
-
-Then, you will be given a catalog of available products with their name, description, and category. Compare the visual analysis of the user's photo with the textual information for each product in the catalog.
-
-You MUST return up to {{count}} of the closest matches based on your analysis. It is critical that you always return results, even if the match isn't perfect. Prioritize the best available options. Do NOT return an empty 'productIds' array.
-
-The 'productIds' array in your response MUST contain ONLY the IDs from the 'Product ID' fields in the provided catalog.
+You MUST return a JSON object containing the 'productIds' of the {{count}} most similar products.
+- The 'productIds' array MUST NOT be empty. Always return the best available matches, even if they are not perfect.
+- The product IDs in your response MUST exist in the provided catalog.
 
 **User's Image:**
 {{media url=photoDataUri}}
@@ -120,21 +110,30 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    // This flow now only contains the "happy path".
-    // Any errors will be thrown and caught by the exported wrapper function.
-    const { output } = await recommendationPrompt(input);
-    
-    if (!output?.productIds || output.productIds.length === 0) {
-      throw new Error("AI returned no product IDs despite being instructed to.");
+    try {
+      const { output } = await recommendationPrompt(input);
+      
+      // Happy Path: Validate the AI's output.
+      if (output?.productIds && output.productIds.length > 0) {
+        const allProductIds = getProducts().map(p => p.id);
+        const validProductIds = output.productIds.filter(id => allProductIds.includes(id));
+        
+        if (validProductIds.length > 0) {
+          return { productIds: validProductIds }; // Success!
+        }
+      }
+
+      // Fallback Path: If the AI returns invalid, empty, or no data, generate a fallback.
+      // This makes the flow self-healing and prevents errors from propagating.
+      console.error('AI visual search returned invalid or empty data. Using direct fallback inside the flow.');
+      const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
+      return { productIds: fallbackIds };
+
+    } catch (error) {
+      // Catastrophic Fallback: Catch any other unexpected errors from the prompt call itself.
+      console.error('An unexpected error occurred during the recommendationPrompt execution:', error);
+      const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
+      return { productIds: fallbackIds };
     }
-    
-    const allProductIds = getProducts().map(p => p.id);
-    const validProductIds = output.productIds.filter(id => allProductIds.includes(id));
-    
-    if (validProductIds.length === 0) {
-      throw new Error(`AI returned only invalid product IDs: ${output.productIds.join(', ')}`);
-    }
-    
-    return { productIds: validProductIds };
   }
 );
