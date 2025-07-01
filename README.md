@@ -21,6 +21,21 @@ This application includes advanced AI features powered by Google's Generative AI
 
 3.  **Restart your app:** Stop and restart the local development server for the changes to take effect.
 
-### For Production Deployment
+### For Production Deployment on Firebase App Hosting
 
-When you publish your app, do not include the `.env.local` file. Instead, set the `GOOGLE_API_KEY` as an environment variable (or "secret") in your hosting provider's project settings (e.g., Firebase App Hosting, Vercel, Netlify). This securely enables the AI features in your live application.
+When you deploy your application, your `.env.local` file is **not** included for security reasons. To enable AI features in your live app for all your users, you must securely provide your API key as a "secret" in your Firebase project.
+
+Your application is already configured to use this secret via the `apphosting.yaml` file.
+
+**Your Action Required:**
+
+1.  **Go to the Firebase Console** and select your project.
+2.  Navigate to the **App Hosting** section from the "Build" menu.
+3.  Find your backend and go to its settings.
+4.  In the **Secrets** tab, click **Create secret**.
+5.  For the "Secret name," enter exactly: `GOOGLE_API_KEY`
+6.  Paste your API key into the "Secret value" field.
+7.  Click **Create secret** and save your changes.
+8.  **Redeploy your app.**
+
+After redeploying, your live application will have access to the key, and all AI features will be enabled for your users.

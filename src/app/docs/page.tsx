@@ -43,17 +43,17 @@ console.log('Please refresh the page to see the changes take effect.');
       {aiEnabled ? (
           <Alert>
             <CheckCircle className="h-4 w-4" />
-            <AlertTitle>AI Features are Enabled</AlertTitle>
+            <AlertTitle>AI Features are Enabled Locally</AlertTitle>
             <AlertDescription>
-              Your Google AI API key is configured correctly. All AI-powered features are active.
+              Your <code>.env.local</code> file is configured correctly. AI features are active for local development.
             </AlertDescription>
           </Alert>
       ) : (
           <Alert variant="destructive">
             <Info className="h-4 w-4" />
-            <AlertTitle>AI Feature Disabled</AlertTitle>
+            <AlertTitle>AI Features Disabled</AlertTitle>
             <AlertDescription>
-              Add your Google AI API key to the .env.local file and restart the server.
+              Add your Google AI API key to the .env.local file and restart the server to enable AI features for local development.
             </AlertDescription>
           </Alert>
       )}
@@ -62,10 +62,10 @@ console.log('Please refresh the page to see the changes take effect.');
         <CardHeader>
           <div className="flex items-center gap-2">
             <KeyRound className="h-6 w-6" />
-            <CardTitle>How to Enable AI Features</CardTitle>
+            <CardTitle>How to Enable AI Features (Local Development)</CardTitle>
           </div>
           <CardDescription>
-            This application uses Google's Generative AI. To turn it on, you need to provide a Google AI API key.
+            This enables AI features on your local machine only. For your live website, see the production deployment section below.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -81,9 +81,7 @@ console.log('Please refresh the page to see the changes take effect.');
           <div>
             <h3 className="font-semibold mb-2">2. Set Up Your Local Environment</h3>
             <p className="text-muted-foreground mb-4">
-              In the root directory of your project, create a new file named <code>.env.local</code>.
-              <br/>
-              Add your API key to this file like so:
+              In the root directory of your project, create a file named <code>.env.local</code> and add your API key.
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="font-code text-sm text-muted-foreground">
@@ -101,16 +99,28 @@ console.log('Please refresh the page to see the changes take effect.');
         <CardHeader>
           <div className="flex items-center gap-2">
             <Server className="h-6 w-6" />
-            <CardTitle>Production Deployment</CardTitle>
+            <CardTitle>Enabling AI in Your Live App (Production)</CardTitle>
           </div>
           <CardDescription>
-            When you publish your app, do not include the <code>.env.local</code> file.
+            Your <code>.env.local</code> file is for local development only and is <strong>not</strong> deployed with your app for security. To enable AI features on your live website for all users, follow these steps.
           </CardDescription>
         </CardHeader>
         <CardContent>
-           <p className="text-muted-foreground">
-            Instead, set the <code>GOOGLE_API_KEY</code> as an environment variable (or "secret") in your hosting provider's project settings (e.g., Firebase App Hosting, Vercel, Netlify). This securely enables the AI features in your live application.
-            </p>
+           <div className="space-y-4 text-muted-foreground">
+            <p>Your app is configured using <code>apphosting.yaml</code> to look for a secret named <strong>GOOGLE_API_KEY</strong>. You must create this secret in the Firebase Console.</p>
+            <ol className="list-decimal list-inside space-y-2 pl-4">
+                <li>Go to the <strong>Firebase Console</strong> and open your project.</li>
+                <li>In the "Build" menu, go to <strong>App Hosting</strong>.</li>
+                <li>Click on your backend to open its settings.</li>
+                <li>Select the <strong>Secrets</strong> tab and click <strong>Create secret</strong>.</li>
+                <li>
+                  Enter the Secret name exactly as: <code className="bg-muted px-1 py-0.5 rounded">GOOGLE_API_KEY</code>
+                </li>
+                <li>Paste your key into the <strong>Secret value</strong> field.</li>
+                <li>Click <strong>Create secret</strong> and save the changes.</li>
+                <li><strong>Redeploy your app</strong>. The AI features will now be active for all users.</li>
+            </ol>
+          </div>
         </CardContent>
       </Card>
 
