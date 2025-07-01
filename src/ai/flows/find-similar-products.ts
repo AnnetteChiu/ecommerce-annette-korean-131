@@ -57,8 +57,9 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
-    prompt: `You are an expert e-commerce stylist. Analyze the provided image and find up to {{count}} products from the catalog below that are a good stylistic match. 
-Consider the item's aesthetic, color, and type. Prioritize finding good matches. If no items in the catalog are a good match, return an empty array for productIds.
+    prompt: `You are an expert e-commerce stylist. Your task is to find the products from the catalog that are the most stylistically similar to the item in the user's photo.
+Analyze the provided image and find up to {{count}} products from the catalog below. Rank the products by similarity and return the best matches.
+Focus on aesthetic, color, and item type. If there are no reasonably similar items, you can return an empty array, but prefer finding the closest possible matches over returning nothing.
 
 Catalog of available products:
 {{#each availableProducts}}
