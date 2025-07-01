@@ -58,16 +58,13 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are a visual search engine API. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
-    prompt: `You are a visual search engine for an e-commerce fashion store. Your only job is to compare the user's uploaded image to a list of available products and find the best visual matches.
+    prompt: `You are a visual search expert for a fashion e-commerce store. Your task is to find products from our catalog that are visually similar to an image provided by a user.
 
-**Instructions:**
-1. Carefully analyze the user's uploaded photo. Pay attention to the item type, color, pattern, material texture, and overall style.
-2. Visually compare the user's photo against each product in the catalog provided below.
-3. You **must** select up to {{count}} products from the catalog that are the most visually similar.
-4. Rank the products from most similar to least similar.
-5. If no products are a perfect match, you must still return the *closest* available matches. Do not return an empty list unless the uploaded image contains no discernible clothing items.
+Analyze the user's photo and identify key visual features like clothing type, color, pattern, and style.
 
-**User's Photo to Match:**
+Then, from the "Available Product Catalog" provided, select up to {{count}} product IDs that are the best visual match. You must return the product IDs of the most similar items, even if there isn't a perfect match.
+
+**User's Photo:**
 {{media url=photoDataUri}}
 
 ---
@@ -76,10 +73,29 @@ const recommendationPrompt = ai.definePrompt({
 {{#each availableProducts}}
 Product ID: {{this.id}}
 Name: {{this.name}}
-Description: {{this.description}}
 {{media url=this.imageUrl}}
 ---
-{{/each}}`
+{{/each}}`,
+    config: {
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_NONE',
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_NONE',
+          },
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_NONE',
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+          },
+        ],
+      },
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
