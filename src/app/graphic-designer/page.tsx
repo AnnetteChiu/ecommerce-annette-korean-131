@@ -33,7 +33,6 @@ export default function GraphicDesignerPage() {
         }
 
         setError(null);
-        setGeneratedImage(null);
 
         startTransition(async () => {
             try {
@@ -58,10 +57,10 @@ export default function GraphicDesignerPage() {
                 <p className="text-muted-foreground mt-2">Describe a design concept, and our AI will bring it to life.</p>
             </div>
 
-            {!isAiEnabled && (
+            {!isAiEnabled ? (
                 <Alert>
                     <Sparkles className="h-4 w-4" />
-                    <AlertTitle>AI Graphic Designer Disabled</AlertTitle>
+                    <AlertTitle>AI Graphic Designer is Disabled</AlertTitle>
                     <AlertDescription>
                         <div>
                             <p className="mb-4">To generate designs from a text prompt, please enable the optional AI feature. See the developer documentation for simple setup instructions.</p>
@@ -74,7 +73,7 @@ export default function GraphicDesignerPage() {
                         </div>
                     </AlertDescription>
                 </Alert>
-            )}
+            ) : null}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <Card>

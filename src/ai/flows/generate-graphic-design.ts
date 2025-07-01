@@ -34,7 +34,7 @@ const generateGraphicDesignFlow = ai.defineFlow(
 
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `A professional, modern, and aesthetically pleasing graphic design based on the following concept: "${prompt}". The design should be suitable for a high-end fashion and lifestyle brand. Avoid text unless explicitly requested. The output should be only the image.`,
+      prompt: `A professional, modern, and aesthetically pleasing graphic design for a high-end fashion and lifestyle brand. The design should be based on the following concept: "${prompt}". Avoid including any text in the image unless it is explicitly requested in the concept.`,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
         safetySettings: [
