@@ -228,7 +228,7 @@ export default function FittingRoomPage() {
                                             <AlertTriangle className="h-4 w-4" />
                                             <AlertTitle>Camera Access Required</AlertTitle>
                                             <AlertDescription>
-                                                Please allow camera access in your browser to use this feature. You may need to check your browser's site settings.
+                                                Please allow camera access in your browser to use the virtual try-on. You may need to check your browser's site settings.
                                             </AlertDescription>
                                         </Alert>
                                     </div>
