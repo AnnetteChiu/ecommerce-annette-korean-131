@@ -82,7 +82,7 @@ export default function FittingRoomPage() {
                 toast({
                     variant: 'destructive',
                     title: 'Camera Access Denied',
-                    description: 'Please enable camera permissions in your browser settings to use the fitting room.',
+                    description: 'Please enable camera permissions in your browser settings to use the virtual try-on.',
                 });
             }
           } else {
@@ -138,6 +138,7 @@ export default function FittingRoomPage() {
     const handleSelectProduct = (product: Product) => {
         setSelectedProduct(product);
         setGenerationError(null);
+        setGeneratedImage(null);
     };
 
     const handleVirtualTryOn = () => {
@@ -292,25 +293,33 @@ export default function FittingRoomPage() {
                             {isGenerating ? 'Generating...' : 'Virtually Try It On'}
                         </Button>
                         <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
-                            {isGenerating && !generatedImage && (
-                                <div className="text-center">
-                                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                                    <p>Our AI is styling you...</p>
-                                </div>
-                            )}
-                            {(generatedImage || (isGenerating && capturedImage)) && (
-                                <Image src={generatedImage || capturedImage!} alt="Virtual try-on result" fill className={cn("object-cover", { 'opacity-50': isGenerating })} />
-                            )}
-                            
-                            {isGenerating && generatedImage && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/50">
-                                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-                                    <p>Generating new look...</p>
-                                </div>
-                            )}
-
-                            {!isGenerating && !generatedImage && (
-                                <p>Your result will appear here.</p>
+                            {isGenerating ? (
+                                <>
+                                    {generatedImage ? (
+                                        <>
+                                            <Image src={generatedImage} alt="Virtual try-on result" fill className="object-cover opacity-50" />
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/50 z-10">
+                                                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                                                <p>Generating new look...</p>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center">
+                                            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                                            <p>Our AI is styling you...</p>
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                <>
+                                    {generatedImage ? (
+                                        <Image src={generatedImage} alt="Virtual try-on result" fill className="object-cover" />
+                                    ) : capturedImage ? (
+                                        <Image src={capturedImage} alt="Your captured photo" fill className="object-cover" />
+                                    ) : (
+                                        <p>Your result will appear here.</p>
+                                    )}
+                                </>
                             )}
                         </div>
                         {showAiNotice && (
@@ -318,15 +327,15 @@ export default function FittingRoomPage() {
                                 <Sparkles className="h-4 w-4" />
                                 <AlertTitle>Enable the Optional AI Feature</AlertTitle>
                                 <AlertDescription>
-                                    <div className="space-y-4">
-                                        <p>You are seeing your original photo. To use the virtual try-on, please follow the setup instructions.</p>
-                                        <Button asChild variant="secondary" size="sm" className="w-full">
-                                            <Link href="/docs">
-                                                <Info className="mr-2 h-4 w-4" />
-                                                View Setup Instructions
-                                            </Link>
-                                        </Button>
-                                    </div>
+                                  <div className="space-y-4">
+                                    <p>To see the product virtually placed on you, enable the optional AI feature.</p>
+                                    <Button asChild variant="secondary" size="sm" className="w-full">
+                                      <Link href="/docs">
+                                        <Info className="mr-2 h-4 w-4" />
+                                        See Simple Setup Instructions
+                                      </Link>
+                                    </Button>
+                                  </div>
                                 </AlertDescription>
                             </Alert>
                         )}
