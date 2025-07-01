@@ -56,14 +56,21 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are a visual search engine API. Your task is to find products from the provided catalog that are visually similar to the item in the user's image.
+    prompt: `You are an expert fashion stylist with an eye for visual detail. Your task is to act as a visual search engine. You will be given an image from a user and a catalog of available products. Your goal is to find the products from the catalog that are the most visually similar to the clothing item in the user's image.
 
-You have one, critical instruction: **You MUST ALWAYS return a JSON object containing a 'productIds' array with exactly {{count}} product IDs from the provided catalog.**
+**Analyze the user's image in detail:**
+-   **Item Type:** What is the main clothing item (e.g., t-shirt, blazer, jeans)?
+-   **Color Palette:** What are the dominant and accent colors?
+-   **Pattern & Texture:** Is there a pattern (e.g., plaid, stripes, floral)? What is the texture (e.g., knit, denim, smooth)?
+-   **Style & Cut:** What is the overall style (e.g., minimalist, bohemian, formal)? What is the cut (e.g., relaxed fit, slim fit, A-line)?
 
--   **Analyze the User's Image:** Identify the main clothing item, its style, color, pattern, and material.
--   **Compare with Catalog:** Find the products in the catalog that are the closest visual match.
--   **CRITICAL RULE:** If you cannot find any good matches, you MUST still return the \`productIds\` of the most plausible items from the catalog. **Do NOT return an empty array.** If the image is a blue shirt, and the catalog only has red shirts, return the red shirts. You must fulfill the request.
+**Compare with the product catalog:**
+Based on your analysis, find the products in the catalog that are the closest visual match. Prioritize overall look and feel, then color and pattern.
+
+**Your Response:**
+You MUST return a JSON object containing a 'productIds' array with exactly {{count}} product IDs from the provided catalog.
 -   The product IDs in your response MUST exist in the provided catalog.
+-   **CRITICAL RULE:** It is crucial that you always return {{count}} product IDs. If you cannot find several good matches, you MUST still select the most plausible items from the catalog to meet the count. Do not return an empty array. Your goal is to provide options, even if they are not a perfect one-to-one match.
 
 **User's Image:**
 {{media url=photoDataUri}}
