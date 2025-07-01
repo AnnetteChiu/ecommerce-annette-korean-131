@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -32,28 +33,27 @@ export function Header() {
           </Link>
           <nav>
             <div className="flex items-center gap-1">
-              {isAiEnabled && (
-                <>
-                  {navLinks.map((link) => {
-                    const isActive = pathname === link.href;
-                    return (
-                      <Button
-                        key={link.href}
-                        variant="ghost"
-                        asChild
-                        className={cn(
-                          isActive && 'bg-accent text-accent-foreground'
-                        )}
-                      >
-                        <Link href={link.href}>
-                          <link.icon />
-                          {link.label}
-                        </Link>
-                      </Button>
-                    );
-                  })}
-                </>
-              )}
+              <>
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Button
+                      key={link.href}
+                      variant="ghost"
+                      asChild
+                      className={cn(
+                        'hidden md:inline-flex',
+                        isActive && 'bg-accent text-accent-foreground'
+                      )}
+                    >
+                      <Link href={link.href}>
+                        <link.icon />
+                        {link.label}
+                      </Link>
+                    </Button>
+                  );
+                })}
+              </>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>

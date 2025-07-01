@@ -1,28 +1,13 @@
+
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Code, PowerOff } from 'lucide-react';
+import { Code, Info } from 'lucide-react';
 import { isAiEnabled } from '@/lib/ai';
-
-function AiDisabledMessage() {
-  return (
-    <div className="text-center py-20">
-      <PowerOff className="mx-auto h-16 w-16 text-muted-foreground" />
-      <h1 className="mt-4 text-3xl font-bold font-headline">AI Feature Disabled</h1>
-      <p className="mt-2 text-muted-foreground max-w-md mx-auto">
-        This feature requires a Google AI API key, but it has not been configured. Please see the README for setup instructions.
-      </p>
-      <Button asChild className="mt-6">
-        <Link href="/">Return to Homepage</Link>
-      </Button>
-    </div>
-  );
-}
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function DocsPage() {
-  if (!isAiEnabled()) {
-    return <AiDisabledMessage />;
-  }
+  const aiEnabled = isAiEnabled();
   
   const codeSnippet = `
 // A sample browsing history with a few products.
@@ -46,6 +31,17 @@ console.log('Please refresh the page to see the changes take effect.');
   return (
     <div className="space-y-8">
       <h1 className="text-4xl font-headline font-bold text-center">Developer Documentation</h1>
+
+      {!aiEnabled && (
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertTitle>AI Features Not Configured</AlertTitle>
+            <AlertDescription>
+              The AI features like product recommendations require a Google AI API key. The code snippets below will still work to update your browsing history, but you won't see AI-powered results until you configure your key. See the README for instructions.
+            </AlertDescription>
+          </Alert>
+      )}
+
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">

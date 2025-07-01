@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
@@ -16,21 +17,6 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-function AiDisabledMessage() {
-  return (
-    <div className="text-center py-20">
-      <PowerOff className="mx-auto h-16 w-16 text-muted-foreground" />
-      <h1 className="mt-4 text-3xl font-bold font-headline">AI Feature Disabled</h1>
-      <p className="mt-2 text-muted-foreground max-w-md mx-auto">
-        This feature requires a Google AI API key, but it has not been configured. Please see the README for setup instructions.
-      </p>
-      <Button asChild className="mt-6">
-        <Link href="/">Return to Homepage</Link>
-      </Button>
-    </div>
-  );
-}
-
 export default function FittingRoomPage() {
     const { isAiEnabled } = useAi();
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -46,7 +32,10 @@ export default function FittingRoomPage() {
     const apparelProducts = getProducts().filter(p => p.category === 'Apparel');
 
     useEffect(() => {
-        if (!isAiEnabled) return;
+        if (!isAiEnabled) {
+            setHasCameraPermission(false);
+            return;
+        };
 
         const getCameraPermission = async () => {
           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -85,10 +74,6 @@ export default function FittingRoomPage() {
             }
         }
     }, [toast, isAiEnabled]);
-
-    if (!isAiEnabled) {
-      return <AiDisabledMessage />;
-    }
 
     const handleCapturePhoto = () => {
         if (videoRef.current && canvasRef.current) {
@@ -145,6 +130,16 @@ export default function FittingRoomPage() {
                 <p className="text-muted-foreground mt-2">Virtually try on our collection from the comfort of your home.</p>
             </div>
 
+            {!isAiEnabled && (
+                <Alert>
+                    <PowerOff className="h-4 w-4" />
+                    <AlertTitle>AI Feature Notice</AlertTitle>
+                    <AlertDescription>
+                        The virtual try-on functionality is an optional feature that requires a Google AI API key. Without it, you can explore the UI, but image generation will be disabled. See the README for setup instructions.
+                    </AlertDescription>
+                </Alert>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-8">
                     {/* Step 1: Capture Photo */}
@@ -162,7 +157,7 @@ export default function FittingRoomPage() {
                                     <Image src={capturedImage} alt="Captured photo" fill className="object-cover" />
                                 )}
                                 
-                                {hasCameraPermission === null && !capturedImage && (
+                                {hasCameraPermission === null && isAiEnabled && !capturedImage && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-muted-foreground p-4 bg-background/80 backdrop-blur-sm z-10">
                                         <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                                         <p>Requesting camera access...</p>
@@ -182,7 +177,7 @@ export default function FittingRoomPage() {
                                 )}
                             </div>
                             <canvas ref={canvasRef} className="hidden" />
-                            <Button onClick={capturedImage ? () => setCapturedImage(null) : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
+                            <Button onClick={capturedImage ? () => setCapturedImage(null) : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true || !isAiEnabled}>
                                 <Camera className="mr-2"/>
                                 {capturedImage ? 'Retake Photo' : 'Capture Photo'}
                             </Button>
@@ -234,7 +229,7 @@ export default function FittingRoomPage() {
                         <CardDescription>Once you have your photo and selected an item, generate your new look!</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                         <Button onClick={handleVirtualTryOn} disabled={!capturedImage || !selectedProduct || isGenerating} className="w-full" size="lg">
+                         <Button onClick={handleVirtualTryOn} disabled={!capturedImage || !selectedProduct || isGenerating || !isAiEnabled} className="w-full" size="lg">
                             {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
                             {isGenerating ? 'Generating...' : 'Virtually Try It On'}
                         </Button>
