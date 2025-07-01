@@ -57,23 +57,24 @@ const recommendationPrompt = ai.definePrompt({
     name: 'findSimilarProductsPrompt',
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
-    system: "You are a visual search engine API. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
-    prompt: `You are a visual search expert for a fashion e-commerce store. Your task is to find products from our catalog that are visually similar to an image provided by a user.
+    system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
+    prompt: `You are a visual search expert. Your task is to find products from the catalog that are visually similar to the user's photo.
 
-Analyze the user's photo and identify key visual features like clothing type, color, pattern, and style.
+Analyze the key visual elements in the user's photo (e.g., clothing type, color, pattern, style).
 
-Then, from the "Available Product Catalog" provided, select up to {{count}} product IDs that are the best visual match. You must return the product IDs of the most similar items, even if there isn't a perfect match.
+Then, find up to {{count}} products from the "Product Catalog" below that are the best visual match. You MUST return product IDs, even if the match is not perfect.
 
 **User's Photo:**
 {{media url=photoDataUri}}
 
 ---
 
-**Available Product Catalog:**
+**Product Catalog:**
 {{#each availableProducts}}
 Product ID: {{this.id}}
 Name: {{this.name}}
-{{media url=this.imageUrl}}
+Description: {{this.description}}
+Image: {{media url=this.imageUrl}}
 ---
 {{/each}}`,
     config: {
@@ -105,14 +106,9 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      // If the model fails to generate valid JSON or returns nothing, return a default response.
-      return output || defaultResponse;
-    } catch (error) {
-      console.error('Error in findSimilarProductsFlow:', error);
-      // On any error, return the default response to avoid crashing the client.
-      return defaultResponse;
-    }
+    const { output } = await recommendationPrompt(input);
+    // If the model fails to generate valid JSON or returns nothing, we return a default response.
+    // The calling component is set up to handle true errors from the AI, which will be thrown by recommendationPrompt.
+    return output || defaultResponse;
   }
 );
