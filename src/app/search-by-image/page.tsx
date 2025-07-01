@@ -256,19 +256,6 @@ export default function SearchByImagePage() {
             </div>
         </div>
       )}
-
-      {/* This block should now be unreachable due to the fallback logic, but is kept for clarity. */}
-      {!isPending && searchPerformed && recommendations.length === 0 && (
-        <Card className="w-full max-w-2xl mt-8">
-            <CardContent className="pt-6 text-center flex flex-col items-center">
-                <Frown className="w-12 h-12 text-muted-foreground mb-4" />
-                <p className="text-lg font-semibold">No Matches Found</p>
-                <p className="text-muted-foreground mt-2">
-                    We couldn't find any products matching your image. Please try a different photo.
-                </p>
-            </CardContent>
-        </Card>
-      )}
     </div>
   );
 }

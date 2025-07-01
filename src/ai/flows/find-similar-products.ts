@@ -131,13 +131,15 @@ const findSimilarProductsFlow = ai.defineFlow(
       
       // Fallback Case 1: AI returned empty, null, or only invalid product IDs.
       console.error('AI visual search returned invalid or empty data. Using fallback.');
-      const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
+      const fallbackProducts = getProducts().sort(() => 0.5 - Math.random());
+      const fallbackIds = fallbackProducts.slice(0, input.count || 4).map(p => p.id);
       return { productIds: fallbackIds };
 
     } catch (error) {
       // Fallback Case 2: A catastrophic error occurred (e.g., Genkit/network failure).
       console.error('A catastrophic error occurred during the visual search flow:', error);
-      const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
+      const fallbackProducts = getProducts().sort(() => 0.5 - Math.random());
+      const fallbackIds = fallbackProducts.slice(0, input.count || 4).map(p => p.id);
       return { productIds: fallbackIds };
     }
   }
