@@ -12,12 +12,6 @@ type RecommendedProductsProps = {
   currentProductName: string;
 };
 
-const defaultHistory = [
-  { id: '2', name: 'Relaxed Fit Blue Jeans' },
-  { id: '3', name: 'Organic Cotton Tee' },
-  { id: '17', name: 'Casual Zip-Up Hoodie' },
-];
-
 export function RecommendedProducts({ currentProductId, currentProductName }: RecommendedProductsProps) {
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [isPending, startTransition] = useTransition();
@@ -27,14 +21,7 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
       try {
         let history = [];
         try {
-          let historyString = sessionStorage.getItem('browsingHistory');
-      
-          // If no history exists, preload with default data for a better "first run" experience
-          if (!historyString) {
-            sessionStorage.setItem('browsingHistory', JSON.stringify(defaultHistory));
-            historyString = sessionStorage.getItem('browsingHistory');
-          }
-      
+          const historyString = sessionStorage.getItem('browsingHistory');
           const parsedHistory = JSON.parse(historyString || '[]');
 
           const MAX_HISTORY = 10;
