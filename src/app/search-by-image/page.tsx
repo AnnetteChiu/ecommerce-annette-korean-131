@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition, useRef } from 'react';
+import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { findSimilarProducts } from '@/ai/flows/find-similar-products';
 import { getProductById } from '@/lib/products';
@@ -66,6 +66,30 @@ export default function SearchByImagePage() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Load previous search from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedSearch = localStorage.getItem('visualSearch');
+      if (savedSearch) {
+        const { imageDataUri: savedImageDataUri, recommendationIds } = JSON.parse(savedSearch);
+        if (savedImageDataUri && recommendationIds && Array.isArray(recommendationIds)) {
+          setImagePreview(savedImageDataUri);
+          setImageDataUri(savedImageDataUri);
+
+          const recommendedProducts = recommendationIds
+            .map((id: string) => getProductById(id))
+            .filter((p): p is Product => !!p);
+          
+          setRecommendations(recommendedProducts);
+          setSearchPerformed(true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load visual search from localStorage', error);
+      localStorage.removeItem('visualSearch'); // Clear corrupted data
+    }
+  }, []); // Run only on mount
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -78,6 +102,8 @@ export default function SearchByImagePage() {
         return;
       }
       
+      // Clear previous search from state and storage
+      localStorage.removeItem('visualSearch');
       setRecommendations([]);
       setSearchPerformed(false);
       setImageDataUri(null); // Reset data URI while processing
@@ -121,11 +147,22 @@ export default function SearchByImagePage() {
             .map(id => getProductById(id))
             .filter((p): p is Product => !!p);
           setRecommendations(recommendedProducts);
+          // Persist search results for the user
+           try {
+            localStorage.setItem('visualSearch', JSON.stringify({
+              imageDataUri: imageDataUri,
+              recommendationIds: result.productIds,
+            }));
+          } catch (e) {
+            console.error("Failed to save visual search results to localStorage", e);
+          }
         } else {
           setRecommendations([]);
+          localStorage.removeItem('visualSearch');
         }
       } catch (error) {
         setRecommendations([]);
+        localStorage.removeItem('visualSearch');
         console.error('Failed to find similar products:', error);
         toast({
           variant: 'destructive',
