@@ -124,16 +124,6 @@ export default function FittingRoomPage() {
                 <p className="text-muted-foreground mt-2">Virtually try on our collection from the comfort of your home.</p>
             </div>
 
-            {!isAiEnabled && (
-                <Alert>
-                    <PowerOff className="h-4 w-4" />
-                    <AlertTitle>AI Feature Notice</AlertTitle>
-                    <AlertDescription>
-                        The virtual try-on functionality is an optional feature that requires a Google AI API key. Without it, you can explore the UI, but image generation will be disabled. See the README for setup instructions.
-                    </AlertDescription>
-                </Alert>
-            )}
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div className="space-y-8">
                     {/* Step 1: Capture Photo */}
