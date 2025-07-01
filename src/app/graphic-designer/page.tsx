@@ -60,14 +60,14 @@ export default function GraphicDesignerPage() {
             {!isAiEnabled ? (
                 <Alert>
                     <Sparkles className="h-4 w-4" />
-                    <AlertTitle>AI Graphic Designer is Disabled</AlertTitle>
+                    <AlertTitle>Enable the Optional AI Feature</AlertTitle>
                     <AlertDescription>
                         <div>
-                            <p className="mb-4">To generate designs from a text prompt, please enable the optional AI feature. See the developer documentation for simple setup instructions.</p>
+                            <p className="mb-4">To generate designs from a text prompt, please see the developer documentation for simple setup instructions.</p>
                             <Button asChild variant="secondary" size="sm" className="w-full md:w-auto">
                                 <Link href="/docs">
                                     <Info className="mr-2 h-4 w-4" />
-                                    See Setup Instructions
+                                    View Instructions
                                 </Link>
                             </Button>
                         </div>
