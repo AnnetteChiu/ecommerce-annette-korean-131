@@ -3,7 +3,7 @@
 import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { findSimilarProducts } from '@/ai/flows/find-similar-products';
-import { getProductById } from '@/lib/products';
+import { getProductById, getProducts } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -142,49 +142,50 @@ export default function SearchByImagePage() {
 
     setSearchPerformed(true);
     startTransition(async () => {
-      setRecommendations([]); // Clear previous results while loading
       try {
-        // The server flow is self-healing and will always return a valid result.
         const result = await findSimilarProducts({
           photoDataUri: imageDataUri,
           count: 4,
         });
 
-        // We can be confident the server returned valid IDs, so we just map them.
-        const recommendedProducts = result.productIds
+        const productIds = result?.productIds;
+
+        if (!productIds || productIds.length === 0) {
+          throw new Error("Server returned no product IDs.");
+        }
+        
+        const recommendedProducts = productIds
           .map(id => getProductById(id))
           .filter((p): p is Product => !!p);
         
+        if (recommendedProducts.length === 0) {
+          throw new Error("Server returned only invalid product IDs.");
+        }
+
         setRecommendations(recommendedProducts);
 
-        if (recommendedProducts.length > 0) {
-          try {
-            localStorage.setItem('visualSearch', JSON.stringify({
-              imageDataUri: imageDataUri,
-              recommendationIds: result.productIds,
-            }));
-          } catch (e) {
-            console.error("Failed to save visual search results to localStorage", e);
-          }
-        } else {
-          // This case should not be reached due to server-side fallbacks.
-          // If it is, we remove any saved search and show a toast.
-          localStorage.removeItem('visualSearch');
-          toast({
-            variant: 'destructive',
-            title: 'No Matches Found',
-            description: "We couldn't find any products that match your style. Please try a different image.",
-          });
+        try {
+          localStorage.setItem('visualSearch', JSON.stringify({
+            imageDataUri: imageDataUri,
+            recommendationIds: result.productIds,
+          }));
+        } catch (e) {
+          console.error("Failed to save visual search results to localStorage", e);
         }
+
       } catch (error) {
-        console.error('Visual search request failed:', error);
-        localStorage.removeItem('visualSearch');
-        setRecommendations([]); // Ensure it's empty on error
+        console.error('Visual search failed, activating client-side fallback:', error);
+        
+        const fallbackProducts = getProducts().slice(0, 4);
+        setRecommendations(fallbackProducts);
+
         toast({
-          variant: 'destructive',
-          title: 'An Error Occurred',
-          description: 'Could not perform the search. Please try again later.',
+          variant: 'default',
+          title: 'Displaying Popular Items',
+          description: 'We had trouble with the visual search. Here are some popular products instead.',
         });
+        
+        localStorage.removeItem('visualSearch');
       }
     });
   };
@@ -240,7 +241,7 @@ export default function SearchByImagePage() {
         </div>
       )}
 
-      {recommendations.length > 0 && !isPending && (
+      {!isPending && recommendations.length > 0 && (
         <div className="w-full mt-8">
             <h2 className="text-3xl font-headline font-bold mb-8 text-center">
               { searchPerformed ? "Our Recommendations" : "Your Previous Search Results" }
