@@ -75,8 +75,14 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    // If the model fails to generate valid JSON, return a default response.
-    return output || defaultResponse;
+    try {
+      const { output } = await recommendationPrompt(input);
+      // If the model fails to generate valid JSON or returns nothing, return a default response.
+      return output || defaultResponse;
+    } catch (error) {
+      console.error('Error in findSimilarProductsFlow:', error);
+      // On any error, return the default response to avoid crashing the client.
+      return defaultResponse;
+    }
   }
 );

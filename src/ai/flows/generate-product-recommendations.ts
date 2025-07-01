@@ -88,8 +88,13 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    // If the model fails to generate valid JSON, return a default response.
-    return output || defaultRecommendation;
+    try {
+      const { output } = await recommendationPrompt(input);
+      // If the model fails to generate valid JSON, return a default response.
+      return output || defaultRecommendation;
+    } catch (error) {
+      console.error('Error in productRecommendationFlow:', error);
+      return defaultRecommendation;
+    }
   }
 );

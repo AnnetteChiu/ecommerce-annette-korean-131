@@ -49,8 +49,13 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    // If the model fails to generate valid JSON, return a default response.
-    return output || defaultResponse;
+    try {
+      const { output } = await recommendationPrompt(input);
+      // If the model fails to generate valid JSON, return a default response.
+      return output || defaultResponse;
+    } catch (error) {
+      console.error('Error in styleRecommendationFlow:', error);
+      return defaultResponse;
+    }
   }
 );
