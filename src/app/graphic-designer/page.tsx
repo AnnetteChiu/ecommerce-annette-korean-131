@@ -65,11 +65,7 @@ export default function GraphicDesignerPage() {
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
                       To use this feature, add your Google AI API key to the{' '}
-                      <code className="font-mono bg-muted p-1 rounded-md">.env.local</code> file and restart the server. See the{' '}
-                      <Link href="/docs" className="font-medium text-primary underline">
-                        documentation
-                      </Link>
-                      {' '}for details.
+                      <code className="font-mono bg-muted p-1 rounded-md">.env.local</code> file and restart the server.
                     </AlertDescription>
                 </Alert>
             ) : null}
