@@ -7,6 +7,7 @@ import { getProducts } from '@/lib/products';
 import type { Product } from '@/types';
 import { virtualTryOn } from '@/ai/flows/virtual-try-on';
 import { useAi } from '@/context/ai-context';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,7 @@ export default function FittingRoomPage() {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+    const [showAiNotice, setShowAiNotice] = useState(false);
     const [isGenerating, startTransition] = useTransition();
 
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -80,6 +82,7 @@ export default function FittingRoomPage() {
             const dataUri = canvas.toDataURL('image/jpeg', 0.9);
             setCapturedImage(dataUri);
             setGeneratedImage(null); // Clear previous results
+            setShowAiNotice(false);
         }
     };
 
@@ -93,12 +96,11 @@ export default function FittingRoomPage() {
             return;
         }
 
+        setShowAiNotice(false);
+
         if (!isAiEnabled) {
             setGeneratedImage(capturedImage);
-            toast({
-                title: 'AI Feature Not Configured',
-                description: 'This is a preview. To see the full virtual try-on, please set up your Google AI API key. See the README for details.',
-            });
+            setShowAiNotice(true);
             return;
         }
 
@@ -240,6 +242,15 @@ export default function FittingRoomPage() {
                                 <p>Your result will appear here.</p>
                             )}
                         </div>
+                        {showAiNotice && (
+                            <Alert>
+                                <Sparkles className="h-4 w-4" />
+                                <AlertTitle>AI Preview Mode</AlertTitle>
+                                <AlertDescription>
+                                This is your captured photo. To see the virtual try-on, please configure your Google AI API key. See the <Link href="/docs" className="underline font-semibold">docs</Link> for instructions.
+                                </AlertDescription>
+                            </Alert>
+                        )}
                     </CardContent>
                 </Card>
             </div>
