@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { getProducts } from '@/lib/products';
 import type { Product } from '@/types';
 import { virtualTryOn } from '@/ai/flows/virtual-try-on';
@@ -32,11 +31,6 @@ export default function FittingRoomPage() {
     const apparelProducts = getProducts().filter(p => p.category === 'Apparel');
 
     useEffect(() => {
-        if (!isAiEnabled) {
-            setHasCameraPermission(false);
-            return;
-        };
-
         const getCameraPermission = async () => {
           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             try {
@@ -73,7 +67,7 @@ export default function FittingRoomPage() {
                 stream.getTracks().forEach(track => track.stop());
             }
         }
-    }, [toast, isAiEnabled]);
+    }, [toast]);
 
     const handleCapturePhoto = () => {
         if (videoRef.current && canvasRef.current) {
@@ -157,7 +151,7 @@ export default function FittingRoomPage() {
                                     <Image src={capturedImage} alt="Captured photo" fill className="object-cover" />
                                 )}
                                 
-                                {hasCameraPermission === null && isAiEnabled && !capturedImage && (
+                                {hasCameraPermission === null && !capturedImage && (
                                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-muted-foreground p-4 bg-background/80 backdrop-blur-sm z-10">
                                         <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                                         <p>Requesting camera access...</p>
@@ -177,7 +171,7 @@ export default function FittingRoomPage() {
                                 )}
                             </div>
                             <canvas ref={canvasRef} className="hidden" />
-                            <Button onClick={capturedImage ? () => setCapturedImage(null) : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true || !isAiEnabled}>
+                            <Button onClick={capturedImage ? () => setCapturedImage(null) : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
                                 <Camera className="mr-2"/>
                                 {capturedImage ? 'Retake Photo' : 'Capture Photo'}
                             </Button>
