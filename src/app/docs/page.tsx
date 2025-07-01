@@ -2,9 +2,15 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Code, Info, KeyRound, Server, CheckCircle } from 'lucide-react';
+import { Code, Info, KeyRound, Server, CheckCircle, Sparkles, Camera, Search } from 'lucide-react';
 import { isAiEnabled } from '@/lib/ai';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 export default function DocsPage() {
   const aiEnabled = isAiEnabled();
@@ -109,32 +115,66 @@ console.log('Please refresh the page to see the changes take effect.');
 
       <Card>
         <CardHeader>
-          <div className="flex items-center gap-2">
-            <Code className="h-6 w-6" />
-            <CardTitle>Testing Product Recommendations</CardTitle>
-          </div>
-          <CardDescription>
-            Use this JavaScript snippet to manually set your browsing history for testing the AI recommendation engine.
-          </CardDescription>
+            <div className="flex items-center gap-2">
+                <Sparkles className="h-6 w-6" />
+                <CardTitle>AI Feature Details & Testing</CardTitle>
+            </div>
+            <CardDescription>
+                An overview of how each AI feature works. The only setup required is a valid Google AI API key.
+            </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">How to use:</h3>
-              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-                <li>Open your running application in the browser.</li>
-                <li>Open the developer tools (usually by pressing F12 or Cmd+Opt+I).</li>
-                <li>Go to the "Console" tab.</li>
-                <li>Copy and paste the code below into the console and press Enter.</li>
-                <li>Refresh any product page to see the recommendations update.</li>
-              </ol>
-            </div>
-            <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-              <code className="font-code text-sm text-muted-foreground">
-                {codeSnippet}
-              </code>
-            </pre>
-          </div>
+            <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="image-generation">
+                    <AccordionTrigger>
+                        <div className="flex items-center gap-2">
+                            <Camera /> Virtual Try-On & Graphic Designer
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-2 pt-2 text-muted-foreground">
+                        <p>These features use Google's Gemini image generation model to create new visuals.</p>
+                        <p><strong>For Virtual Try-On:</strong> For best results, use a clear, well-lit, and front-facing photo.</p>
+                        <p><strong>For the Graphic Designer:</strong> Be descriptive in your prompts to get the best results. Mention styles, colors, and specific elements.</p>
+                    </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="recommendations">
+                    <AccordionTrigger>
+                         <div className="flex items-center gap-2">
+                            <Search /> Recommendations & Visual Search
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-2 pt-2 text-muted-foreground">
+                         <p>The Style Recommender, product recommendations, and visual image search use Gemini's multimodal capabilities to analyze text and images.</p>
+                         <p>The Style Recommender and product recommendations use your recent browsing history (stored locally in your browser's <code>sessionStorage</code>) to personalize suggestions. The visual search analyzes an uploaded image to find similar items.</p>
+                    </AccordionContent>
+                </AccordionItem>
+                 <AccordionItem value="testing-recs">
+                    <AccordionTrigger>
+                        <div className="flex items-center gap-2">
+                            <Code /> Testing Product Recommendations
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <div className="space-y-4 pt-2">
+                           <div>
+                              <h3 className="font-semibold mb-2 text-card-foreground">How to use:</h3>
+                              <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
+                                <li>Open your running application in the browser.</li>
+                                <li>Open the developer tools (usually by pressing F12 or Cmd+Opt+I).</li>
+                                <li>Go to the "Console" tab.</li>
+                                <li>Copy and paste the code below into the console and press Enter.</li>
+                                <li>Refresh any product page to see the recommendations update.</li>
+                              </ol>
+                            </div>
+                            <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
+                              <code className="font-code text-sm text-muted-foreground">
+                                {codeSnippet}
+                              </code>
+                            </pre>
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
         </CardContent>
       </Card>
     </div>
