@@ -9,13 +9,14 @@ import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, Upload } from 'lucide-react';
+import { Loader2, Search, Upload, ImageOff } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function SearchByImagePage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<Product[]>([]);
+  const [searchPerformed, setSearchPerformed] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,6 +39,7 @@ export default function SearchByImagePage() {
         setImagePreview(URL.createObjectURL(file));
         setImageDataUri(result);
         setRecommendations([]); // Clear previous recommendations
+        setSearchPerformed(false); // Reset on new image
       };
       reader.readAsDataURL(file);
     }
@@ -52,6 +54,7 @@ export default function SearchByImagePage() {
       return;
     }
 
+    setSearchPerformed(true);
     startTransition(async () => {
       try {
         const result = await findSimilarProducts({
@@ -66,12 +69,9 @@ export default function SearchByImagePage() {
           setRecommendations(recommendedProducts);
         } else {
           setRecommendations([]);
-          toast({
-            title: 'No Matches Found',
-            description: 'We couldn\'t find any similar products. Try a different image.',
-          });
         }
       } catch (error) {
+        setRecommendations([]);
         console.error('Failed to find similar products:', error);
         toast({
           variant: 'destructive',
@@ -119,7 +119,7 @@ export default function SearchByImagePage() {
                 ) : (
                     <Search className="mr-2" />
                 )}
-                Find Similar Products
+                {isPending ? 'Analyzing...' : 'Find Similar Products'}
                 </Button>
             </div>
           )}
@@ -130,6 +130,14 @@ export default function SearchByImagePage() {
          <div className="flex flex-col items-center justify-center py-16 text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
             <p className="text-muted-foreground">Analyzing your image...</p>
+        </div>
+      )}
+
+      {!isPending && searchPerformed && recommendations.length === 0 && (
+        <div className="w-full mt-8 text-center border rounded-lg p-12 bg-muted/50">
+          <ImageOff className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
+          <h2 className="text-2xl font-headline font-bold">No Matches Found</h2>
+          <p className="text-muted-foreground mt-2">We couldn't find any products that match your style. Please try a different image.</p>
         </div>
       )}
 
