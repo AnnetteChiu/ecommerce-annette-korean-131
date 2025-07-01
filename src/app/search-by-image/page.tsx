@@ -150,20 +150,23 @@ export default function SearchByImagePage() {
 
         const productIds = result?.productIds;
 
+        // This is a robust client-side safety net. If the server returns nothing, we throw to trigger the fallback.
         if (!productIds || productIds.length === 0) {
-          throw new Error("Server returned no product IDs.");
+          throw new Error("Server returned no recommendations.");
         }
         
         const recommendedProducts = productIds
           .map(id => getProductById(id))
           .filter((p): p is Product => !!p);
         
+        // Final check: if mapping IDs resulted in no valid products, also use the fallback.
         if (recommendedProducts.length === 0) {
-          throw new Error("Server returned only invalid product IDs.");
+            throw new Error("Server returned only invalid product IDs.");
         }
 
         setRecommendations(recommendedProducts);
 
+        // Save the successful search results to localStorage.
         try {
           localStorage.setItem('visualSearch', JSON.stringify({
             imageDataUri: imageDataUri,
@@ -174,15 +177,18 @@ export default function SearchByImagePage() {
         }
 
       } catch (error) {
-        console.error('Visual search failed, activating client-side fallback:', error);
+        // This is the client-side fallback. It will trigger if the try block fails for ANY reason,
+        // guaranteeing the user never sees an empty state.
+        console.error('Visual search failed, activating robust client-side fallback:', error);
         
-        const fallbackProducts = getProducts().slice(0, 4);
+        const allProducts = getProducts();
+        const fallbackProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
         setRecommendations(fallbackProducts);
 
         toast({
           variant: 'default',
           title: 'Displaying Popular Items',
-          description: 'We had trouble with the visual search. Here are some popular products instead.',
+          description: 'We had trouble with the visual search, but here are some popular products for you.',
         });
         
         localStorage.removeItem('visualSearch');
