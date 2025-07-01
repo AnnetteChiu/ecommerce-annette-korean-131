@@ -162,6 +162,7 @@ export default function FittingRoomPage() {
 
         startTransition(async () => {
             try {
+                // Keep the previous image visible during generation for a better UX
                 const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
 
                 const result = await virtualTryOn({
@@ -307,7 +308,7 @@ export default function FittingRoomPage() {
                                 <Sparkles className="h-4 w-4" />
                                 <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
                                 <AlertDescription>
-                                To see the product virtually placed on you, you can enable the optional AI features. See the <Link href="/docs" className="underline font-semibold">docs</Link> for setup instructions.
+                                  Here is your original photo. To see the product virtually placed on you, enable the optional AI feature. See the <Link href="/docs" className="underline font-semibold">docs</Link> for simple setup instructions.
                                 </AlertDescription>
                             </Alert>
                         )}
