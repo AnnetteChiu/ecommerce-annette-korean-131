@@ -217,7 +217,7 @@ export default function FittingRoomPage() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      The Google AI API key is missing. Please add your key to the <code>src/ai/config.ts</code> file to enable this feature.
+                      To enable this feature, please add your Google AI API key to the <code>src/ai/config.ts</code> file.
                     </AlertDescription>
                 </Alert>
             )}
@@ -305,10 +305,12 @@ export default function FittingRoomPage() {
                                     <p>Generating your new look...</p>
                                 </div>
                             ) : !isAiEnabled ? (
-                                <div className="flex flex-col items-center text-center p-4">
-                                    <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
-                                    <p className="font-semibold">AI Feature Disabled</p>
-                                    <p className="text-sm text-muted-foreground max-w-xs">The Google AI API key is missing. Please add it to <code>src/ai/config.ts</code> to use this feature.</p>
+                                <div className="p-4 w-full">
+                                    <Alert variant="destructive">
+                                        <AlertTriangle className="h-4 w-4" />
+                                        <AlertTitle>AI Feature Disabled</AlertTitle>
+                                        <AlertDescription>Add your API key in <code>src/ai/config.ts</code> to see results here.</AlertDescription>
+                                    </Alert>
                                 </div>
                             ) : generatedImage ? (
                                 <Image src={generatedImage} alt="Virtual try-on result" fill className={cn("object-cover", isGenerating && "opacity-50")} />

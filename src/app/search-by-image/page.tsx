@@ -217,7 +217,7 @@ export default function SearchByImagePage() {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>AI Feature Disabled</AlertTitle>
                 <AlertDescription>
-                  The Google AI API key is missing. Please add your key to the <code>src/ai/config.ts</code> file to enable this feature.
+                  To enable this feature, please add your Google AI API key to the <code>src/ai/config.ts</code> file.
                 </AlertDescription>
             </Alert>
           )}
