@@ -318,15 +318,15 @@ export default function FittingRoomPage() {
                                 <Sparkles className="h-4 w-4" />
                                 <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
                                 <AlertDescription>
-                                  <div>
-                                    <p className="mb-4">You are seeing your original photo. To use the virtual try-on, please see the developer documentation for simple setup instructions.</p>
-                                    <Button asChild variant="secondary" size="sm" className="w-full">
-                                        <Link href="/docs">
-                                            <Info className="mr-2 h-4 w-4" />
-                                            View Instructions
-                                        </Link>
-                                    </Button>
-                                  </div>
+                                    <div>
+                                        <p className="mb-4">You're seeing your original photo. To have the product virtually placed on you, enable the optional AI feature.</p>
+                                        <Button asChild variant="secondary" size="sm" className="w-full">
+                                            <Link href="/docs">
+                                                <Info className="mr-2 h-4 w-4" />
+                                                View simple setup instructions
+                                            </Link>
+                                        </Button>
+                                    </div>
                                 </AlertDescription>
                             </Alert>
                         )}
@@ -345,5 +345,3 @@ export default function FittingRoomPage() {
         </div>
     );
 }
-
-    

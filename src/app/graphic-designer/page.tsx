@@ -33,6 +33,9 @@ export default function GraphicDesignerPage() {
         }
 
         setError(null);
+        const previousImage = generatedImage;
+        setGeneratedImage(null);
+
 
         startTransition(async () => {
             try {
@@ -46,6 +49,7 @@ export default function GraphicDesignerPage() {
                 console.error('Graphic design generation failed:', err);
                 const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred.';
                 setError(`We couldn't generate the graphic design. The AI may have had trouble with this prompt. Please try a different one. Error: ${errorMessage}`);
+                setGeneratedImage(previousImage);
             }
         });
     };
@@ -63,11 +67,11 @@ export default function GraphicDesignerPage() {
                     <AlertTitle>Enable the Optional AI Feature</AlertTitle>
                     <AlertDescription>
                         <div>
-                            <p className="mb-4">To generate designs from a text prompt, please see the developer documentation for simple setup instructions.</p>
+                            <p className="mb-4">To generate designs from a text prompt, enable the optional AI feature.</p>
                             <Button asChild variant="secondary" size="sm" className="w-full md:w-auto">
                                 <Link href="/docs">
                                     <Info className="mr-2 h-4 w-4" />
-                                    View Instructions
+                                    View simple setup instructions
                                 </Link>
                             </Button>
                         </div>
