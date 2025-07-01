@@ -14,6 +14,21 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
+// Helper function to fetch an image and convert it to a data URI
+async function urlToDataUri(url: string): Promise<string> {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+    }
+    const blob = await response.blob();
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
 export default function FittingRoomPage() {
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -93,9 +108,11 @@ export default function FittingRoomPage() {
         startTransition(async () => {
             setGeneratedImage(null);
             try {
+                const productImageDataUri = await urlToDataUri(selectedProduct.imageUrl);
+
                 const result = await virtualTryOn({
                     userPhotoDataUri: capturedImage,
-                    productImageUrl: selectedProduct.imageUrl,
+                    productImageDataUri: productImageDataUri,
                 });
 
                 if (result.generatedImageDataUri) {

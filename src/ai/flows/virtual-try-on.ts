@@ -16,11 +16,10 @@ const VirtualTryOnInputSchema = z.object({
     .describe(
       "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
-  productImageUrl: z
+  productImageDataUri: z
     .string()
-    .url()
     .describe(
-      "An image URL of the product to try on."
+      "An image of the product to try on, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
 export type VirtualTryOnInput = z.infer<typeof VirtualTryOnInputSchema>;
@@ -34,24 +33,13 @@ export async function virtualTryOn(input: VirtualTryOnInput): Promise<VirtualTry
   return virtualTryOnFlow(input);
 }
 
-async function urlToDataUri(url: string): Promise<string> {
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.statusText}`);
-    }
-    const blob = await response.blob();
-    const buffer = Buffer.from(await blob.arrayBuffer());
-    return `data:${blob.type};base64,${buffer.toString('base64')}`;
-}
-
 const virtualTryOnFlow = ai.defineFlow(
   {
     name: 'virtualTryOnFlow',
     inputSchema: VirtualTryOnInputSchema,
     outputSchema: VirtualTryOnOutputSchema,
   },
-  async ({ userPhotoDataUri, productImageUrl }) => {
-    const productImageDataUri = await urlToDataUri(productImageUrl);
+  async ({ userPhotoDataUri, productImageDataUri }) => {
 
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
