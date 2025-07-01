@@ -14,6 +14,7 @@ const ProductForPromptSchema = z.object({
   name: z.string(),
   description: z.string(),
   category: z.string(),
+  imageUrl: z.string().url(),
 });
 
 const FlowInputSchema = z.object({
@@ -34,15 +35,13 @@ const FindSimilarProductsOutputSchema = z.object({
 export type FindSimilarProductsInput = z.infer<typeof FindSimilarProductsInputSchema>;
 export type FindSimilarProductsOutput = z.infer<typeof FindSimilarProductsOutputSchema>;
 
-const defaultResponse = { productIds: [] };
-
 export async function findSimilarProducts(input: FindSimilarProductsInput): Promise<FindSimilarProductsOutput> {
   const allProducts = getProducts();
   const availableProducts = allProducts
-    .map(({ id, name, description, category }) => ({ id, name, description, category }));
+    .map(({ id, name, description, category, imageUrl }) => ({ id, name, description, category, imageUrl }));
 
   if (availableProducts.length === 0) {
-    return defaultResponse;
+    return { productIds: [] };
   }
   
   // Let errors from the flow propagate up to the calling component.
@@ -57,22 +56,24 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are a fashion expert. Find up to {{count}} products from the provided catalog that stylistically match the user's photo.
-Analyze the photo for garment type, style, color, and pattern. Then, compare those elements to the product descriptions to find the best matches.
+    prompt: `You are a visual search engine. Your task is to find products that are visually and stylistically similar to the user's uploaded image. You will be given the user's image and a catalog of product images.
 
-Return a JSON object with a 'productIds' array containing the selected product IDs. If you cannot find any good matches, it is acceptable to return an empty 'productIds' array.
+Compare the user's image to each product image in the catalog. Focus on matching elements like garment type (e.g., dress, jeans), style (e.g., minimalist, bohemian), color, pattern, and overall aesthetic.
 
-**User's Photo to Analyze:**
+You MUST return up to {{count}} of the closest matches. It is critical that you always return results, even if the match isn't perfect. Prioritize the best available options from the catalog. Do NOT return an empty 'productIds' array.
+
+**User's Image:**
 {{media url=photoDataUri}}
 
 ---
 
-**Product Catalog (Text Descriptions):**
+**Available Product Catalog (Images and Details):**
 {{#each availableProducts}}
 Product ID: {{this.id}}
 Name: {{this.name}}
 Description: {{this.description}}
 Category: {{this.category}}
+Image: {{media url=this.imageUrl}}
 ---
 {{/each}}`,
     config: {
@@ -104,13 +105,20 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    // The prompt() call will validate the output against the schema.
-    // If the model generates invalid JSON or something else goes wrong,
-    // this will throw an error, which will be caught by the client.
-    const { output } = await recommendationPrompt(input);
-    
-    // If the model correctly returns an empty array, we pass it along.
-    // The client-side logic will handle this case with a fallback.
-    return output || defaultResponse;
+    try {
+      const { output } = await recommendationPrompt(input);
+      // The prompt now demands results, but as a safeguard,
+      // if it still fails to provide any, we'll throw to trigger the fallback.
+      if (!output?.productIds || output.productIds.length === 0) {
+        throw new Error("AI returned no product IDs despite being instructed to.");
+      }
+      return output;
+    } catch (error) {
+      console.error('Visual search flow failed, using server-side fallback:', error);
+      // If the AI fails for any reason, return the first few products as a fallback.
+      // This prevents the client from ever seeing a "No Matches" state.
+      const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
+      return { productIds: fallbackIds };
+    }
   }
 );
