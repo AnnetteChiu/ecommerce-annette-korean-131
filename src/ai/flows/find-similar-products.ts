@@ -57,12 +57,14 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are an expert fashion stylist acting as a visual search engine.
-Analyze the provided user's photo to understand its key visual characteristics: clothing type, style (e.g., minimalist, bohemian, sporty), color palette, patterns, and fabric texture.
+    prompt: `You are an expert fashion stylist. Your goal is to find products from a catalog that stylistically match a user's uploaded photo.
 
-Then, read through the product catalog. Based on your visual analysis of the user's photo, find up to {{count}} products from the catalog whose descriptions and names suggest they are the best stylistic match.
+1.  **Analyze the Photo:** Carefully examine the user's photo to identify key fashion elements like the type of garment, style (e.g., casual, formal, bohemian), color, pattern, and material.
+2.  **Match with Catalog:** Compare these visual elements to the text descriptions of the products in the provided catalog.
+3.  **Select Best Matches:** Choose up to {{count}} products that are the closest stylistic match to the photo.
+4.  **CRITICAL FALLBACK:** If you cannot find any products that are a good stylistic match, **do not return an empty list.** Instead, as a fallback, select the first {{count}} product IDs from the catalog provided. Your primary goal is to always provide recommendations.
 
-You MUST return product IDs. Prioritize finding the closest possible matches, even if they are not a perfect fit. Do not return an empty list if there are products in the catalog.
+You MUST return a JSON object with a 'productIds' array containing the selected product IDs. Prioritize good matches, but use the fallback if necessary to ensure the list is never empty.
 
 **User's Photo to Analyze:**
 {{media url=photoDataUri}}
