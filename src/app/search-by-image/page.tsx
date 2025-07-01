@@ -3,7 +3,7 @@
 import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { findSimilarProducts } from '@/ai/flows/find-similar-products';
-import { getProductById } from '@/lib/products';
+import { getProductById, getProducts } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,7 @@ export default function SearchByImagePage() {
       const savedSearch = localStorage.getItem('visualSearch');
       if (savedSearch) {
         const { imageDataUri: savedImageDataUri, recommendationIds } = JSON.parse(savedSearch);
-        if (savedImageDataUri && recommendationIds && Array.isArray(recommendationIds)) {
+        if (savedImageDataUri && recommendationIds && Array.isArray(recommendationIds) && recommendationIds.length > 0) {
           setImagePreview(savedImageDataUri);
           setImageDataUri(savedImageDataUri);
 
@@ -80,8 +80,12 @@ export default function SearchByImagePage() {
             .map((id: string) => getProductById(id))
             .filter((p): p is Product => !!p);
           
-          setRecommendations(recommendedProducts);
-          setSearchPerformed(true);
+          if (recommendedProducts.length > 0) {
+            setRecommendations(recommendedProducts);
+            setSearchPerformed(true);
+          } else {
+            localStorage.removeItem('visualSearch');
+          }
         }
       }
     } catch (error) {
@@ -89,6 +93,16 @@ export default function SearchByImagePage() {
       localStorage.removeItem('visualSearch'); // Clear corrupted data
     }
   }, []); // Run only on mount
+  
+  const displayFallbackResults = () => {
+    toast({
+      variant: 'default',
+      title: 'Visual Search Unavailable',
+      description: 'We had trouble analyzing your image, but here are some popular items!',
+    });
+    const fallbackProducts = getProducts().slice(0, 4);
+    setRecommendations(fallbackProducts);
+  };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -142,33 +156,33 @@ export default function SearchByImagePage() {
           count: 4,
         });
 
-        if (result.productIds && result.productIds.length > 0) {
+        if (result?.productIds?.length > 0) {
           const recommendedProducts = result.productIds
             .map(id => getProductById(id))
             .filter((p): p is Product => !!p);
-          setRecommendations(recommendedProducts);
-          // Persist search results for the user
-           try {
-            localStorage.setItem('visualSearch', JSON.stringify({
-              imageDataUri: imageDataUri,
-              recommendationIds: result.productIds,
-            }));
-          } catch (e) {
-            console.error("Failed to save visual search results to localStorage", e);
+          
+          if (recommendedProducts.length > 0) {
+            setRecommendations(recommendedProducts);
+            try {
+              localStorage.setItem('visualSearch', JSON.stringify({
+                imageDataUri: imageDataUri,
+                recommendationIds: result.productIds,
+              }));
+            } catch (e) {
+              console.error("Failed to save visual search results to localStorage", e);
+            }
+          } else {
+            // This can happen if product IDs from AI are no longer valid.
+            displayFallbackResults();
           }
         } else {
-          setRecommendations([]);
-          localStorage.removeItem('visualSearch');
+          // AI returned no results, use fallback.
+          displayFallbackResults();
         }
       } catch (error) {
-        setRecommendations([]);
-        localStorage.removeItem('visualSearch');
         console.error('Failed to find similar products:', error);
-        toast({
-          variant: 'destructive',
-          title: 'An Error Occurred',
-          description: 'We could not perform the search at this time. Please try again later.',
-        });
+        // An error occurred, use fallback.
+        displayFallbackResults();
       }
     });
   };
@@ -224,7 +238,8 @@ export default function SearchByImagePage() {
         </div>
       )}
 
-      {!isPending && searchPerformed && recommendations.length === 0 && (
+      {searchPerformed && !isPending && recommendations.length === 0 && (
+        // This state should ideally not be reached due to the fallback, but kept as a safeguard.
         <div className="w-full mt-8 text-center border rounded-lg p-12 bg-muted/50">
           <ImageOff className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
           <h2 className="text-2xl font-headline font-bold">No Matches Found</h2>

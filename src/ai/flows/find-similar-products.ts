@@ -45,7 +45,7 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
     return defaultResponse;
   }
   
-  // The flow is designed to handle its own errors and return a default response.
+  // Let errors from the flow propagate up to the calling component.
   return await findSimilarProductsFlow({ 
     ...input, 
     availableProducts,
@@ -104,25 +104,13 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    try {
-      const { output } = await recommendationPrompt(input);
-      // If the model returns a valid response with at least one product, use it.
-      if (output?.productIds?.length) {
-        return output;
-      }
-      // If we are here, the model either failed to return a valid object,
-      // or it returned an empty list of product IDs.
-      // We will proceed to our fallback logic.
-      console.log('AI returned no recommendations, using code-based fallback.');
-    } catch (error) {
-        console.error('Error in findSimilarProductsFlow, using code-based fallback:', error);
-        // An error occurred, so we proceed to our fallback logic.
-    }
-
-    // **Code-based Fallback**
-    // The AI has failed to provide a recommendation.
-    // Return the first `count` products from the catalog as a reliable fallback.
-    const fallbackIds = input.availableProducts.slice(0, input.count).map(p => p.id);
-    return { productIds: fallbackIds };
+    // The prompt() call will validate the output against the schema.
+    // If the model generates invalid JSON or something else goes wrong,
+    // this will throw an error, which will be caught by the client.
+    const { output } = await recommendationPrompt(input);
+    
+    // If the model correctly returns an empty array, we pass it along.
+    // The client-side logic will handle this case with a fallback.
+    return output || defaultResponse;
   }
 );
