@@ -316,7 +316,7 @@ export default function FittingRoomPage() {
                         {showAiNotice && (
                             <Alert>
                                 <Sparkles className="h-4 w-4" />
-                                <AlertTitle>Enable the Optional AI Feature</AlertTitle>
+                                <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
                                 <AlertDescription>
                                   <div>
                                     <p className="mb-4">You are seeing your original photo. To use the virtual try-on, please see the developer documentation for simple setup instructions.</p>
@@ -345,3 +345,5 @@ export default function FittingRoomPage() {
         </div>
     );
 }
+
+    
