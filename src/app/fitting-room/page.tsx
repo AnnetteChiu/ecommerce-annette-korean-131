@@ -93,6 +93,15 @@ export default function FittingRoomPage() {
             return;
         }
 
+        if (!isAiEnabled) {
+            setGeneratedImage(capturedImage);
+            toast({
+                title: 'AI Feature Not Configured',
+                description: 'This is a preview. To see the full virtual try-on, please set up your Google AI API key. See the README for details.',
+            });
+            return;
+        }
+
         startTransition(async () => {
             setGeneratedImage(null);
             try {
@@ -213,7 +222,7 @@ export default function FittingRoomPage() {
                         <CardDescription>Once you have your photo and selected an item, generate your new look!</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                         <Button onClick={handleVirtualTryOn} disabled={!capturedImage || !selectedProduct || isGenerating || !isAiEnabled} className="w-full" size="lg">
+                         <Button onClick={handleVirtualTryOn} disabled={!capturedImage || !selectedProduct || isGenerating} className="w-full" size="lg">
                             {isGenerating ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-2" />}
                             {isGenerating ? 'Generating...' : 'Virtually Try It On'}
                         </Button>
