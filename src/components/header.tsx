@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Book, Camera } from 'lucide-react';
+import { Search, Book, Camera, Palette } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -21,6 +21,7 @@ export function Header() {
 
   const navLinks = [
     { href: '/fitting-room', label: 'Fitting Room', icon: Camera },
+    { href: '/graphic-designer', label: 'Graphic Designer', icon: Palette },
     { href: '/docs', label: 'Docs', icon: Book },
   ];
 
