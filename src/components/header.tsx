@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Search, Book, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,10 +11,18 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { CartIcon } from './cart-icon';
-import { isAiEnabled } from '@/lib/ai';
+import { useAi } from '@/context/ai-context';
+import { cn } from '@/lib/utils';
 
 export function Header() {
-  const aiEnabled = isAiEnabled();
+  const { isAiEnabled } = useAi();
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: '/fitting-room', label: 'Fitting Room', icon: Camera },
+    { href: '/search-by-image', label: 'Find Your Style', icon: Search },
+    { href: '/docs', label: 'Docs', icon: Book },
+  ];
 
   return (
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 border-b">
@@ -22,26 +33,26 @@ export function Header() {
           </Link>
           <nav>
             <div className="flex items-center gap-1">
-              {aiEnabled && (
+              {isAiEnabled && (
                 <>
-                  <Button variant="ghost" asChild>
-                    <Link href="/fitting-room">
-                      <Camera />
-                      Fitting Room
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" asChild>
-                    <Link href="/search-by-image">
-                      <Search />
-                      Find Your Style
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" asChild>
-                    <Link href="/docs">
-                      <Book />
-                      Docs
-                    </Link>
-                  </Button>
+                  {navLinks.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Button
+                        key={link.href}
+                        variant="ghost"
+                        asChild
+                        className={cn(
+                          isActive && 'bg-accent text-accent-foreground'
+                        )}
+                      >
+                        <Link href={link.href}>
+                          <link.icon />
+                          {link.label}
+                        </Link>
+                      </Button>
+                    );
+                  })}
                 </>
               )}
               <TooltipProvider>
