@@ -14,17 +14,6 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-async function urlToDataUri(url: string): Promise<string> {
-    const response = await fetch(url);
-    const blob = await response.blob();
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
-    });
-}
-
 export default function FittingRoomPage() {
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -99,11 +88,9 @@ export default function FittingRoomPage() {
         startTransition(async () => {
             setGeneratedImage(null);
             try {
-                const productImageDataUri = await urlToDataUri(selectedProduct.imageUrl);
-
                 const result = await virtualTryOn({
                     userPhotoDataUri: capturedImage,
-                    productImageDataUri: productImageDataUri,
+                    productImageUrl: selectedProduct.imageUrl,
                 });
 
                 if (result.generatedImageDataUri) {
