@@ -14,7 +14,6 @@ const ProductForPromptSchema = z.object({
   name: z.string(),
   description: z.string(),
   category: z.string(),
-  imageUrl: z.string().url(),
 });
 
 const FlowInputSchema = z.object({
@@ -38,7 +37,7 @@ export type FindSimilarProductsOutput = z.infer<typeof FindSimilarProductsOutput
 export async function findSimilarProducts(input: FindSimilarProductsInput): Promise<FindSimilarProductsOutput> {
   const allProducts = getProducts();
   const availableProducts = allProducts
-    .map(({ id, name, description, category, imageUrl }) => ({ id, name, description, category, imageUrl }));
+    .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
   if (availableProducts.length === 0) {
     return { productIds: [] };
@@ -64,11 +63,18 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are a visual search engine. Your task is to find products that are visually and stylistically similar to the user's uploaded image. You will be given the user's image and a catalog of product images.
+    prompt: `You are a fashion expert and a visual search engine. Your task is to find products from a catalog that are visually and stylistically similar to the user's uploaded image.
 
-Compare the user's image to each product image in the catalog. Focus on matching elements like garment type (e.g., dress, jeans), style (e.g., minimalist, bohemian), color, pattern, and overall aesthetic.
+You will be given a photo provided by the user. Analyze the photo carefully. Identify key visual elements:
+- Garment type (e.g., dress, jeans, tote bag)
+- Style (e.g., minimalist, bohemian, professional, casual)
+- Color and pattern
+- Material/texture (e.g., denim, leather, knit)
+- Overall aesthetic and mood.
 
-You MUST return up to {{count}} of the closest matches. It is critical that you always return results, even if the match isn't perfect. Prioritize the best available options from the catalog. Do NOT return an empty 'productIds' array.
+Then, you will be given a catalog of available products with their name, description, and category. Compare the visual analysis of the user's photo with the textual information for each product in the catalog.
+
+You MUST return up to {{count}} of the closest matches based on your analysis. It is critical that you always return results, even if the match isn't perfect. Prioritize the best available options. Do NOT return an empty 'productIds' array.
 
 The 'productIds' array in your response MUST contain ONLY the IDs from the 'Product ID' fields in the provided catalog.
 
@@ -77,13 +83,12 @@ The 'productIds' array in your response MUST contain ONLY the IDs from the 'Prod
 
 ---
 
-**Available Product Catalog (Images and Details):**
+**Available Product Catalog (Text Only):**
 {{#each availableProducts}}
 Product ID: {{this.id}}
 Name: {{this.name}}
 Description: {{this.description}}
 Category: {{this.category}}
-Image: {{media url=this.imageUrl}}
 ---
 {{/each}}`,
     config: {
