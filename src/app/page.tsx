@@ -7,10 +7,12 @@ import { SaleBanner } from '@/components/sale-banner';
 import { ImageBanner } from '@/components/image-banner';
 import { SideBanner } from '@/components/side-banner';
 import { StyleRecommender } from '@/components/style-recommender';
+import { isAiEnabled } from '@/lib/ai';
 
 export default function Home() {
   const products = getProducts();
   const stories = getStories();
+  const aiEnabled = isAiEnabled();
 
   return (
     <div className="space-y-16">
@@ -80,7 +82,7 @@ export default function Home() {
         
         <aside className="lg:col-span-1 space-y-8 sticky top-24 self-start">
           <SideBanner />
-          <StyleRecommender />
+          {aiEnabled && <StyleRecommender />}
         </aside>
       </div>
     </div>

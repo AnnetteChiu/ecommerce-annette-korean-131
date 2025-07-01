@@ -1,7 +1,29 @@
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Code } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Code, PowerOff } from 'lucide-react';
+import { isAiEnabled } from '@/lib/ai';
+
+function AiDisabledMessage() {
+  return (
+    <div className="text-center py-20">
+      <PowerOff className="mx-auto h-16 w-16 text-muted-foreground" />
+      <h1 className="mt-4 text-3xl font-bold font-headline">AI Feature Disabled</h1>
+      <p className="mt-2 text-muted-foreground max-w-md mx-auto">
+        This feature requires a Google AI API key, but it has not been configured. Please see the README for setup instructions.
+      </p>
+      <Button asChild className="mt-6">
+        <Link href="/">Return to Homepage</Link>
+      </Button>
+    </div>
+  );
+}
 
 export default function DocsPage() {
+  if (!isAiEnabled()) {
+    return <AiDisabledMessage />;
+  }
+  
   const codeSnippet = `
 // A sample browsing history with a few products.
 const newHistory = [

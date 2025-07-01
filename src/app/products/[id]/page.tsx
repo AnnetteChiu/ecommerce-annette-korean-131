@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { ShoppingCart, Plus, Minus } from 'lucide-react';
 import { RecommendedProducts } from '@/components/recommended-products';
 import { useCart } from '@/context/cart-context';
+import { useAi } from '@/context/ai-context';
 import {
   Accordion,
   AccordionContent,
@@ -21,6 +22,7 @@ import { ProductViewTracker } from '@/components/product-view-tracker';
 export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const { isAiEnabled } = useAi();
   const params = useParams<{ id: string }>();
   const product = getProductById(params.id);
 
@@ -152,7 +154,7 @@ export default function ProductPage() {
 
         </div>
       </div>
-      <RecommendedProducts currentProductId={product.id} currentProductName={product.name} />
+      {isAiEnabled && product && <RecommendedProducts currentProductId={product.id} currentProductName={product.name} />}
     </>
   );
 }

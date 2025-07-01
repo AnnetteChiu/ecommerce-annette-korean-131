@@ -1,8 +1,8 @@
-
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { findSimilarProducts } from '@/ai/flows/find-similar-products';
 import { getProductById, getProducts } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
@@ -10,8 +10,9 @@ import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, Upload } from 'lucide-react';
+import { Loader2, Search, Upload, PowerOff } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAi } from '@/context/ai-context';
 
 // Helper to resize and compress the image
 const resizeAndCompressImage = (file: File, maxSize = 1024, quality = 0.8): Promise<string> => {
@@ -57,8 +58,23 @@ const resizeAndCompressImage = (file: File, maxSize = 1024, quality = 0.8): Prom
   });
 };
 
+function AiDisabledMessage() {
+  return (
+    <div className="text-center py-20">
+      <PowerOff className="mx-auto h-16 w-16 text-muted-foreground" />
+      <h1 className="mt-4 text-3xl font-bold font-headline">AI Feature Disabled</h1>
+      <p className="mt-2 text-muted-foreground max-w-md mx-auto">
+        This feature requires a Google AI API key, but it has not been configured. Please see the README for setup instructions.
+      </p>
+      <Button asChild className="mt-6">
+        <Link href="/">Return to Homepage</Link>
+      </Button>
+    </div>
+  );
+}
 
 export default function SearchByImagePage() {
+  const { isAiEnabled } = useAi();
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageDataUri, setImageDataUri] = useState<string | null>(null);
   const [recommendations, setRecommendations] = useState<Product[]>([]);
@@ -69,6 +85,7 @@ export default function SearchByImagePage() {
 
   // Load previous search from localStorage on mount
   useEffect(() => {
+    if (!isAiEnabled) return;
     try {
       const savedSearch = localStorage.getItem('visualSearch');
       if (savedSearch) {
@@ -95,8 +112,12 @@ export default function SearchByImagePage() {
       console.error('Failed to load visual search from localStorage', error);
       localStorage.removeItem('visualSearch'); // Clear corrupted data
     }
-  }, []); // Run only on mount
+  }, [isAiEnabled]); // Run only on mount
   
+  if (!isAiEnabled) {
+    return <AiDisabledMessage />;
+  }
+
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {

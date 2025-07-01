@@ -2,19 +2,37 @@
 
 import { useState, useEffect, useRef, useTransition } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { getProducts } from '@/lib/products';
 import type { Product } from '@/types';
 import { virtualTryOn } from '@/ai/flows/virtual-try-on';
+import { useAi } from '@/context/ai-context';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Camera, PersonStanding, Sparkles, AlertTriangle } from 'lucide-react';
+import { Loader2, Camera, PersonStanding, Sparkles, AlertTriangle, PowerOff } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
+function AiDisabledMessage() {
+  return (
+    <div className="text-center py-20">
+      <PowerOff className="mx-auto h-16 w-16 text-muted-foreground" />
+      <h1 className="mt-4 text-3xl font-bold font-headline">AI Feature Disabled</h1>
+      <p className="mt-2 text-muted-foreground max-w-md mx-auto">
+        This feature requires a Google AI API key, but it has not been configured. Please see the README for setup instructions.
+      </p>
+      <Button asChild className="mt-6">
+        <Link href="/">Return to Homepage</Link>
+      </Button>
+    </div>
+  );
+}
+
 export default function FittingRoomPage() {
+    const { isAiEnabled } = useAi();
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -28,6 +46,8 @@ export default function FittingRoomPage() {
     const apparelProducts = getProducts().filter(p => p.category === 'Apparel');
 
     useEffect(() => {
+        if (!isAiEnabled) return;
+
         const getCameraPermission = async () => {
           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             try {
@@ -64,7 +84,11 @@ export default function FittingRoomPage() {
                 stream.getTracks().forEach(track => track.stop());
             }
         }
-    }, [toast]);
+    }, [toast, isAiEnabled]);
+
+    if (!isAiEnabled) {
+      return <AiDisabledMessage />;
+    }
 
     const handleCapturePhoto = () => {
         if (videoRef.current && canvasRef.current) {
