@@ -80,10 +80,11 @@ console.log('Please refresh the page to see the changes take effect.');
           </div>
           <div>
             <h3 className="font-semibold mb-2">2. Set Up Your Local Environment</h3>
-            <ol className="list-decimal list-inside space-y-2 text-muted-foreground mb-4">
-              <li>In the root directory of your project, create a new file named <code>.env.local</code>.</li>
-              <li>Add your API key to this file like so:</li>
-            </ol>
+            <p className="text-muted-foreground mb-4">
+              In the root directory of your project, create a new file named <code>.env.local</code>.
+              <br/>
+              Add your API key to this file like so:
+            </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="font-code text-sm text-muted-foreground">
                 {envSnippet}
