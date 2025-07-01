@@ -133,8 +133,7 @@ export default function FittingRoomPage() {
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
-                setGeneratedImage(capturedImage);
-                setGenerationError("We couldn't generate the image, but here's your original photo. The AI may have had trouble with this combination. Please try a different item or photo.");
+                setGenerationError("We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.");
             }
         });
     }, [isAiEnabled, capturedImage, startTransition, toast]);
@@ -176,8 +175,6 @@ export default function FittingRoomPage() {
         setGeneratedImage(null);
         setGenerationError(null);
     };
-    
-    const resultImage = generatedImage || capturedImage;
 
     return (
         <div className="space-y-8">
@@ -280,8 +277,8 @@ export default function FittingRoomPage() {
                                 </div>
                             )}
 
-                            {resultImage ? (
-                                <Image src={resultImage} alt="Virtual try-on result" fill className={cn("object-cover", isGenerating && "opacity-50")} />
+                            {generatedImage ? (
+                                <Image src={generatedImage} alt="Virtual try-on result" fill className={cn("object-cover", isGenerating && "opacity-50")} />
                             ) : (
                                 <p className="text-center p-4">Capture a photo and select an item. Your result will appear here.</p>
                             )}
