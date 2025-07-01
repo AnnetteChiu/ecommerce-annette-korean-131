@@ -162,10 +162,14 @@ export default function FittingRoomPage() {
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
+                let description = "We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.";
+                if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
+                    description = 'The Google AI API key is not configured correctly. Please see the documentation for instructions.';
+                }
                 toast({
                     variant: 'destructive',
                     title: 'Generation Failed',
-                    description: "We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.",
+                    description: description,
                 });
             }
         });

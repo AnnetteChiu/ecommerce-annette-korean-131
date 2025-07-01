@@ -154,14 +154,12 @@ export default function SearchByImagePage() {
           count: 4,
         });
 
-        // The server flow is now self-healing and guarantees valid IDs.
         const recommendedProducts = result.productIds
           .map(id => getProductById(id))
           .filter((p): p is Product => !!p);
 
         setRecommendations(recommendedProducts);
 
-        // Save to local storage only if we have products to show.
         if (recommendedProducts.length > 0) {
             try {
               localStorage.setItem('visualSearch', JSON.stringify({
@@ -172,7 +170,6 @@ export default function SearchByImagePage() {
               console.error("Failed to save visual search results to localStorage", e);
             }
         } else {
-            // This case should now only be hit if the entire product catalog is empty.
             toast({
                 title: "No Products Found",
                 description: "Your product catalog appears to be empty."
@@ -180,19 +177,26 @@ export default function SearchByImagePage() {
             localStorage.removeItem('visualSearch');
         }
       } catch (error) {
-        // This is the definitive client-side safety net that catches any network error.
-        console.error("Visual search failed, activating client-side fallback:", error);
-        toast({
-            variant: "destructive",
-            title: "Visual Search Unsuccessful",
-            description: "We couldn't find a match, but here are some of our popular items!",
-        });
+        console.error("Visual search error:", error);
         
-        // Use a client-side fallback to show popular/random items.
-        const fallbackProducts = getProducts().sort(() => 0.5 - Math.random()).slice(0, 4);
-        setRecommendations(fallbackProducts);
+        if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
+            toast({
+                variant: "destructive",
+                title: "Visual Search Failed",
+                description: "The Google AI API key is not configured correctly. Please see the documentation for instructions.",
+            });
+            setRecommendations([]);
+        } else {
+            // Client-side fallback for other errors
+            toast({
+                variant: "destructive",
+                title: "Visual Search Unsuccessful",
+                description: "We couldn't find a match, but here are some of our popular items!",
+            });
+            const fallbackProducts = getProducts().sort(() => 0.5 - Math.random()).slice(0, 4);
+            setRecommendations(fallbackProducts);
+        }
         
-        // Clear any potentially saved bad search from localStorage.
         localStorage.removeItem('visualSearch');
       }
     });

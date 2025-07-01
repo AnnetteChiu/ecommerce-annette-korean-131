@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -115,10 +116,14 @@ export default function ManageProductsPage() {
         }
       } catch (error) {
         console.error('Failed to generate description', error);
+        let description = 'Could not generate a description at this time.';
+        if (error instanceof Error && error.message.includes('API_KEY_INVALID')) {
+            description = "The Google AI API key is not configured correctly. Please see the documentation for instructions.";
+        }
         toast({
           variant: 'destructive',
           title: 'Generation Failed',
-          description: 'Could not generate a description at this time.',
+          description: description,
         });
       }
     });

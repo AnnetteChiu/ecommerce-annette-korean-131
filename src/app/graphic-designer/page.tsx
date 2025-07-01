@@ -45,10 +45,14 @@ export default function GraphicDesignerPage() {
                 }
             } catch (err) {
                 console.error('Graphic design generation failed:', err);
+                let description = "We couldn't generate a new design. Please try a different prompt.";
+                if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
+                    description = 'The Google AI API key is not configured correctly. Please see the documentation for instructions.';
+                }
                 toast({
                     variant: 'destructive',
                     title: 'Generation Failed',
-                    description: "We couldn't generate a new design. Please try a different prompt.",
+                    description: description,
                 });
             }
         });
