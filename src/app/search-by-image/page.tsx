@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
@@ -147,21 +146,28 @@ export default function SearchByImagePage() {
           count: 4,
         });
         
-        // The server flow has its own robust fallback, but we validate here as a final safeguard.
-        if (!result || !result.productIds || result.productIds.length === 0) {
-          throw new Error('Server returned no product IDs.');
-        }
-
+        // We can now trust the server to always return a valid list of product IDs.
         const recommendedProducts = result.productIds
           .map(id => getProductById(id))
-          .filter((p): p is Product => !!p);
+          .filter((p): p is Product => !!p); // Filter is a final safeguard.
         
+        // This condition should now be unreachable, but we leave the UI just in case.
         if (recommendedProducts.length === 0) {
-           throw new Error('Server returned only invalid product IDs.');
+            // This is unexpected, as the server should always return valid IDs or fallbacks.
+            console.error("Client received an empty list of recommendations from a supposedly robust endpoint.");
+            toast({
+                variant: 'destructive',
+                title: 'An Unexpected Error Occurred',
+                description: 'Please try again. Displaying popular items as a fallback.',
+            });
+            const fallbackProducts = getProducts().slice(0, 4);
+            setRecommendations(fallbackProducts);
+        } else {
+             setRecommendations(recommendedProducts);
         }
 
-        setRecommendations(recommendedProducts);
         try {
+          // Save the results that were actually found and returned by the server
           localStorage.setItem('visualSearch', JSON.stringify({
             imageDataUri: imageDataUri,
             recommendationIds: result.productIds,
@@ -171,12 +177,12 @@ export default function SearchByImagePage() {
         }
 
       } catch (error) {
-        // This is the new, robust fallback. Any failure in the try block will land here.
-        console.error('Visual search failed, using client-side fallback:', error);
+        // This catch block is for catastrophic failures like network errors.
+        console.error('Visual search request failed catastrophically:', error);
         toast({
-          variant: 'default',
-          title: 'Visual Search Unavailable',
-          description: 'We had trouble analyzing your image, but here are some popular items!',
+          variant: 'destructive',
+          title: 'Search Unavailable',
+          description: 'Could not connect to the server. Showing some popular items instead.',
         });
         const fallbackProducts = getProducts().slice(0, 4);
         setRecommendations(fallbackProducts);

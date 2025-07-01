@@ -43,18 +43,12 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
     return { productIds: [] };
   }
   
-  try {
-    // This flow is now architected to be self-healing and will always return valid product IDs.
-    // This catch block is for catastrophic failures (e.g., AI service is completely offline).
-    return await findSimilarProductsFlow({ 
-      ...input, 
-      availableProducts,
-    });
-  } catch (error) {
-    console.error('Visual search flow failed catastrophically:', error);
-    const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
-    return { productIds: fallbackIds };
-  }
+  // The flow is now self-healing and guaranteed to return a result.
+  // No complex try/catch is needed here anymore.
+  return await findSimilarProductsFlow({ 
+    ...input, 
+    availableProducts,
+  });
 }
 
 const recommendationPrompt = ai.definePrompt({
@@ -113,24 +107,29 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    // The prompt is now much more robust, but we keep this as a final safety net.
     try {
       const { output } = await recommendationPrompt(input);
       
-      // We still validate that the output is not null and has product IDs.
-      // The prompt is heavily instructed to avoid this, so this is a last resort.
+      // Robust check: ensure output and productIds exist and are not empty.
       if (output?.productIds && output.productIds.length > 0) {
-        return output; // Trust the AI's output.
+        // Further validation: ensure the IDs are valid products.
+        const allProductIds = new Set(getProducts().map(p => p.id));
+        const validIds = output.productIds.filter(id => allProductIds.has(id));
+        
+        if (validIds.length > 0) {
+            // As long as we have at least one valid ID, we return it.
+            return { productIds: validIds };
+        }
       }
       
-      // This should ideally never be reached due to the new prompt instructions.
-      console.error('AI visual search returned empty data despite instructions. Using fallback.');
+      // Fallback Case 1: AI returned empty, null, or only invalid product IDs.
+      console.error('AI visual search returned invalid or empty data. Using fallback.');
       const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
       return { productIds: fallbackIds };
 
     } catch (error) {
-      // Catastrophic Fallback: For network errors, API key issues, etc.
-      console.error('An unexpected error occurred during the visual search flow:', error);
+      // Fallback Case 2: A catastrophic error occurred (e.g., Genkit/network failure).
+      console.error('A catastrophic error occurred during the visual search flow:', error);
       const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
       return { productIds: fallbackIds };
     }
