@@ -153,6 +153,7 @@ export default function FittingRoomPage() {
 
         setShowAiNotice(false);
         setGenerationError(null);
+        setGeneratedImage(null); // Clear previous results before starting
 
         if (!isAiEnabled) {
             setShowAiNotice(true);
