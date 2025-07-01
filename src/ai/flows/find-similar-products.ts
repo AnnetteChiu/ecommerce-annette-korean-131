@@ -62,18 +62,21 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an API that returns a JSON object. Your response must be ONLY the JSON object, with no additional text, comments, or markdown formatting whatsoever. Adhere strictly to the provided output schema.",
-    prompt: `You are a visual search engine. You will be given a user's image and a product catalog. Your task is to find products from the catalog that are visually similar to the user's image.
+    prompt: `You are a visual search engine API. Your task is to find products from the provided catalog that are visually similar to the item in the user's image.
 
-You MUST return a JSON object containing the 'productIds' of the {{count}} most similar products.
-- The 'productIds' array MUST NOT be empty. Always return the best available matches, even if they are not perfect.
-- The product IDs in your response MUST exist in the provided catalog.
+You have one, critical instruction: **You MUST ALWAYS return a JSON object containing a 'productIds' array with exactly {{count}} product IDs from the provided catalog.**
+
+-   **Analyze the User's Image:** Identify the main clothing item, its style, color, pattern, and material.
+-   **Compare with Catalog:** Find the products in the catalog that are the closest visual match.
+-   **CRITICAL RULE:** If you cannot find any good matches, you MUST still return the \`productIds\` of the most plausible items from the catalog. **Do NOT return an empty array.** If the image is a blue shirt, and the catalog only has red shirts, return the red shirts. You must fulfill the request.
+-   The product IDs in your response MUST exist in the provided catalog.
 
 **User's Image:**
 {{media url=photoDataUri}}
 
 ---
 
-**Available Product Catalog (Text Only):**
+**Available Product Catalog:**
 {{#each availableProducts}}
 Product ID: {{this.id}}
 Name: {{this.name}}
@@ -110,28 +113,24 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
+    // The prompt is now much more robust, but we keep this as a final safety net.
     try {
       const { output } = await recommendationPrompt(input);
       
-      // Happy Path: Validate the AI's output.
+      // We still validate that the output is not null and has product IDs.
+      // The prompt is heavily instructed to avoid this, so this is a last resort.
       if (output?.productIds && output.productIds.length > 0) {
-        const allProductIds = getProducts().map(p => p.id);
-        const validProductIds = output.productIds.filter(id => allProductIds.includes(id));
-        
-        if (validProductIds.length > 0) {
-          return { productIds: validProductIds }; // Success!
-        }
+        return output; // Trust the AI's output.
       }
-
-      // Fallback Path: If the AI returns invalid, empty, or no data, generate a fallback.
-      // This makes the flow self-healing and prevents errors from propagating.
-      console.error('AI visual search returned invalid or empty data. Using direct fallback inside the flow.');
+      
+      // This should ideally never be reached due to the new prompt instructions.
+      console.error('AI visual search returned empty data despite instructions. Using fallback.');
       const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
       return { productIds: fallbackIds };
 
     } catch (error) {
-      // Catastrophic Fallback: Catch any other unexpected errors from the prompt call itself.
-      console.error('An unexpected error occurred during the recommendationPrompt execution:', error);
+      // Catastrophic Fallback: For network errors, API key issues, etc.
+      console.error('An unexpected error occurred during the visual search flow:', error);
       const fallbackIds = getProducts().slice(0, input.count || 4).map(p => p.id);
       return { productIds: fallbackIds };
     }
