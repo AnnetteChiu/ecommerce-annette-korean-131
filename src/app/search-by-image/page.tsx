@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
@@ -142,52 +143,57 @@ export default function SearchByImagePage() {
 
     setSearchPerformed(true);
     startTransition(async () => {
-      const result = await findSimilarProducts({
-        photoDataUri: imageDataUri,
-        count: 4,
-      });
+      try {
+        const result = await findSimilarProducts({
+          photoDataUri: imageDataUri,
+          count: 4,
+        });
 
-      const productIds = result?.productIds;
+        const productIds = result?.productIds;
 
-      // SUCCESS CASE: We received a valid list of product IDs.
-      if (productIds && productIds.length > 0) {
-        const recommendedProducts = productIds
-          .map(id => getProductById(id))
-          .filter((p): p is Product => !!p);
-        
-        // Final check to ensure we could map IDs to actual products.
-        if (recommendedProducts.length > 0) {
-          setRecommendations(recommendedProducts);
-          // Save the successful search results to localStorage.
-          try {
-            localStorage.setItem('visualSearch', JSON.stringify({
-              imageDataUri: imageDataUri,
-              recommendationIds: result.productIds,
-            }));
-          } catch (e) {
-            console.error("Failed to save visual search results to localStorage", e);
+        // SUCCESS CASE: We received a valid list of product IDs.
+        if (productIds && productIds.length > 0) {
+          const recommendedProducts = productIds
+            .map(id => getProductById(id))
+            .filter((p): p is Product => !!p);
+          
+          if (recommendedProducts.length > 0) {
+            setRecommendations(recommendedProducts);
+            // Save the successful search results to localStorage.
+            try {
+              localStorage.setItem('visualSearch', JSON.stringify({
+                imageDataUri: imageDataUri,
+                recommendationIds: result.productIds,
+              }));
+            } catch (e) {
+              console.error("Failed to save visual search results to localStorage", e);
+            }
+            return;
           }
-          // Exit here, as the success case is handled.
-          return;
         }
+        
+        // This is a "soft failure" - server responded but with no valid products.
+        // It should theoretically be handled by the server fallback, but we'll trigger the fallback here too.
+        throw new Error("AI returned no valid recommendations.");
+
+      } catch (error) {
+        // --- CATASTROPHIC FAILURE FALLBACK ---
+        // This block runs if the server-side call failed completely (e.g. network error, server crash)
+        // OR if the soft failure was thrown above. This is our safety net.
+        console.error('Visual search failed, activating client-side fallback.', error);
+        
+        const allProducts = getProducts();
+        const fallbackProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
+        setRecommendations(fallbackProducts);
+
+        toast({
+          variant: 'default',
+          title: 'Displaying Popular Items',
+          description: 'We had trouble with the visual search, but here are some popular products for you.',
+        });
+        
+        localStorage.removeItem('visualSearch');
       }
-
-      // --- FALLBACK CASE ---
-      // This block runs if the server-side call failed, returned null/undefined,
-      // or returned empty/invalid product IDs. This is our safety net.
-      console.error('Visual search failed or returned empty data, activating client-side fallback.');
-      
-      const allProducts = getProducts();
-      const fallbackProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
-      setRecommendations(fallbackProducts);
-
-      toast({
-        variant: 'default',
-        title: 'Displaying Popular Items',
-        description: 'We had trouble with the visual search, but here are some popular products for you.',
-      });
-      
-      localStorage.removeItem('visualSearch');
     });
   };
 
