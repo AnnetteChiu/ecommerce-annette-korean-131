@@ -74,7 +74,7 @@ export default function FittingRoomPage() {
             canvas.height = video.videoHeight;
             const context = canvas.getContext('2d');
             context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-            const dataUri = canvas.toDataURL('image/png');
+            const dataUri = canvas.toDataURL('image/jpeg', 0.9);
             setCapturedImage(dataUri);
             setGeneratedImage(null); // Clear previous results
         }
