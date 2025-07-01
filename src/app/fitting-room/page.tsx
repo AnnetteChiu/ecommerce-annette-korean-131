@@ -13,7 +13,7 @@ import { convertImageUrlToDataUri } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Camera, PersonStanding, Sparkles, AlertTriangle } from 'lucide-react';
+import { Loader2, Camera, PersonStanding, Sparkles, AlertTriangle, Info } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -164,9 +164,11 @@ export default function FittingRoomPage() {
             try {
                 // Keep the previous image visible during generation for a better UX
                 const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
+                
+                const resizedCapturedImage = await resizeImage(capturedImage);
 
                 const result = await virtualTryOn({
-                    userPhotoDataUri: capturedImage,
+                    userPhotoDataUri: resizedCapturedImage,
                     productImageDataUri: productImageDataUri,
                 });
 
@@ -290,15 +292,23 @@ export default function FittingRoomPage() {
                             {isGenerating ? 'Generating...' : 'Virtually Try It On'}
                         </Button>
                         <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
-                            {isGenerating && (
+                            {isGenerating && !generatedImage && (
                                 <div className="text-center">
                                     <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                                     <p>Our AI is styling you...</p>
                                 </div>
                             )}
-                            {!isGenerating && generatedImage && (
-                                <Image src={generatedImage} alt="Virtual try-on result" fill className="object-cover" />
+                            {(generatedImage || (isGenerating && capturedImage)) && (
+                                <Image src={generatedImage || capturedImage!} alt="Virtual try-on result" fill className={cn("object-cover", { 'opacity-50': isGenerating })} />
                             )}
+                            
+                            {isGenerating && generatedImage && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white bg-black/50">
+                                    <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+                                    <p>Generating new look...</p>
+                                </div>
+                            )}
+
                             {!isGenerating && !generatedImage && (
                                 <p>Your result will appear here.</p>
                             )}
@@ -307,8 +317,14 @@ export default function FittingRoomPage() {
                             <Alert>
                                 <Sparkles className="h-4 w-4" />
                                 <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
-                                <AlertDescription>
-                                  To see the product virtually placed on you, enable the optional AI feature. See the <Link href="/docs" className="underline font-semibold">docs</Link> for simple setup instructions.
+                                <AlertDescription className="space-y-2">
+                                    <p>To see the product virtually placed on you, enable the optional AI feature.</p>
+                                    <Button asChild variant="secondary" size="sm" className="w-full">
+                                        <Link href="/docs">
+                                            <Info className="mr-2 h-4 w-4" />
+                                            See Simple Setup Instructions
+                                        </Link>
+                                    </Button>
                                 </AlertDescription>
                             </Alert>
                         )}
