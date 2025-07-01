@@ -18,6 +18,8 @@ const GenerateStyleRecommendationOutputSchema = z.object({
 export type GenerateStyleRecommendationInput = z.infer<typeof GenerateStyleRecommendationInputSchema>;
 export type GenerateStyleRecommendationOutput = z.infer<typeof GenerateStyleRecommendationOutputSchema>;
 
+const defaultResponse = { recommendations: 'We could not generate a recommendation at this time. Please try browsing more items.' };
+
 export async function generateStyleRecommendation(input: GenerateStyleRecommendationInput): Promise<GenerateStyleRecommendationOutput> {
   if (!input.browsingHistory || input.browsingHistory.trim() === '') {
       return { recommendations: 'Browse some products first to get a personalized style recommendation.' };
@@ -47,9 +49,8 @@ const styleRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateStyleRecommendationOutputSchema,
   },
   async (input) => {
-    // Let Genkit's structured output handle validation.
-    // An error will be thrown automatically if the output doesn't match the schema.
     const { output } = await recommendationPrompt(input);
-    return output!;
+    // If the model fails to generate valid JSON, return a default response.
+    return output || defaultResponse;
   }
 );

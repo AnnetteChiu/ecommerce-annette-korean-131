@@ -88,9 +88,8 @@ const productRecommendationFlow = ai.defineFlow(
     outputSchema: GenerateProductRecommendationsOutputSchema,
   },
   async (input) => {
-    // Let Genkit's structured output handle validation.
-    // An error will be thrown automatically if the output doesn't match the schema.
     const { output } = await recommendationPrompt(input);
-    return output!;
+    // If the model fails to generate valid JSON, return a default response.
+    return output || defaultRecommendation;
   }
 );

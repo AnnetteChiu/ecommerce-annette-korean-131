@@ -57,7 +57,7 @@ const recommendationPrompt = ai.definePrompt({
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
     system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
-    prompt: `Analyze the uploaded image's style, clothing, and colors. Recommend up to {{count}} products from the catalog below that are visually similar or a good stylistic match.
+    prompt: `Analyze the uploaded image's style, clothing, and colors. Recommend up to {{count}} products from the catalog below that are visually similar or a good stylistic match. If no products are a good match, return an empty array for productIds.
 
 Catalog of available products:
 {{#each availableProducts}}
@@ -74,9 +74,8 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    // Let Genkit's structured output handle validation.
-    // An error will be thrown automatically if the output doesn't match the schema.
     const { output } = await recommendationPrompt(input);
-    return output!;
+    // If the model fails to generate valid JSON, return a default response.
+    return output || defaultResponse;
   }
 );
