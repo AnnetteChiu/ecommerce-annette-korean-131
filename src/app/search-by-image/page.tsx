@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useRef, useEffect } from 'react';
@@ -210,7 +211,7 @@ export default function SearchByImagePage() {
                 <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>AI Feature Disabled</AlertTitle>
                 <AlertDescription>
-                    The Google AI API key is missing. Please add it to your <code>.env.local</code> file (for local development) or configure it as a secret for your deployed app. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
+                  The Google AI API key is missing. Please add it in <code>src/ai/config.ts</code> to enable this feature. See the <Link href="/docs" className="underline font-bold">documentation</Link> for more details.
                 </AlertDescription>
             </Alert>
           )}
