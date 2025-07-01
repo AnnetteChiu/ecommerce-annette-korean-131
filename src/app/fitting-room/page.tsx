@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Camera, PersonStanding, Sparkles, AlertTriangle, PowerOff } from 'lucide-react';
+import { Loader2, Camera, PersonStanding, Sparkles, AlertTriangle } from 'lucide-react';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -245,9 +245,9 @@ export default function FittingRoomPage() {
                         {showAiNotice && (
                             <Alert>
                                 <Sparkles className="h-4 w-4" />
-                                <AlertTitle>AI Preview Mode</AlertTitle>
+                                <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
                                 <AlertDescription>
-                                This is your captured photo. To see the virtual try-on, please configure your Google AI API key. See the <Link href="/docs" className="underline font-semibold">docs</Link> for instructions.
+                                This is your captured photo. To see the product virtually placed on you, configure the optional AI features. See the <Link href="/docs" className="underline font-semibold">docs</Link> for setup instructions.
                                 </AlertDescription>
                             </Alert>
                         )}
