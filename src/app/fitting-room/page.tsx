@@ -66,6 +66,23 @@ export default function FittingRoomPage() {
     const apparelProducts = getProducts().filter(p => p.category === 'Apparel');
 
     useEffect(() => {
+        try {
+            const savedTryOn = sessionStorage.getItem('fittingRoomResult');
+            if (savedTryOn) {
+                const { captured, generated, product } = JSON.parse(savedTryOn);
+                if (captured && generated && product) {
+                    setCapturedImage(captured);
+                    setGeneratedImage(generated);
+                    setSelectedProduct(product);
+                }
+            }
+        } catch (error) {
+            console.error("Failed to load fitting room state from sessionStorage", error);
+            sessionStorage.removeItem('fittingRoomResult');
+        }
+    }, []); // Run only on mount
+
+    useEffect(() => {
         const getCameraPermission = async () => {
           if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             try {
@@ -128,8 +145,18 @@ export default function FittingRoomPage() {
 
                 if (result.generatedImageDataUri) {
                     setGeneratedImage(result.generatedImageDataUri);
+                    try {
+                        sessionStorage.setItem('fittingRoomResult', JSON.stringify({
+                            captured: resizedCapturedImage,
+                            generated: result.generatedImageDataUri,
+                            product: productToTryOn,
+                        }));
+                    } catch (e) {
+                        console.error("Failed to save fitting room state to sessionStorage", e);
+                    }
                 } else {
-                    throw new Error("AI did not return an image.");
+                    setGenerationError("We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.");
+                    setGeneratedImage(null);
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
@@ -168,6 +195,7 @@ export default function FittingRoomPage() {
             }
             setGeneratedImage(null);
             setGenerationError(null);
+            sessionStorage.removeItem('fittingRoomResult');
         }
     };
 
@@ -175,6 +203,8 @@ export default function FittingRoomPage() {
         setCapturedImage(null);
         setGeneratedImage(null);
         setGenerationError(null);
+        setSelectedProduct(null);
+        sessionStorage.removeItem('fittingRoomResult');
     };
 
     return (
