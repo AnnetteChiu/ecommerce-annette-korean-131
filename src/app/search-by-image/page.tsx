@@ -3,13 +3,13 @@
 import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { findSimilarProducts } from '@/ai/flows/find-similar-products';
-import { getProductById, getProducts } from '@/lib/products';
+import { getProductById } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, Upload, ImageOff } from 'lucide-react';
+import { Loader2, Search, Upload } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Helper to resize and compress the image
@@ -131,17 +131,6 @@ export default function SearchByImagePage() {
     }
   };
   
-  const showFallback = (message: string) => {
-    toast({
-        variant: 'destructive',
-        title: 'Search Unavailable',
-        description: message,
-    });
-    const fallbackProducts = getProducts().slice(0, 4);
-    setRecommendations(fallbackProducts);
-    localStorage.removeItem('visualSearch');
-  }
-
   const handleSearch = () => {
     if (!imageDataUri) {
       toast({
@@ -153,43 +142,49 @@ export default function SearchByImagePage() {
 
     setSearchPerformed(true);
     startTransition(async () => {
+      setRecommendations([]); // Clear previous results while loading
       try {
+        // The server flow is self-healing and will always return a valid result.
         const result = await findSimilarProducts({
           photoDataUri: imageDataUri,
           count: 4,
         });
+
+        // We can be confident the server returned valid IDs, so we just map them.
+        const recommendedProducts = result.productIds
+          .map(id => getProductById(id))
+          .filter((p): p is Product => !!p);
         
-        // This is our primary safety net. If the server returns anything
-        // other than a valid list of product IDs, we show the fallback.
-        if (result?.productIds && result.productIds.length > 0) {
-          const recommendedProducts = result.productIds
-            .map(id => getProductById(id))
-            .filter((p): p is Product => !!p); // Filter is a final safeguard.
-          
-          if (recommendedProducts.length > 0) {
-            setRecommendations(recommendedProducts);
-            // Save the successful search
-            try {
-              localStorage.setItem('visualSearch', JSON.stringify({
-                imageDataUri: imageDataUri,
-                recommendationIds: result.productIds,
-              }));
-            } catch (e) {
-              console.error("Failed to save visual search results to localStorage", e);
-            }
-          } else {
-            // This case handles when the AI returns only invalid IDs.
-            showFallback('Our AI stylist could not find a match. Please try another image.');
+        setRecommendations(recommendedProducts);
+
+        if (recommendedProducts.length > 0) {
+          try {
+            localStorage.setItem('visualSearch', JSON.stringify({
+              imageDataUri: imageDataUri,
+              recommendationIds: result.productIds,
+            }));
+          } catch (e) {
+            console.error("Failed to save visual search results to localStorage", e);
           }
         } else {
-          // This case handles a null response, empty productIds, etc.
-          showFallback('The server returned an unexpected response. Please try again.');
+          // This case should not be reached due to server-side fallbacks.
+          // If it is, we remove any saved search and show a toast.
+          localStorage.removeItem('visualSearch');
+          toast({
+            variant: 'destructive',
+            title: 'No Matches Found',
+            description: "We couldn't find any products that match your style. Please try a different image.",
+          });
         }
-
       } catch (error) {
-        // This catch block is for catastrophic failures like network errors.
-        console.error('Visual search request failed catastrophically:', error);
-        showFallback('Could not connect to the server. Showing popular items instead.');
+        console.error('Visual search request failed:', error);
+        localStorage.removeItem('visualSearch');
+        setRecommendations([]); // Ensure it's empty on error
+        toast({
+          variant: 'destructive',
+          title: 'An Error Occurred',
+          description: 'Could not perform the search. Please try again later.',
+        });
       }
     });
   };
@@ -244,17 +239,8 @@ export default function SearchByImagePage() {
             <p className="text-muted-foreground">Analyzing your image...</p>
         </div>
       )}
-      
-      {/* This "No Matches" UI is now effectively unreachable, because recommendations will always be populated with a fallback. We leave it as a deep failsafe. */}
-      {searchPerformed && !isPending && recommendations.length === 0 && (
-        <div className="w-full mt-8 text-center border rounded-lg p-12 bg-muted/50">
-          <ImageOff className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
-          <h2 className="text-2xl font-headline font-bold">No Matches Found</h2>
-          <p className="text-muted-foreground mt-2">We couldn't find any products that match your style. Please try a different image.</p>
-        </div>
-      )}
 
-      {recommendations.length > 0 && (
+      {recommendations.length > 0 && !isPending && (
         <div className="w-full mt-8">
             <h2 className="text-3xl font-headline font-bold mb-8 text-center">
               { searchPerformed ? "Our Recommendations" : "Your Previous Search Results" }
