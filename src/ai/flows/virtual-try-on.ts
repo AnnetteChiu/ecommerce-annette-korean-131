@@ -16,10 +16,10 @@ const VirtualTryOnInputSchema = z.object({
     .describe(
       "A photo of the user, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
-  productImageUrl: z
-    .string().url()
+  productImageDataUri: z
+    .string()
     .describe(
-      "A public URL of the product image to try on."
+      "A photo of the product, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
 export type VirtualTryOnInput = z.infer<typeof VirtualTryOnInputSchema>;
@@ -39,13 +39,13 @@ const virtualTryOnFlow = ai.defineFlow(
     inputSchema: VirtualTryOnInputSchema,
     outputSchema: VirtualTryOnOutputSchema,
   },
-  async ({ userPhotoDataUri, productImageUrl }) => {
+  async ({ userPhotoDataUri, productImageDataUri }) => {
 
     const { media } = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
       prompt: [
         { media: { url: userPhotoDataUri } },
-        { media: { url: productImageUrl } },
+        { media: { url: productImageDataUri } },
         { text: "You are a virtual fitting room assistant. Your task is to realistically place the clothing item from the second image onto the person in the first image. Ensure the clothing fits the person's body shape and pose. The background of the first image should be preserved. Do not include any text or logos in the output image." },
       ],
       config: {

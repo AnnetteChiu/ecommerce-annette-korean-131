@@ -8,6 +8,7 @@ import type { Product } from '@/types';
 import { virtualTryOn } from '@/ai/flows/virtual-try-on';
 import { useAi } from '@/context/ai-context';
 import Link from 'next/link';
+import { convertImageUrlToDataUri } from '@/app/actions';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -107,9 +108,11 @@ export default function FittingRoomPage() {
         startTransition(async () => {
             setGeneratedImage(null);
             try {
+                const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
+
                 const result = await virtualTryOn({
                     userPhotoDataUri: capturedImage,
-                    productImageUrl: selectedProduct.imageUrl,
+                    productImageDataUri: productImageDataUri,
                 });
 
                 if (result.generatedImageDataUri) {
@@ -119,10 +122,11 @@ export default function FittingRoomPage() {
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
+                const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
                 toast({
                     variant: 'destructive',
                     title: 'Generation Failed',
-                    description: 'Could not generate the image. The AI might be busy, or the images might not be suitable. Please try again.',
+                    description: `Could not generate the image. ${errorMessage} Please try again.`,
                 });
             }
         });
