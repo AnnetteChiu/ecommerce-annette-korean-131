@@ -133,20 +133,20 @@ export default function FittingRoomPage() {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="relative aspect-video w-full bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                                <video ref={videoRef} className={cn("w-full h-full object-cover", capturedImage || hasCameraPermission !== true ? 'hidden' : 'block')} autoPlay muted playsInline />
+                                <video ref={videoRef} className={cn("w-full h-full object-cover", { 'hidden': !!capturedImage })} autoPlay muted playsInline />
                                 {capturedImage && (
                                     <Image src={capturedImage} alt="Captured photo" fill className="object-cover" />
                                 )}
                                 
                                 {hasCameraPermission === null && !capturedImage && (
-                                    <div className="text-center text-muted-foreground p-4">
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-muted-foreground p-4 bg-background/80 backdrop-blur-sm z-10">
                                         <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
                                         <p>Requesting camera access...</p>
                                     </div>
                                 )}
 
                                 {hasCameraPermission === false && !capturedImage && (
-                                    <div className="p-4">
+                                    <div className="absolute inset-0 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm z-10">
                                         <Alert variant="destructive">
                                             <AlertTriangle className="h-4 w-4" />
                                             <AlertTitle>Camera Access Required</AlertTitle>
