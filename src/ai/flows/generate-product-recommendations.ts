@@ -7,7 +7,8 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import {getProducts} from '@/lib/products';
+import {getProducts, getProductById} from '@/lib/products';
+import type { Product } from '@/types';
 
 const BrowsingHistoryItemSchema = z.object({
   id: z.string(),
@@ -36,8 +37,6 @@ const GenerateProductRecommendationsOutputSchema = z.object({
 export type GenerateProductRecommendationsInput = z.infer<typeof GenerateProductRecommendationsInputSchema>;
 export type GenerateProductRecommendationsOutput = z.infer<typeof GenerateProductRecommendationsOutputSchema>;
 
-const defaultRecommendation = { productIds: [] };
-
 export async function generateProductRecommendations(input: GenerateProductRecommendationsInput): Promise<GenerateProductRecommendationsOutput> {
     const allProducts = getProducts();
     
@@ -46,10 +45,10 @@ export async function generateProductRecommendations(input: GenerateProductRecom
       .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
     if (availableProducts.length === 0) {
-      return defaultRecommendation;
+      return { productIds: [] };
     }
     
-    // Let errors from the flow propagate up to the calling component.
+    // The flow is now self-healing and guaranteed to return a result.
     return await productRecommendationFlow({ 
       ...input, 
       availableProducts,
@@ -60,8 +59,8 @@ const recommendationPrompt = ai.definePrompt({
     name: 'productRecommendationPrompt',
     input: { schema: FlowInputSchema },
     output: { schema: GenerateProductRecommendationsOutputSchema },
-    system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
-    prompt: `Based on the user's browsing history and the product they are currently viewing, recommend up to {{count}} products from the catalog.
+    system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting. Your goal is to provide relevant recommendations, but it is CRITICAL that you always return an array of product IDs, even if the matches aren't perfect. The array must contain {{count}} product IDs.",
+    prompt: `Based on the user's browsing history and the product they are currently viewing, recommend exactly {{count}} products from the catalog.
 Consider the categories and styles of the products. Try to recommend items that are complementary or similar.
 
 Current Product ID: {{currentProductId}}
@@ -90,11 +89,50 @@ const productRecommendationFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      // If the model fails to generate valid JSON, return a default response.
-      return output || defaultRecommendation;
+      
+      // Validate the output
+      if (output?.productIds && output.productIds.length > 0) {
+        const allProductIds = new Set(input.availableProducts.map(p => p.id));
+        const validIds = output.productIds.filter(id => allProductIds.has(id));
+
+        if (validIds.length > 0) {
+          // Return valid IDs, ensuring the count is met if possible, but don't fail.
+          return { productIds: validIds.slice(0, input.count) };
+        }
+      }
+      
+      // If we reach here, AI failed or returned invalid data.
+      throw new Error("AI returned no valid recommendations.");
+
     } catch (error) {
-      console.error('Error in productRecommendationFlow:', error);
-      return defaultRecommendation;
+      console.error('AI recommendations failed, using server-side fallback:', error);
+        
+        // Server-Side Fallback Logic
+        const allProducts = getProducts();
+        const currentProduct = getProductById(input.currentProductId);
+        
+        let fallbackRecs: Product[] = [];
+
+        if (currentProduct) {
+          // 1. Try to get products from the same category
+          fallbackRecs = allProducts.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id);
+        }
+        
+        // 2. If not enough recommendations, fill with other products
+        const otherProducts = allProducts.filter(
+            p => p.id !== input.currentProductId && !fallbackRecs.find(fr => fr.id === p.id)
+        );
+
+        // Shuffle the remaining products to ensure variety
+        const shuffledOthers = otherProducts.sort(() => 0.5 - Math.random());
+
+        // Add products until we have the required count
+        while (fallbackRecs.length < input.count && shuffledOthers.length > 0) {
+            fallbackRecs.push(shuffledOthers.shift()!);
+        }
+
+        const fallbackIds = fallbackRecs.slice(0, input.count).map(p => p.id);
+        return { productIds: fallbackIds };
     }
   }
 );

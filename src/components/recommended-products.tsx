@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from 'react';
 import { generateProductRecommendations } from '@/ai/flows/generate-product-recommendations';
-import { getProductById, getProducts } from '@/lib/products';
+import { getProductById } from '@/lib/products';
 import { ProductCard } from './product-card';
 import type { Product } from '@/types';
 import { Loader2 } from 'lucide-react';
@@ -27,49 +27,25 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
           console.error("Could not read browsing history, proceeding with empty history.", e);
         }
 
+        // The server flow is now self-healing and will always return product IDs.
         const result = await generateProductRecommendations({
           currentProductId,
           browsingHistory: history,
           count: 4,
         });
 
-        if (result && result.productIds && result.productIds.length > 0) {
-          const recommendedProducts = result.productIds
-            .map(id => getProductById(id))
-            .filter((p): p is Product => !!p);
-          setRecommendations(recommendedProducts);
-        } else {
-            // If AI gives no results, throw an error to trigger the fallback.
-            throw new Error("AI returned no recommendations.");
-        }
+        // We can be confident the server returned valid IDs, so we just map them.
+        const recommendedProducts = result.productIds
+          .map(id => getProductById(id))
+          .filter((p): p is Product => !!p);
+        
+        setRecommendations(recommendedProducts);
+
       } catch (error) {
-        console.error('AI recommendations failed, using fallback logic:', error);
-        
-        // Fallback Logic
-        const allProducts = getProducts();
-        const currentProduct = getProductById(currentProductId);
-        
-        let fallbackRecs: Product[] = [];
-
-        if (currentProduct) {
-          // 1. Try to get products from the same category
-          fallbackRecs = allProducts.filter(p => p.category === currentProduct.category && p.id !== currentProduct.id);
-        }
-        
-        // 2. If not enough recommendations, fill with other random products
-        const otherProducts = allProducts.filter(
-            p => p.id !== currentProductId && !fallbackRecs.find(fr => fr.id === p.id)
-        );
-
-        // Shuffle the remaining products to ensure variety
-        const shuffledOthers = otherProducts.sort(() => 0.5 - Math.random());
-
-        // Add products until we have 4 recommendations
-        while (fallbackRecs.length < 4 && shuffledOthers.length > 0) {
-            fallbackRecs.push(shuffledOthers.shift()!);
-        }
-
-        setRecommendations(fallbackRecs.slice(0, 4));
+        // This catch block is now only for catastrophic errors (e.g., network failure).
+        // In this case, we'll just log the error and show nothing.
+        console.error('Failed to fetch recommendations due to a server or network error:', error);
+        setRecommendations([]); // Ensure no stale recommendations are shown
       }
     });
   }, [currentProductId, currentProductName]);
@@ -83,8 +59,8 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
     );
   }
 
-  if (!isPending && recommendations.length === 0) {
-    return null;
+  if (recommendations.length === 0) {
+    return null; // Don't render the section if there are no recommendations
   }
 
   return (
