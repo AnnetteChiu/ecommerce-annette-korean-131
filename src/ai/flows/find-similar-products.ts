@@ -100,7 +100,7 @@ No products available. You must return an empty productIds array.
           },
           {
             category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-            threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+            threshold: 'BLOCK_NONE',
           },
         ],
       },

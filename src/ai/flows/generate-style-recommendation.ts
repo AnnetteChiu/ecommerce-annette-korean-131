@@ -39,7 +39,27 @@ const recommendationPrompt = ai.definePrompt({
 The user has viewed the following products:
 {{browsingHistory}}
 
-Based on these items, generate a brief (2-3 sentences) style recommendation.`
+Based on these items, generate a brief (2-3 sentences) style recommendation.`,
+    config: {
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_HATE_SPEECH',
+            threshold: 'BLOCK_NONE',
+          },
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_NONE',
+          },
+          {
+            category: 'HARM_CATEGORY_HARASSMENT',
+            threshold: 'BLOCK_NONE',
+          },
+          {
+            category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+            threshold: 'BLOCK_NONE',
+          },
+        ],
+      },
 });
 
 const styleRecommendationFlow = ai.defineFlow(

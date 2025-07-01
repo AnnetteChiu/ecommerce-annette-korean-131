@@ -52,7 +52,7 @@ const generateGraphicDesignFlow = ai.defineFlow(
             },
             {
               category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-              threshold: 'BLOCK_MEDIUM_AND_ABOVE',
+              threshold: 'BLOCK_NONE',
             },
           ],
       },
