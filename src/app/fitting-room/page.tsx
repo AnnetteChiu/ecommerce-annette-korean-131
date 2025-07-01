@@ -18,6 +18,40 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
+// Helper to resize and compress an image from a data URI
+const resizeImage = (dataUri: string, maxSize = 1024, quality = 0.9): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const img = new window.Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let { width, height } = img;
+
+            if (width > height) {
+                if (width > maxSize) {
+                    height *= maxSize / width;
+                    width = maxSize;
+                }
+            } else {
+                if (height > maxSize) {
+                    width *= maxSize / height;
+                    height = maxSize;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                return reject(new Error('Failed to get canvas context'));
+            }
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = (err) => reject(new Error('Image load error'));
+        img.src = dataUri;
+    });
+};
+
 export default function FittingRoomPage() {
     const { isAiEnabled } = useAi();
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -72,7 +106,7 @@ export default function FittingRoomPage() {
         }
     }, [toast]);
 
-    const handleCapturePhoto = () => {
+    const handleCapturePhoto = async () => {
         if (videoRef.current && canvasRef.current) {
             const video = videoRef.current;
             const canvas = canvasRef.current;
@@ -81,7 +115,20 @@ export default function FittingRoomPage() {
             const context = canvas.getContext('2d');
             context?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
             const dataUri = canvas.toDataURL('image/jpeg', 0.9);
-            setCapturedImage(dataUri);
+
+            try {
+                const resizedDataUri = await resizeImage(dataUri);
+                setCapturedImage(resizedDataUri);
+            } catch (error) {
+                 console.error("Failed to resize image", error);
+                toast({
+                    variant: 'destructive',
+                    title: 'Photo Capture Failed',
+                    description: 'Could not process the captured photo. Please try again.',
+                });
+                setCapturedImage(null);
+            }
+
             setGeneratedImage(null); // Clear previous results
             setShowAiNotice(false);
         }
@@ -251,7 +298,7 @@ export default function FittingRoomPage() {
                                 <Sparkles className="h-4 w-4" />
                                 <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
                                 <AlertDescription>
-                                This is your captured photo. To see the product virtually placed on you, configure the optional AI features. See the <Link href="/docs" className="underline font-semibold">docs</Link> for setup instructions.
+                                To see the product virtually placed on you, you can enable the optional AI features. See the <Link href="/docs" className="underline font-semibold">docs</Link> for setup instructions.
                                 </AlertDescription>
                             </Alert>
                         )}
