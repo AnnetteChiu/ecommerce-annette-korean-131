@@ -21,61 +21,40 @@ export function Header() {
             CodiStyle
           </Link>
           <nav>
-            <TooltipProvider>
-              <div className="flex items-center gap-1">
-                {aiEnabled && (
-                  <>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href="/fitting-room">
-                            <Camera className="h-5 w-5" />
-                            <span className="sr-only">AI Fitting Room</span>
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>AI Fitting Room</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href="/search-by-image">
-                            <Search className="h-5 w-5" />
-                            <span className="sr-only">Search by Image</span>
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Search by Image</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href="/docs">
-                            <Book className="h-5 w-5" />
-                            <span className="sr-only">Documentation</span>
-                          </Link>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Documentation</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </>
-                )}
+            <div className="flex items-center gap-1">
+              {aiEnabled && (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link href="/fitting-room">
+                      <Camera />
+                      Fitting Room
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link href="/search-by-image">
+                      <Search />
+                      Search by Image
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" asChild>
+                    <Link href="/docs">
+                      <Book />
+                      Docs
+                    </Link>
+                  </Button>
+                </>
+              )}
+              <TooltipProvider>
                 <Tooltip>
-                  <TooltipTrigger asChild>
-                    <CartIcon />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Shopping Cart</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            </TooltipProvider>
+                    <TooltipTrigger asChild>
+                      <CartIcon />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Shopping Cart</p>
+                    </TooltipContent>
+                  </Tooltip>
+              </TooltipProvider>
+            </div>
           </nav>
         </div>
       </div>
