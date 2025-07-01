@@ -155,14 +155,12 @@ export default function FittingRoomPage() {
         setGenerationError(null);
 
         if (!isAiEnabled) {
-            setGeneratedImage(capturedImage);
             setShowAiNotice(true);
             return;
         }
 
         startTransition(async () => {
             try {
-                const previousResult = generatedImage;
                 const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
                 
                 const resizedCapturedImage = await resizeImage(capturedImage);
@@ -175,7 +173,6 @@ export default function FittingRoomPage() {
                 if (result.generatedImageDataUri) {
                     setGeneratedImage(result.generatedImageDataUri);
                 } else {
-                    setGeneratedImage(previousResult);
                     throw new Error("AI did not return an image.");
                 }
             } catch (error) {
@@ -327,11 +324,11 @@ export default function FittingRoomPage() {
                                 <Sparkles className="h-4 w-4" />
                                 <AlertTitle>AI Feature Disabled</AlertTitle>
                                 <AlertDescription>
-                                  The Virtual Try-On feature requires AI to be enabled. See the{' '}
+                                  To use the Virtual Try-On, please{' '}
                                   <Link href="/docs" className="font-medium text-primary underline">
-                                    developer documentation
+                                    enable the optional AI feature
                                   </Link>
-                                  {' '}for setup instructions.
+                                  .
                                 </AlertDescription>
                             </Alert>
                         )}

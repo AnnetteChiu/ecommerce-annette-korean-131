@@ -64,11 +64,11 @@ export default function GraphicDesignerPage() {
                     <Sparkles className="h-4 w-4" />
                     <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                        The Graphic Designer feature requires AI to be enabled. See the{' '}
+                        To use the Graphic Designer, please{' '}
                         <Link href="/docs" className="font-medium text-primary underline">
-                            developer documentation
+                            enable the optional AI feature
                         </Link>
-                        {' '}for setup instructions.
+                        .
                     </AlertDescription>
                 </Alert>
             ) : null}
