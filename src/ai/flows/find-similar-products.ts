@@ -14,6 +14,7 @@ const ProductForPromptSchema = z.object({
   name: z.string(),
   description: z.string(),
   category: z.string(),
+  imageUrl: z.string().url(),
 });
 
 const FlowInputSchema = z.object({
@@ -39,7 +40,7 @@ const defaultResponse = { productIds: [] };
 export async function findSimilarProducts(input: FindSimilarProductsInput): Promise<FindSimilarProductsOutput> {
   const allProducts = getProducts();
   const availableProducts = allProducts
-    .map(({ id, name, description, category }) => ({ id, name, description, category }));
+    .map(({ id, name, description, category, imageUrl }) => ({ id, name, description, category, imageUrl }));
 
   if (availableProducts.length === 0) {
     return defaultResponse;
@@ -61,18 +62,24 @@ const recommendationPrompt = ai.definePrompt({
 
 **Instructions:**
 1. Carefully analyze the user's uploaded photo. Pay attention to the item type, color, pattern, material texture, and overall style.
-2. Compare this analysis against the product descriptions in the catalog provided below.
-3. You **must** select up to {{count}} products from the catalog that are the most similar.
+2. Visually compare the user's photo against each product in the catalog provided below.
+3. You **must** select up to {{count}} products from the catalog that are the most visually similar.
 4. Rank the products from most similar to least similar.
 5. If no products are a perfect match, you must still return the *closest* available matches. Do not return an empty list unless the uploaded image contains no discernible clothing items.
 
-**Product Catalog:**
-{{#each availableProducts}}
-- ID: {{this.id}}, Name: {{this.name}}, Category: {{this.category}}, Description: {{this.description}}
-{{/each}}
+**User's Photo to Match:**
+{{media url=photoDataUri}}
 
-**User's Photo:**
-{{media url=photoDataUri}}`
+---
+
+**Available Product Catalog:**
+{{#each availableProducts}}
+Product ID: {{this.id}}
+Name: {{this.name}}
+Description: {{this.description}}
+{{media url=this.imageUrl}}
+---
+{{/each}}`
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
