@@ -8,7 +8,7 @@ To get started, take a look at src/app/page.tsx.
 
 This application uses Google's Generative AI. To enable the AI-powered features (like product recommendations, style analysis, and the virtual fitting room), you need to provide a Google AI API key.
 
-1.  **Get an API Key:** Obtain your API key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+1.  **Get an API Key:** Go to [Google AI Studio](https://aistudio.google.com/app/apikey). Click the "**Create API key**" button to generate a new key.
 
 2.  **Create an Environment File:** In the root directory of your project, create a new file named `.env.local`.
 
