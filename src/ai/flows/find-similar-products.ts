@@ -62,6 +62,8 @@ Compare the user's image to each product image in the catalog. Focus on matching
 
 You MUST return up to {{count}} of the closest matches. It is critical that you always return results, even if the match isn't perfect. Prioritize the best available options from the catalog. Do NOT return an empty 'productIds' array.
 
+The 'productIds' array in your response MUST contain ONLY the IDs from the 'Product ID' fields in the provided catalog.
+
 **User's Image:**
 {{media url=photoDataUri}}
 
@@ -107,12 +109,20 @@ const findSimilarProductsFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await recommendationPrompt(input);
-      // The prompt now demands results, but as a safeguard,
-      // if it still fails to provide any, we'll throw to trigger the fallback.
+      
       if (!output?.productIds || output.productIds.length === 0) {
         throw new Error("AI returned no product IDs despite being instructed to.");
       }
-      return output;
+      
+      const allProductIds = getProducts().map(p => p.id);
+      const validProductIds = output.productIds.filter(id => allProductIds.includes(id));
+      
+      if (validProductIds.length === 0) {
+        throw new Error(`AI returned only invalid product IDs: ${output.productIds.join(', ')}`);
+      }
+      
+      return { productIds: validProductIds };
+
     } catch (error) {
       console.error('Visual search flow failed, using server-side fallback:', error);
       // If the AI fails for any reason, return the first few products as a fallback.
