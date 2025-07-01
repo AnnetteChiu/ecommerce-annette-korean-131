@@ -46,7 +46,7 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
     return defaultResponse;
   }
   
-  // Let errors from the flow propagate up to the calling component.
+  // The flow is designed to handle its own errors and return a default response.
   return await findSimilarProductsFlow({ 
     ...input, 
     availableProducts,
@@ -106,9 +106,15 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
-    const { output } = await recommendationPrompt(input);
-    // If the model fails to generate valid JSON or returns nothing, we return a default response.
-    // The calling component is set up to handle true errors from the AI, which will be thrown by recommendationPrompt.
-    return output || defaultResponse;
+    try {
+      const { output } = await recommendationPrompt(input);
+      // If the model fails to generate valid JSON or returns nothing, we return a default response.
+      return output || defaultResponse;
+    } catch (error) {
+        console.error('Error in findSimilarProductsFlow:', error);
+        // Return a default empty response to the client to avoid a crash.
+        // The UI will gracefully handle the empty list of recommendations.
+        return defaultResponse;
+    }
   }
 );
