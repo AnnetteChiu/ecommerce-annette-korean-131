@@ -62,15 +62,14 @@ export default function GraphicDesignerPage() {
             {!isAiEnabled ? (
                 <Alert>
                     <Sparkles className="h-4 w-4" />
-                    <AlertTitle>AI Feature Inactive</AlertTitle>
+                    <AlertTitle>AI Feature Disabled</AlertTitle>
                     <AlertDescription>
-                      Please add your key to the{' '}
-                      <code className="font-mono bg-muted p-1 rounded-md">.env.local</code> file and restart the server.
-                      See the{' '}
+                      To use this feature, add your Google AI API key to the{' '}
+                      <code className="font-mono bg-muted p-1 rounded-md">.env.local</code> file and restart the server. See the{' '}
                       <Link href="/docs" className="font-medium text-primary underline">
                         documentation
                       </Link>
-                      {' '}for detailed instructions.
+                      {' '}for details.
                     </AlertDescription>
                 </Alert>
             ) : null}
