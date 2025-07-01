@@ -15,16 +15,12 @@ This application includes advanced AI features powered by Google's Generative AI
     *   Click the **"Create API key"** button to get your new key.
 
 2.  **Add the key to your code:**
-    *   Open the file `src/ai/genkit.ts`.
+    *   Open the file `src/ai/config.ts`.
     *   Replace the placeholder `YOUR_GOOGLE_API_KEY_HERE` with your actual API key.
 
     ```typescript
-    // src/ai/genkit.ts
-    // ...
-    export const ai = genkit({
-      plugins: [googleAI({apiKey: "YOUR_GOOGLE_API_KEY_HERE"})], // Add your key here
-      model: 'googleai/gemini-2.0-flash',
-    });
+    // src/ai/config.ts
+    export const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';
     ```
 
 3.  **Restart your app:** Stop and restart the local development server for the changes to take effect.

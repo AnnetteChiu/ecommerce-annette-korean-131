@@ -30,8 +30,8 @@ console.log('Browsing history has been updated. New history:', JSON.parse(sessio
 console.log('Please refresh the page to see the changes take effect.');
   `.trim();
   
-  const envSnippet = `// In src/ai/genkit.ts
-plugins: [googleAI({apiKey: "YOUR_GOOGLE_API_KEY_HERE"})]`;
+  const envSnippet = `// In src/ai/config.ts
+export const GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY_HERE';`;
 
   return (
     <div className="space-y-8">
@@ -60,7 +60,7 @@ plugins: [googleAI({apiKey: "YOUR_GOOGLE_API_KEY_HERE"})]`;
           <div>
             <h3 className="font-semibold mb-2">2. Add Your Key to the Code</h3>
             <p className="text-muted-foreground mb-4">
-              Open the file <code>src/ai/genkit.ts</code> and replace the placeholder text with your API key.
+              Open the file <code>src/ai/config.ts</code> and replace the placeholder text with your API key.
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="font-code text-sm text-muted-foreground">
