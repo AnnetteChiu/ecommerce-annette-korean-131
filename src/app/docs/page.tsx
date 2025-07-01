@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Code, Info } from 'lucide-react';
+import { Code, Info, KeyRound, Server, CheckCircle } from 'lucide-react';
 import { isAiEnabled } from '@/lib/ai';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
@@ -27,20 +27,85 @@ console.log('Browsing history has been updated. New history:', JSON.parse(sessio
 // Refresh the page to see the new recommendations.
 console.log('Please refresh the page to see the changes take effect.');
   `.trim();
+  
+  const envSnippet = `GOOGLE_API_KEY=YOUR_API_KEY_HERE`;
 
   return (
     <div className="space-y-8">
       <h1 className="text-4xl font-headline font-bold text-center">Developer Documentation</h1>
-
-      {!aiEnabled && (
+      
+      {aiEnabled ? (
           <Alert>
-            <Info className="h-4 w-4" />
-            <AlertTitle>AI Features Not Configured</AlertTitle>
+            <CheckCircle className="h-4 w-4" />
+            <AlertTitle>AI Features are Enabled</AlertTitle>
             <AlertDescription>
-              The AI features like product recommendations require a Google AI API key. The code snippets below will still work to update your browsing history, but you won't see AI-powered results until you configure your key. See the README for instructions.
+              Your Google AI API key is configured correctly. All AI-powered features are active.
+            </AlertDescription>
+          </Alert>
+      ) : (
+          <Alert variant="destructive">
+            <Info className="h-4 w-4" />
+            <AlertTitle>AI Features are Disabled</AlertTitle>
+            <AlertDescription>
+              To use features like Virtual Try-On and the Graphic Designer, you need to provide a Google AI API key. Follow the instructions below to get started.
             </AlertDescription>
           </Alert>
       )}
+
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <KeyRound className="h-6 w-6" />
+            <CardTitle>How to Enable AI Features</CardTitle>
+          </div>
+          <CardDescription>
+            This application uses Google's Generative AI. To turn it on, you need to provide a Google AI API key.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <h3 className="font-semibold mb-2">1. Generate Your API Key</h3>
+            <p className="text-muted-foreground mb-4">Visit Google AI Studio to create a free API key for your project.</p>
+            <Button asChild>
+                <Link href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">
+                    Get Your Google AI Key
+                </Link>
+            </Button>
+          </div>
+          <div>
+            <h3 className="font-semibold mb-2">2. Set Up Your Local Environment</h3>
+            <ol className="list-decimal list-inside space-y-2 text-muted-foreground mb-4">
+              <li>In the root directory of your project, create a new file named <code>.env.local</code>.</li>
+              <li>Add your API key to this file like so:</li>
+            </ol>
+            <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
+              <code className="font-code text-sm text-muted-foreground">
+                {envSnippet}
+              </code>
+            </pre>
+             <p className="text-muted-foreground mt-4">
+              <strong>Important:</strong> After saving the file, you must stop and restart your local development server for the changes to take effect.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <Server className="h-6 w-6" />
+            <CardTitle>Production Deployment</CardTitle>
+          </div>
+          <CardDescription>
+            When you publish your app, do not include the <code>.env.local</code> file.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+           <p className="text-muted-foreground">
+            Instead, set the <code>GOOGLE_API_KEY</code> as an environment variable (or "secret") in your hosting provider's project settings (e.g., Firebase App Hosting, Vercel, Netlify). This securely enables the AI features in your live application.
+            </p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
