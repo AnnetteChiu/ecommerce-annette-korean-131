@@ -316,7 +316,7 @@ export default function FittingRoomPage() {
                         {showAiNotice && (
                             <Alert>
                                 <Sparkles className="h-4 w-4" />
-                                <AlertTitle>AI Virtual Try-On Disabled</AlertTitle>
+                                <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
                                 <AlertDescription>
                                   <div>
                                     <p className="mb-4">To see the product virtually placed on you, please enable the optional AI feature. See the developer documentation for simple setup instructions.</p>
