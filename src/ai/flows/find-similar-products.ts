@@ -56,17 +56,23 @@ const recommendationPrompt = ai.definePrompt({
     name: 'findSimilarProductsPrompt',
     input: { schema: FlowInputSchema },
     output: { schema: FindSimilarProductsOutputSchema },
-    system: "You are an e-commerce style advisor. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
-    prompt: `You are an expert e-commerce stylist. Your task is to find the products from the catalog that are the most stylistically similar to the item in the user's photo.
-Analyze the provided image and find up to {{count}} products from the catalog below. Rank the products by similarity and return the best matches.
-Focus on aesthetic, color, and item type. If there are no reasonably similar items, you can return an empty array, but prefer finding the closest possible matches over returning nothing.
+    system: "You are a visual search engine API. Your response must be only a valid JSON object matching the provided schema, with no other text, explanation, or markdown formatting.",
+    prompt: `You are a visual search engine for an e-commerce fashion store. Your only job is to compare the user's uploaded image to a list of available products and find the best visual matches.
 
-Catalog of available products:
+**Instructions:**
+1. Carefully analyze the user's uploaded photo. Pay attention to the item type, color, pattern, material texture, and overall style.
+2. Compare this analysis against the product descriptions in the catalog provided below.
+3. You **must** select up to {{count}} products from the catalog that are the most similar.
+4. Rank the products from most similar to least similar.
+5. If no products are a perfect match, you must still return the *closest* available matches. Do not return an empty list unless the uploaded image contains no discernible clothing items.
+
+**Product Catalog:**
 {{#each availableProducts}}
-- Name: {{this.name}}, ID: {{this.id}}, Category: {{this.category}}, Description: {{this.description}}
+- ID: {{this.id}}, Name: {{this.name}}, Category: {{this.category}}, Description: {{this.description}}
 {{/each}}
 
-Photo: {{media url=photoDataUri}}`
+**User's Photo:**
+{{media url=photoDataUri}}`
 });
 
 const findSimilarProductsFlow = ai.defineFlow(
