@@ -4,13 +4,13 @@
 import { useState, useTransition, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { findSimilarProducts } from '@/ai/flows/find-similar-products';
-import { getProductById, getProducts } from '@/lib/products';
+import { getProductById } from '@/lib/products';
 import { ProductCard } from '@/components/product-card';
 import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, Upload, Frown } from 'lucide-react';
+import { Loader2, Search, Upload } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Helper to resize and compress the image
@@ -143,52 +143,28 @@ export default function SearchByImagePage() {
 
     setSearchPerformed(true);
     startTransition(async () => {
-      // Use .catch() to handle any catastrophic API call failures gracefully.
+      // Because the server-side flow is now self-healing, we can remove the complex
+      // try/catch and fallback logic from the client. We trust the server to always
+      // return a valid list of product IDs.
       const result = await findSimilarProducts({
         photoDataUri: imageDataUri,
         count: 4,
-      }).catch(err => {
-        console.error('Visual search API call failed:', err);
-        return null; // Return null to trigger the fallback logic below.
       });
 
-      let recommendedProducts: Product[] = [];
+      const recommendedProducts = result.productIds
+        .map(id => getProductById(id))
+        .filter((p): p is Product => !!p);
 
-      // Check if the result is valid and contains product IDs we can use.
-      if (result?.productIds && result.productIds.length > 0) {
-        recommendedProducts = result.productIds
-          .map(id => getProductById(id))
-          .filter((p): p is Product => !!p); // Filter out any nulls if an ID is invalid.
-      }
-      
-      // If we got good recommendations, display them.
-      if (recommendedProducts.length > 0) {
-        setRecommendations(recommendedProducts);
-        // Save the successful search results to localStorage.
-        try {
-          localStorage.setItem('visualSearch', JSON.stringify({
-            imageDataUri: imageDataUri,
-            recommendationIds: result!.productIds,
-          }));
-        } catch (e) {
-          console.error("Failed to save visual search results to localStorage", e);
-        }
-      } else {
-        // This is our single, robust fallback point.
-        // It triggers if the API call failed OR if the AI returned no usable products.
-        console.log('No valid recommendations found, activating client-side fallback.');
-        
-        const allProducts = getProducts();
-        const fallbackProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
-        setRecommendations(fallbackProducts);
+      setRecommendations(recommendedProducts);
 
-        toast({
-          variant: 'default',
-          title: 'Displaying Popular Items',
-          description: 'We had trouble with the visual search, but here are some popular products for you.',
-        });
-        
-        localStorage.removeItem('visualSearch');
+      // Save the successful search results to localStorage.
+      try {
+        localStorage.setItem('visualSearch', JSON.stringify({
+          imageDataUri: imageDataUri,
+          recommendationIds: result.productIds,
+        }));
+      } catch (e) {
+        console.error("Failed to save visual search results to localStorage", e);
       }
     });
   };
