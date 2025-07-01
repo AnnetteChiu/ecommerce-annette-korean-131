@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef, useTransition } from 'react';
@@ -162,7 +161,7 @@ export default function FittingRoomPage() {
 
         startTransition(async () => {
             try {
-                // Keep the previous image visible during generation for a better UX
+                const previousResult = generatedImage;
                 const productImageDataUri = await convertImageUrlToDataUri(selectedProduct.imageUrl);
                 
                 const resizedCapturedImage = await resizeImage(capturedImage);
@@ -175,11 +174,12 @@ export default function FittingRoomPage() {
                 if (result.generatedImageDataUri) {
                     setGeneratedImage(result.generatedImageDataUri);
                 } else {
+                    setGeneratedImage(previousResult);
                     throw new Error("AI did not return an image.");
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
-                setGeneratedImage(capturedImage); // Show the original image as a fallback
+                setGeneratedImage(capturedImage); 
                 setGenerationError("We couldn't generate the image, but here's your original photo. The AI may have had trouble with this combination. Please try a different item or photo.");
             }
         });
@@ -318,12 +318,12 @@ export default function FittingRoomPage() {
                                 <Sparkles className="h-4 w-4" />
                                 <AlertTitle>Enable the Optional AI Feature</AlertTitle>
                                 <AlertDescription>
-                                    <div>
-                                        <p className="mb-4">You are seeing your original photo. To use the virtual try-on, enable the optional AI feature.</p>
+                                    <div className="space-y-4">
+                                        <p>You are seeing your original photo. To use the virtual try-on, please follow the setup instructions.</p>
                                         <Button asChild variant="secondary" size="sm" className="w-full">
                                             <Link href="/docs">
                                                 <Info className="mr-2 h-4 w-4" />
-                                                View simple setup instructions
+                                                View Setup Instructions
                                             </Link>
                                         </Button>
                                     </div>

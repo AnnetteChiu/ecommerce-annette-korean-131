@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useTransition } from 'react';
@@ -34,8 +33,7 @@ export default function GraphicDesignerPage() {
 
         setError(null);
         const previousImage = generatedImage;
-        setGeneratedImage(null);
-
+        // Keep previous image visible during generation by not setting it to null here.
 
         startTransition(async () => {
             try {
@@ -66,12 +64,12 @@ export default function GraphicDesignerPage() {
                     <Sparkles className="h-4 w-4" />
                     <AlertTitle>Enable the Optional AI Feature</AlertTitle>
                     <AlertDescription>
-                        <div>
-                            <p className="mb-4">To generate designs from a text prompt, enable the optional AI feature.</p>
+                        <div className="space-y-4">
+                             <p>To generate unique designs from a text prompt, please follow the setup instructions.</p>
                             <Button asChild variant="secondary" size="sm" className="w-full md:w-auto">
                                 <Link href="/docs">
                                     <Info className="mr-2 h-4 w-4" />
-                                    View simple setup instructions
+                                    View Setup Instructions
                                 </Link>
                             </Button>
                         </div>
