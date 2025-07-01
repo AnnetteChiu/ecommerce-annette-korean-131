@@ -41,41 +41,48 @@ const virtualTryOnFlow = ai.defineFlow(
     outputSchema: VirtualTryOnOutputSchema,
   },
   async ({ userPhotoDataUri, productImageDataUri }) => {
+    try {
+      const { media } = await ai.generate({
+        model: 'googleai/gemini-2.0-flash-preview-image-generation',
+        prompt: [
+          { media: { url: userPhotoDataUri } },
+          { media: { url: productImageDataUri } },
+          { text: "Take the clothing item from the second image and realistically place it onto the person in the first image. The person's pose and the background of the first image must be preserved exactly as they are. The output must be only the final image, with no added text or logos." },
+        ],
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+          safetySettings: [
+              {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_NONE',
+              },
+              {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_NONE',
+              },
+              {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_NONE',
+              },
+              {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_NONE',
+              },
+            ],
+        },
+      });
 
-    const { media } = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: [
-        { media: { url: userPhotoDataUri } },
-        { media: { url: productImageDataUri } },
-        { text: "Take the clothing item from the second image and realistically place it onto the person in the first image. The person's pose and the background of the first image must be preserved exactly as they are. The output must be only the final image, with no added text or logos." },
-      ],
-      config: {
-        responseModalities: ['TEXT', 'IMAGE'],
-        safetySettings: [
-            {
-              category: 'HARM_CATEGORY_HATE_SPEECH',
-              threshold: 'BLOCK_NONE',
-            },
-            {
-              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-              threshold: 'BLOCK_NONE',
-            },
-            {
-              category: 'HARM_CATEGORY_HARASSMENT',
-              threshold: 'BLOCK_NONE',
-            },
-            {
-              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-              threshold: 'BLOCK_NONE',
-            },
-          ],
-      },
-    });
+      if (!media?.url) {
+        throw new Error('Image generation failed to produce an image.');
+      }
 
-    if (!media?.url) {
-      throw new Error('Image generation failed to produce an image.');
+      return { generatedImageDataUri: media.url };
+    } catch (err) {
+      console.error('Error in virtualTryOnFlow:', err);
+      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
+        throw new Error('The Google AI API key is not configured correctly. Please see the documentation for instructions.');
+      }
+      throw new Error("We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.");
     }
-
-    return { generatedImageDataUri: media.url };
   }
 );

@@ -49,10 +49,18 @@ const generateProductDescriptionFlow = ai.defineFlow(
     outputSchema: GenerateProductDescriptionOutputSchema,
   },
   async (input) => {
-    const { output } = await descriptionPrompt(input);
-    if (!output?.description) {
-        throw new Error('Failed to generate a product description.');
+    try {
+      const { output } = await descriptionPrompt(input);
+      if (!output?.description) {
+          throw new Error('Failed to generate a product description.');
+      }
+      return output;
+    } catch (err) {
+      console.error('Error in generateProductDescriptionFlow:', err);
+      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
+        throw new Error('The Google AI API key is not configured correctly. Please see the documentation for instructions.');
+      }
+      throw new Error("Could not generate a description at this time.");
     }
-    return output;
   }
 );

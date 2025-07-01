@@ -31,37 +31,44 @@ const generateGraphicDesignFlow = ai.defineFlow(
     outputSchema: GenerateGraphicDesignOutputSchema,
   },
   async ({ prompt }) => {
+    try {
+      const { media } = await ai.generate({
+        model: 'googleai/gemini-2.0-flash-preview-image-generation',
+        prompt: `A professional, modern, and aesthetically pleasing graphic design for a high-end fashion and lifestyle brand. The design should be based on the following concept: "${prompt}". Avoid including any text in the image unless it is explicitly requested in the concept.`,
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+          safetySettings: [
+              {
+                category: 'HARM_CATEGORY_HATE_SPEECH',
+                threshold: 'BLOCK_NONE',
+              },
+              {
+                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+                threshold: 'BLOCK_NONE',
+              },
+              {
+                category: 'HARM_CATEGORY_HARASSMENT',
+                threshold: 'BLOCK_NONE',
+              },
+              {
+                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+                threshold: 'BLOCK_NONE',
+              },
+            ],
+        },
+      });
 
-    const { media } = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `A professional, modern, and aesthetically pleasing graphic design for a high-end fashion and lifestyle brand. The design should be based on the following concept: "${prompt}". Avoid including any text in the image unless it is explicitly requested in the concept.`,
-      config: {
-        responseModalities: ['TEXT', 'IMAGE'],
-        safetySettings: [
-            {
-              category: 'HARM_CATEGORY_HATE_SPEECH',
-              threshold: 'BLOCK_NONE',
-            },
-            {
-              category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-              threshold: 'BLOCK_NONE',
-            },
-            {
-              category: 'HARM_CATEGORY_HARASSMENT',
-              threshold: 'BLOCK_NONE',
-            },
-            {
-              category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-              threshold: 'BLOCK_NONE',
-            },
-          ],
-      },
-    });
+      if (!media?.url) {
+        throw new Error('Image generation failed to produce an image.');
+      }
 
-    if (!media?.url) {
-      throw new Error('Image generation failed to produce an image.');
+      return { generatedImageDataUri: media.url };
+    } catch (err) {
+      console.error('Error in generateGraphicDesignFlow:', err);
+      if (err instanceof Error && err.message.includes('API_KEY_INVALID')) {
+        throw new Error('The Google AI API key is not configured correctly. Please see the documentation for instructions.');
+      }
+      throw new Error("We couldn't generate a new design. Please try again.");
     }
-
-    return { generatedImageDataUri: media.url };
   }
 );
