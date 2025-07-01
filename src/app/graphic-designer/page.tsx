@@ -114,7 +114,7 @@ export default function GraphicDesignerPage() {
                                 <div className="flex flex-col items-center text-center p-4">
                                     <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
                                     <p className="font-semibold">AI Feature Disabled</p>
-                                    <p className="text-sm text-muted-foreground">Add your API key to <code>src/ai/config.ts</code>.</p>
+                                    <p className="text-sm text-muted-foreground max-w-xs">The Google AI API key is missing. Please add it to <code>src/ai/config.ts</code> to use this feature.</p>
                                 </div>
                             ) : generatedImage ? (
                                 <Image src={generatedImage} alt="Generated graphic design" fill className="object-contain" />
