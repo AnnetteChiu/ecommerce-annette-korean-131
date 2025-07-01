@@ -20,7 +20,6 @@ export function Header() {
 
   const navLinks = [
     { href: '/fitting-room', label: 'Fitting Room', icon: Camera },
-    { href: '/search-by-image', label: 'Find Your Style', icon: Search },
     { href: '/docs', label: 'Docs', icon: Book },
   ];
 
@@ -56,6 +55,21 @@ export function Header() {
                 </>
               )}
               <TooltipProvider>
+                {isAiEnabled && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" asChild className={cn(pathname === '/search-by-image' && 'bg-accent text-accent-foreground')}>
+                          <Link href="/search-by-image">
+                              <Search className="h-5 w-5" />
+                              <span className="sr-only">Find Your Style</span>
+                          </Link>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Find Your Style</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
                 <Tooltip>
                     <TooltipTrigger asChild>
                       <CartIcon />
