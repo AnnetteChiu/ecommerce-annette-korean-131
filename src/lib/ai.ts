@@ -1,8 +1,10 @@
 /**
- * Checks if AI features are enabled by verifying the presence of the Google AI API key.
- * This check is performed server-side.
- * @returns {boolean} True if AI features are enabled.
+ * Checks if AI features are enabled.
+ * NOTE: With the current setup, the API key is hardcoded in src/ai/genkit.ts,
+ * so this function will always return true.
+ * @returns {boolean} True, indicating AI features are enabled.
  */
 export function isAiEnabled(): boolean {
-  return !!process.env.GOOGLE_API_KEY;
+  // Hardcoded to true because the key is set directly in the code.
+  return true;
 }

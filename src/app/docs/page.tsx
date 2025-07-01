@@ -3,8 +3,6 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Code, Info, KeyRound, Server, CheckCircle, Sparkles, Camera, Search } from 'lucide-react';
-import { isAiEnabled } from '@/lib/ai';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Accordion,
   AccordionContent,
@@ -13,8 +11,6 @@ import {
 } from '@/components/ui/accordion';
 
 export default function DocsPage() {
-  const aiEnabled = isAiEnabled();
-  
   const codeSnippet = `
 // A sample browsing history with a few products.
 const newHistory = [
@@ -34,38 +30,21 @@ console.log('Browsing history has been updated. New history:', JSON.parse(sessio
 console.log('Please refresh the page to see the changes take effect.');
   `.trim();
   
-  const envSnippet = `GOOGLE_API_KEY=YOUR_API_KEY_HERE`;
+  const envSnippet = `// In src/ai/genkit.ts
+plugins: [googleAI({apiKey: "YOUR_GOOGLE_API_KEY_HERE"})]`;
 
   return (
     <div className="space-y-8">
       <h1 className="text-4xl font-headline font-bold text-center">Developer Documentation</h1>
-      
-      {aiEnabled ? (
-          <Alert>
-            <CheckCircle className="h-4 w-4" />
-            <AlertTitle>AI Features are Enabled Locally</AlertTitle>
-            <AlertDescription>
-              Your <code>.env.local</code> file is configured correctly. AI features are active for local development.
-            </AlertDescription>
-          </Alert>
-      ) : (
-          <Alert variant="destructive">
-            <Info className="h-4 w-4" />
-            <AlertTitle>AI Features Disabled</AlertTitle>
-            <AlertDescription>
-              Add your Google AI API key to the .env.local file and restart the server to enable AI features for local development.
-            </AlertDescription>
-          </Alert>
-      )}
 
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
             <KeyRound className="h-6 w-6" />
-            <CardTitle>How to Enable AI Features (Local Development)</CardTitle>
+            <CardTitle>How to Enable AI Features</CardTitle>
           </div>
           <CardDescription>
-            This enables AI features on your local machine only. For your live website, see the production deployment section below.
+            To activate the AI features, you need to add your Google AI API key directly into the application's source code.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -79,9 +58,9 @@ console.log('Please refresh the page to see the changes take effect.');
             </Button>
           </div>
           <div>
-            <h3 className="font-semibold mb-2">2. Set Up Your Local Environment</h3>
+            <h3 className="font-semibold mb-2">2. Add Your Key to the Code</h3>
             <p className="text-muted-foreground mb-4">
-              In the root directory of your project, create a file named <code>.env.local</code> and add your API key.
+              Open the file <code>src/ai/genkit.ts</code> and replace the placeholder text with your API key.
             </p>
             <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
               <code className="font-code text-sm text-muted-foreground">
@@ -89,37 +68,8 @@ console.log('Please refresh the page to see the changes take effect.');
               </code>
             </pre>
              <p className="text-muted-foreground mt-4">
-              <strong>Important:</strong> After saving the file, you must stop and restart your local development server for the changes to take effect.
+              <strong>Important:</strong> After saving the file, you must stop and restart your development server for the changes to take effect.
             </p>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Server className="h-6 w-6" />
-            <CardTitle>Enabling AI in Your Live App (Production)</CardTitle>
-          </div>
-          <CardDescription>
-            Your <code>.env.local</code> file is for local development only and is <strong>not</strong> deployed with your app for security. To enable AI features on your live website for all users, follow these steps.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-           <div className="space-y-4 text-muted-foreground">
-            <p>Your app is configured using <code>apphosting.yaml</code> to look for a secret named <strong>GOOGLE_API_KEY</strong>. You must create this secret in the Firebase Console.</p>
-            <ol className="list-decimal list-inside space-y-2 pl-4">
-                <li>Go to the <strong>Firebase Console</strong> and open your project.</li>
-                <li>In the "Build" menu, go to <strong>App Hosting</strong>.</li>
-                <li>Click on your backend to open its settings.</li>
-                <li>Select the <strong>Secrets</strong> tab and click <strong>Create secret</strong>.</li>
-                <li>
-                  Enter the Secret name exactly as: <code className="bg-muted px-1 py-0.5 rounded">GOOGLE_API_KEY</code>
-                </li>
-                <li>Paste your key into the <strong>Secret value</strong> field.</li>
-                <li>Click <strong>Create secret</strong> and save the changes.</li>
-                <li><strong>Redeploy your app</strong>. The AI features will now be active for all users.</li>
-            </ol>
           </div>
         </CardContent>
       </Card>
@@ -131,7 +81,7 @@ console.log('Please refresh the page to see the changes take effect.');
                 <CardTitle>AI Feature Details & Testing</CardTitle>
             </div>
             <CardDescription>
-                An overview of how each AI feature works. The only setup required is a valid Google AI API key.
+                An overview of how each AI feature works.
             </CardDescription>
         </CardHeader>
         <CardContent>

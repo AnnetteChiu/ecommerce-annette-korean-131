@@ -5,12 +5,3 @@ runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
   maxInstances: 1
-  # Set environment variables for your application.
-  # Here we are mapping the GOOGLE_API_KEY secret to an environment variable.
-  environmentVariables:
-    GOOGLE_API_KEY: "secret:GOOGLE_API_KEY"
-
-# Grant the backend access to the GOOGLE_API_KEY secret.
-# You must create this secret in your Firebase project's App Hosting settings.
-secrets:
-  - GOOGLE_API_KEY
