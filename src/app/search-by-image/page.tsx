@@ -10,7 +10,7 @@ import type { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, Upload } from 'lucide-react';
+import { Loader2, Search, Upload, Frown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 // Helper to resize and compress the image
@@ -143,44 +143,40 @@ export default function SearchByImagePage() {
 
     setSearchPerformed(true);
     startTransition(async () => {
-      try {
-        const result = await findSimilarProducts({
-          photoDataUri: imageDataUri,
-          count: 4,
-        });
+      // Use .catch() to handle any catastrophic API call failures gracefully.
+      const result = await findSimilarProducts({
+        photoDataUri: imageDataUri,
+        count: 4,
+      }).catch(err => {
+        console.error('Visual search API call failed:', err);
+        return null; // Return null to trigger the fallback logic below.
+      });
 
-        const productIds = result?.productIds;
+      let recommendedProducts: Product[] = [];
 
-        // SUCCESS CASE: We received a valid list of product IDs.
-        if (productIds && productIds.length > 0) {
-          const recommendedProducts = productIds
-            .map(id => getProductById(id))
-            .filter((p): p is Product => !!p);
-          
-          if (recommendedProducts.length > 0) {
-            setRecommendations(recommendedProducts);
-            // Save the successful search results to localStorage.
-            try {
-              localStorage.setItem('visualSearch', JSON.stringify({
-                imageDataUri: imageDataUri,
-                recommendationIds: result.productIds,
-              }));
-            } catch (e) {
-              console.error("Failed to save visual search results to localStorage", e);
-            }
-            return;
-          }
+      // Check if the result is valid and contains product IDs we can use.
+      if (result?.productIds && result.productIds.length > 0) {
+        recommendedProducts = result.productIds
+          .map(id => getProductById(id))
+          .filter((p): p is Product => !!p); // Filter out any nulls if an ID is invalid.
+      }
+      
+      // If we got good recommendations, display them.
+      if (recommendedProducts.length > 0) {
+        setRecommendations(recommendedProducts);
+        // Save the successful search results to localStorage.
+        try {
+          localStorage.setItem('visualSearch', JSON.stringify({
+            imageDataUri: imageDataUri,
+            recommendationIds: result!.productIds,
+          }));
+        } catch (e) {
+          console.error("Failed to save visual search results to localStorage", e);
         }
-        
-        // This is a "soft failure" - server responded but with no valid products.
-        // It should theoretically be handled by the server fallback, but we'll trigger the fallback here too.
-        throw new Error("AI returned no valid recommendations.");
-
-      } catch (error) {
-        // --- CATASTROPHIC FAILURE FALLBACK ---
-        // This block runs if the server-side call failed completely (e.g. network error, server crash)
-        // OR if the soft failure was thrown above. This is our safety net.
-        console.error('Visual search failed, activating client-side fallback.', error);
+      } else {
+        // This is our single, robust fallback point.
+        // It triggers if the API call failed OR if the AI returned no usable products.
+        console.log('No valid recommendations found, activating client-side fallback.');
         
         const allProducts = getProducts();
         const fallbackProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
@@ -259,6 +255,19 @@ export default function SearchByImagePage() {
                 ))}
             </div>
         </div>
+      )}
+
+      {/* This block should now be unreachable due to the fallback logic, but is kept for clarity. */}
+      {!isPending && searchPerformed && recommendations.length === 0 && (
+        <Card className="w-full max-w-2xl mt-8">
+            <CardContent className="pt-6 text-center flex flex-col items-center">
+                <Frown className="w-12 h-12 text-muted-foreground mb-4" />
+                <p className="text-lg font-semibold">No Matches Found</p>
+                <p className="text-muted-foreground mt-2">
+                    We couldn't find any products matching your image. Please try a different photo.
+                </p>
+            </CardContent>
+        </Card>
       )}
     </div>
   );
