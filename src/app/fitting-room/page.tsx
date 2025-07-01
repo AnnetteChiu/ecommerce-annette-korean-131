@@ -58,6 +58,7 @@ export default function FittingRoomPage() {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+    const [generationError, setGenerationError] = useState<string | null>(null);
     const [showAiNotice, setShowAiNotice] = useState(false);
     const [isGenerating, startTransition] = useTransition();
 
@@ -130,8 +131,14 @@ export default function FittingRoomPage() {
             }
 
             setGeneratedImage(null); // Clear previous results
+            setGenerationError(null);
             setShowAiNotice(false);
         }
+    };
+
+    const handleSelectProduct = (product: Product) => {
+        setSelectedProduct(product);
+        setGenerationError(null);
     };
 
     const handleVirtualTryOn = () => {
@@ -144,6 +151,7 @@ export default function FittingRoomPage() {
             return;
         }
 
+        setGenerationError(null);
         setShowAiNotice(false);
 
         if (!isAiEnabled) {
@@ -169,14 +177,16 @@ export default function FittingRoomPage() {
                 }
             } catch (error) {
                 console.error('Virtual try-on failed:', error);
-                const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-                toast({
-                    variant: 'destructive',
-                    title: 'Generation Failed',
-                    description: `Could not generate the image. ${errorMessage} Please try again.`,
-                });
+                setGeneratedImage(capturedImage); // Show the original image as a fallback
+                setGenerationError("We couldn't generate the image, but here's your original photo. The AI may have had trouble with this combination. Please try a different item or photo.");
             }
         });
+    };
+
+    const handleRetake = () => {
+        setCapturedImage(null);
+        setGeneratedImage(null);
+        setGenerationError(null);
     };
 
     return (
@@ -223,7 +233,7 @@ export default function FittingRoomPage() {
                                 )}
                             </div>
                             <canvas ref={canvasRef} className="hidden" />
-                            <Button onClick={capturedImage ? () => setCapturedImage(null) : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
+                            <Button onClick={capturedImage ? handleRetake : handleCapturePhoto} className="w-full" disabled={hasCameraPermission !== true}>
                                 <Camera className="mr-2"/>
                                 {capturedImage ? 'Retake Photo' : 'Capture Photo'}
                             </Button>
@@ -243,7 +253,7 @@ export default function FittingRoomPage() {
                                         <div 
                                             key={product.id} 
                                             className="flex-shrink-0 cursor-pointer" 
-                                            onClick={() => setSelectedProduct(product)}
+                                            onClick={() => handleSelectProduct(product)}
                                         >
                                             <div className={cn(
                                                 "rounded-lg overflow-hidden border-2 transition-all",
@@ -299,6 +309,15 @@ export default function FittingRoomPage() {
                                 <AlertTitle>Enable AI Virtual Try-On</AlertTitle>
                                 <AlertDescription>
                                 To see the product virtually placed on you, you can enable the optional AI features. See the <Link href="/docs" className="underline font-semibold">docs</Link> for setup instructions.
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                        {generationError && (
+                            <Alert variant="destructive">
+                                <AlertTriangle className="h-4 w-4" />
+                                <AlertTitle>Generation Failed</AlertTitle>
+                                <AlertDescription>
+                                    {generationError}
                                 </AlertDescription>
                             </Alert>
                         )}
