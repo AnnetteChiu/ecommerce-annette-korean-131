@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef, useTransition, useCallback } from 'react';
@@ -215,9 +214,9 @@ export default function FittingRoomPage() {
             {!isAiEnabled && (
                 <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>AI Feature Disabled</AlertTitle>
+                    <AlertTitle>Google AI API Key Required</AlertTitle>
                     <AlertDescription>
-                      Please add your Google AI API key to <code>src/ai/config.ts</code> to enable this feature.
+                      To enable this feature, please add your key to <code>src/ai/config.ts</code>.
                     </AlertDescription>
                 </Alert>
             )}
@@ -308,8 +307,8 @@ export default function FittingRoomPage() {
                                 <div className="p-4 w-full">
                                     <Alert variant="destructive">
                                         <AlertTriangle className="h-4 w-4" />
-                                        <AlertTitle>AI Feature Disabled</AlertTitle>
-                                        <AlertDescription>Please add your Google AI API key to <code>src/ai/config.ts</code> to enable this feature.</AlertDescription>
+                                        <AlertTitle>Google AI API Key Required</AlertTitle>
+                                        <AlertDescription>To enable this feature, please add your key to <code>src/ai/config.ts</code>.</AlertDescription>
                                     </Alert>
                                 </div>
                             ) : generatedImage ? (
