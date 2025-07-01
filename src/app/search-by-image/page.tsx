@@ -163,6 +163,7 @@ export default function SearchByImagePage() {
     }
 
     setSearchPerformed(true);
+    setRecommendations([]);
     startTransition(async () => {
       try {
         const result = await findSimilarProducts({
@@ -170,28 +171,33 @@ export default function SearchByImagePage() {
           count: 4,
         });
 
+        // The server flow is now self-healing and guarantees valid IDs.
         const recommendedProducts = result.productIds
           .map(id => getProductById(id))
           .filter((p): p is Product => !!p);
 
-        if (recommendedProducts.length === 0) {
-            // This case should be rare due to the server-side fallback, but we handle it just in case.
-            throw new Error("AI returned empty or invalid product IDs.");
-        }
-
         setRecommendations(recommendedProducts);
 
-        // Save the successful search results to localStorage.
-        try {
-          localStorage.setItem('visualSearch', JSON.stringify({
-            imageDataUri: imageDataUri,
-            recommendationIds: result.productIds,
-          }));
-        } catch (e) {
-          console.error("Failed to save visual search results to localStorage", e);
+        // Save to local storage only if we have products to show.
+        if (recommendedProducts.length > 0) {
+            try {
+              localStorage.setItem('visualSearch', JSON.stringify({
+                imageDataUri: imageDataUri,
+                recommendationIds: result.productIds,
+              }));
+            } catch (e) {
+              console.error("Failed to save visual search results to localStorage", e);
+            }
+        } else {
+            // This case should now only be hit if the entire product catalog is empty.
+            toast({
+                title: "No Products Found",
+                description: "Your product catalog appears to be empty."
+            })
+            localStorage.removeItem('visualSearch');
         }
       } catch (error) {
-        // This is the definitive client-side safety net that catches any error.
+        // This is the definitive client-side safety net that catches any network error.
         console.error("Visual search failed, activating client-side fallback:", error);
         toast({
             variant: "destructive",

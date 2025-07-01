@@ -39,12 +39,7 @@ export async function findSimilarProducts(input: FindSimilarProductsInput): Prom
   const availableProducts = allProducts
     .map(({ id, name, description, category }) => ({ id, name, description, category }));
 
-  if (availableProducts.length === 0) {
-    return { productIds: [] };
-  }
-  
-  // The flow is now self-healing and guaranteed to return a result.
-  // No complex try/catch is needed here anymore.
+  // The flow is self-healing. We trust it to handle all cases, including an empty product catalog.
   return await findSimilarProductsFlow({ 
     ...input, 
     availableProducts,
@@ -78,13 +73,17 @@ You MUST return a JSON object containing a 'productIds' array with exactly {{cou
 ---
 
 **Available Product Catalog:**
+{{#if availableProducts}}
 {{#each availableProducts}}
 Product ID: {{this.id}}
 Name: {{this.name}}
 Description: {{this.description}}
 Category: {{this.category}}
 ---
-{{/each}}`,
+{{/each}}
+{{else}}
+No products available. You must return an empty productIds array.
+{{/if}}`,
     config: {
         safetySettings: [
           {
@@ -114,33 +113,50 @@ const findSimilarProductsFlow = ai.defineFlow(
     outputSchema: FindSimilarProductsOutputSchema,
   },
   async (input) => {
+    // This is the fallback function, to be used whenever the primary flow fails.
+    const generateFallback = () => {
+        console.error('Visual search failed or returned invalid data. Using server-side fallback.');
+        if (input.availableProducts.length === 0) {
+            return { productIds: [] };
+        }
+        const fallbackProducts = [...input.availableProducts].sort(() => 0.5 - Math.random());
+        const fallbackIds = fallbackProducts.slice(0, input.count).map(p => p.id);
+        return { productIds: fallbackIds };
+    };
+
+    // Handle case where there are no products to search from.
+    if (input.availableProducts.length === 0) {
+      return { productIds: [] };
+    }
+
     try {
       const { output } = await recommendationPrompt(input);
       
-      // Robust check: ensure output and productIds exist and are not empty.
-      if (output?.productIds && output.productIds.length > 0) {
-        // Further validation: ensure the IDs are valid products.
-        const allProductIds = new Set(getProducts().map(p => p.id));
-        const validIds = output.productIds.filter(id => allProductIds.has(id));
-        
-        if (validIds.length > 0) {
-            // As long as we have at least one valid ID, we return it.
-            return { productIds: validIds };
-        }
+      // Robust check: ensure output and productIds exist.
+      if (!output?.productIds) {
+        return generateFallback();
       }
       
-      // Fallback Case 1: AI returned empty, null, or only invalid product IDs.
-      console.error('AI visual search returned invalid or empty data. Using fallback.');
-      const fallbackProducts = getProducts().sort(() => 0.5 - Math.random());
-      const fallbackIds = fallbackProducts.slice(0, input.count || 4).map(p => p.id);
-      return { productIds: fallbackIds };
+      // Further validation: ensure the IDs are valid products.
+      const availableProductIds = new Set(input.availableProducts.map(p => p.id));
+      const validIds = output.productIds.filter(id => availableProductIds.has(id));
+      
+      // If we don't get enough valid IDs, use the fallback to ensure consistency.
+      if (validIds.length < input.count) {
+          console.warn(`AI returned only ${validIds.length}/${input.count} valid products. Augmenting with fallback.`);
+          const fallback = generateFallback();
+          // Combine valid results with fallback, avoiding duplicates, and trim to count.
+          const combinedIds = [...new Set([...validIds, ...fallback.productIds])];
+          return { productIds: combinedIds.slice(0, input.count) };
+      }
+      
+      // Success case: we have enough valid IDs.
+      return { productIds: validIds };
 
     } catch (error) {
-      // Fallback Case 2: A catastrophic error occurred (e.g., Genkit/network failure).
+      // Fallback for any catastrophic error (e.g., Genkit/network failure).
       console.error('A catastrophic error occurred during the visual search flow:', error);
-      const fallbackProducts = getProducts().sort(() => 0.5 - Math.random());
-      const fallbackIds = fallbackProducts.slice(0, input.count || 4).map(p => p.id);
-      return { productIds: fallbackIds };
+      return generateFallback();
     }
   }
 );
