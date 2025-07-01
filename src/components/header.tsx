@@ -33,7 +33,7 @@ export function Header() {
                   <Button variant="ghost" asChild>
                     <Link href="/search-by-image">
                       <Search />
-                      Search by Image
+                      Find Your Style
                     </Link>
                   </Button>
                   <Button variant="ghost" asChild>
