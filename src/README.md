@@ -40,22 +40,26 @@ You can also find instructions for testing specific AI features by running the a
 When you deploy your site to Firebase App Hosting, the API key must be stored securely in Google Cloud Secret Manager. Your `apphosting.yaml` file is already configured to use this secret. This makes the key available to your application on the server, so your end-users will not need to provide their own keys.
 
 **Prerequisites:**
-Before you begin, you must complete the following setup steps on your local machine. The `gcloud` commands below will not work until you do.
+Before you begin, you must complete the following setup steps on your local machine. The `gcloud` and `firebase` commands below will not work until you do.
 
 1.  **Install Google Cloud SDK:** You must first install the command-line tools.
     - [**Click here to follow the official installation guide for the Google Cloud SDK.**](https://cloud.google.com/sdk/docs/install)
     - **Important:** After installation, you must **close and reopen your terminal** for the `gcloud` command to be recognized.
 
-2.  **Login to Google Cloud:** Once the SDK is installed, authenticate with Google Cloud by running this command in your terminal:
+2.  **Install Firebase CLI:** You will also need the Firebase command-line tools to deploy your app.
+    - **Run this command in your terminal:** `npm install -g firebase-tools`
+    - **Important:** If you've previously installed it, make sure it's up to date (`npm update -g firebase-tools`).
+
+3.  **Login to Google Cloud:** Once the SDK is installed, authenticate with Google Cloud by running this command in your terminal:
     ```
     gcloud auth login
     ```
 
-3.  **Set Your Project:** Configure the gcloud CLI to use your project ID with:
+4.  **Set Your Project:** Configure the gcloud CLI to use your project ID with:
     ```
     gcloud config set project gen-lang-client-0049357498
     ```
-4.  **Enable Secret Manager API:** Enable the API by running `gcloud services enable secretmanager.googleapis.com` or by visiting [this link in the Cloud Console](https://console.cloud.google.com/apis/library/secretmanager.googleapis.com).
+5.  **Enable Secret Manager API:** Enable the API by running `gcloud services enable secretmanager.googleapis.com` or by visiting [this link in the Cloud Console](https://console.cloud.google.com/apis/library/secretmanager.googleapis.com).
 
 Follow these steps in your terminal:
 
