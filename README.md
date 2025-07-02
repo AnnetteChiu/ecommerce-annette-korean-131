@@ -41,6 +41,7 @@ When you deploy your site to Firebase App Hosting, the API key must be stored se
 
 **Prerequisites:**
 - Make sure you have the [Google Cloud SDK installed](https://cloud.google.com/sdk/docs/install) and are logged into your Google Cloud account (`gcloud auth login`).
+- Set your project in gcloud: `gcloud config set project gen-lang-client-0049357498`
 - Ensure you have enabled the Secret Manager API for your project.
 
 Follow these steps in your terminal:
