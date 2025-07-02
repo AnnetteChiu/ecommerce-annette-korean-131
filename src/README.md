@@ -67,7 +67,7 @@ Follow these steps in your terminal:
     ```
     gcloud secrets create GOOGLE_API_KEY --replication-policy="automatic"
     ```
-2.  **Add Your Key as a Secret Version:** Replace `YOUR_API_KEY_HERE` with your actual Google AI API key.
+2.  **Add Your Key as a Secret Version:** This next command adds your key to the secret container. Replace `YOUR_API_KEY_HERE` with your actual key before running it.
     ```
     echo -n "YOUR_API_KEY_HERE" | gcloud secrets versions add GOOGLE_API_KEY --data-file=-
     ```
