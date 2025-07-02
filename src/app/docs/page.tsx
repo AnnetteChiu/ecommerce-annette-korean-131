@@ -51,11 +51,11 @@ GOOGLE_API_KEY="YOUR_GOOGLE_AI_API_KEY_HERE"
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="font-semibold mb-2">1. Generate Your API Key</h3>
+            <h3 className="font-semibold mb-2">1. Create Your API Key</h3>
             <p className="text-muted-foreground mb-4">Visit Google AI Studio to create a free API key for your project.</p>
             <Button asChild>
                 <Link href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">
-                    Get Your Google AI Key
+                    Go to Google AI Studio
                 </Link>
             </Button>
           </div>
