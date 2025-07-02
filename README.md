@@ -37,7 +37,7 @@ You can also find instructions for testing specific AI features by running the a
 
 ### 2. For Production Deployment
 
-When you deploy your site to Firebase App Hosting, the API key must be stored securely in Google Cloud Secret Manager. Your `apphosting.yaml` file is already configured to use this secret.
+When you deploy your site to Firebase App Hosting, the API key must be stored securely in Google Cloud Secret Manager. Your `apphosting.yaml` file is already configured to use this secret. This makes the key available to your application on the server, so your end-users will not need to provide their own keys.
 
 **Prerequisites:**
 - Make sure you have the [Google Cloud SDK installed](https://cloud.google.com/sdk/docs/install) and are logged into your Google Cloud account (`gcloud auth login`).
