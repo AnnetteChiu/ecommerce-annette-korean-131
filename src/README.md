@@ -47,7 +47,7 @@ Before you begin, ensure you have completed the following steps:
     ```bash
     gcloud config set project gen-lang-client-0049357498
     ```
-4.  **Enable Secret Manager API:** Ensure the Secret Manager API is enabled for your project. You can enable it by running `gcloud services enable secretmanager.googleapis.com` or by visiting [this link in the Cloud Console](https://console.cloud.google.com/apis/library/secretmanager.googleapis.com).
+4.  **Enable Secret Manager API:** Enable the API by running `gcloud services enable secretmanager.googleapis.com` or by visiting [this link in the Cloud Console](https://console.cloud.google.com/apis/library/secretmanager.googleapis.com).
 
 Follow these steps in your terminal:
 
