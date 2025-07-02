@@ -9,6 +9,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
 
 export default function DocsPage() {
   const codeSnippet = `
