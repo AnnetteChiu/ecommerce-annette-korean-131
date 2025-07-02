@@ -12,18 +12,24 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { CartIcon } from './cart-icon';
-import { useAi } from '@/context/ai-context';
 import { cn } from '@/lib/utils';
 
-export function Header() {
-  const { isAiEnabled } = useAi();
+interface HeaderProps {
+  isProduction: boolean;
+}
+
+export function Header({ isProduction }: HeaderProps) {
   const pathname = usePathname();
 
-  const navLinks = [
+  const allNavLinks = [
     { href: '/fitting-room', label: 'Fitting Room', icon: Camera },
     { href: '/graphic-designer', label: 'Graphic Designer', icon: Palette },
     { href: '/docs', label: 'Docs', icon: Book },
   ];
+  
+  const navLinks = isProduction 
+    ? allNavLinks.filter(link => link.href !== '/docs')
+    : allNavLinks;
 
   return (
     <header className="bg-background/80 backdrop-blur-sm sticky top-0 z-40 border-b">

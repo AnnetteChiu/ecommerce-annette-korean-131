@@ -18,6 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const aiEnabled = isAiEnabled();
+  const isProduction = process.env.NODE_ENV === 'production';
 
   return (
     <html lang="en" className="h-full">
@@ -29,7 +30,7 @@ export default function RootLayout({
       <body className="font-body antialiased flex flex-col min-h-screen" suppressHydrationWarning>
         <AiProvider enabled={aiEnabled}>
           <CartProvider>
-            <Header />
+            <Header isProduction={isProduction} />
             <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
               {children}
             </main>
