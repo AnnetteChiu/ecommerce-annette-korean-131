@@ -40,9 +40,14 @@ You can also find instructions for testing specific AI features by running the a
 When you deploy your site to Firebase App Hosting, the API key must be stored securely in Google Cloud Secret Manager. Your `apphosting.yaml` file is already configured to use this secret. This makes the key available to your application on the server, so your end-users will not need to provide their own keys.
 
 **Prerequisites:**
-- Make sure you have the [Google Cloud SDK installed](https://cloud.google.com/sdk/docs/install) and are logged into your Google Cloud account (`gcloud auth login`).
-- Set your project in gcloud: `gcloud config set project gen-lang-client-0049357498`
-- Ensure you have enabled the Secret Manager API for your project.
+Before you begin, ensure you have completed the following steps:
+1.  **Install Google Cloud SDK:** Make sure you have the [Google Cloud SDK installed](https://cloud.google.com/sdk/docs/install).
+2.  **Login to Google Cloud:** Authenticate with Google Cloud by running `gcloud auth login` in your terminal.
+3.  **Set Your Project:** Configure the gcloud CLI to use your project ID with:
+    ```bash
+    gcloud config set project gen-lang-client-0049357498
+    ```
+4.  **Enable Secret Manager API:** Ensure the Secret Manager API is enabled for your project. You can enable it by running `gcloud services enable secretmanager.googleapis.com` or by visiting [this link in the Cloud Console](https://console.cloud.google.com/apis/library/secretmanager.googleapis.com).
 
 Follow these steps in your terminal:
 
