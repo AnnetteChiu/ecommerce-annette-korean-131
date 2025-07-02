@@ -35,7 +35,7 @@ export function StyleRecommender() {
       } catch (error) {
         console.error('Failed to generate style recommendations:', error);
         const description = error instanceof Error ? error.message : "An unknown error occurred.";
-        if (description.includes('API key') || description.includes('API_KEY_INVALID')) {
+        if (description === 'API_KEY_INVALID') {
             disableAi();
             toast({
                 variant: 'destructive',

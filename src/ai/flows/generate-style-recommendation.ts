@@ -76,7 +76,7 @@ const styleRecommendationFlow = ai.defineFlow(
     } catch (err) {
       console.error('Error in styleRecommendationFlow:', err);
       if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        throw err;
+        throw new Error('API_KEY_INVALID');
       }
       throw new Error("Could not generate a recommendation at this time. Please try again.");
     }

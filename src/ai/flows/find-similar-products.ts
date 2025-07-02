@@ -135,7 +135,9 @@ const findSimilarProductsFlow = ai.defineFlow(
 
     } catch (err) {
       console.error('Error in findSimilarProductsFlow:', err);
-      // Re-throw the original error to be handled by the client
+      if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
+        throw new Error('API_KEY_INVALID');
+      }
       throw err;
     }
   }

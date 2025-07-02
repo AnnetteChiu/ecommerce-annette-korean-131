@@ -80,7 +80,7 @@ const virtualTryOnFlow = ai.defineFlow(
     } catch (err) {
       console.error('Error in virtualTryOnFlow:', err);
        if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        throw err;
+        throw new Error('API_KEY_INVALID');
       }
       throw new Error("We couldn't generate the image. The AI may have had trouble with this combination. Please try a different item or photo.");
     }

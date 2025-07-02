@@ -46,7 +46,7 @@ export default function GraphicDesignerPage() {
             } catch (err) {
                 console.error('Graphic design generation failed:', err);
                 const description = err instanceof Error ? err.message : "An unknown error occurred.";
-                if (description.includes('API key') || description.includes('API_KEY_INVALID')) {
+                if (description === 'API_KEY_INVALID') {
                     disableAi();
                     toast({
                         variant: 'destructive',
@@ -76,7 +76,7 @@ export default function GraphicDesignerPage() {
                     <AlertTriangle className="h-4 w-4" />
                     <AlertTitle>Google AI API Key Required</AlertTitle>
                     <AlertDescription>
-                      This feature is disabled. To enable it, set your Google AI API key in a <code>.env.local</code> file. See the <Link href="/docs" className="underline">documentation</Link> for details.
+                      This feature is disabled. Please see the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
                     </AlertDescription>
                 </Alert>
             ) : null}
@@ -125,7 +125,7 @@ export default function GraphicDesignerPage() {
                                         <AlertTriangle className="h-4 w-4" />
                                         <AlertTitle>Google AI API Key Required</AlertTitle>
                                         <AlertDescription>
-                                            This feature is disabled. To enable it, set your Google AI API key in a <code>.env.local</code> file. See the <Link href="/docs" className="underline">documentation</Link> for details.
+                                            This feature is disabled. Please see the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
                                         </AlertDescription>
                                     </Alert>
                                 </div>

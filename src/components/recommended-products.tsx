@@ -48,12 +48,12 @@ export function RecommendedProducts({ currentProductId, currentProductName }: Re
         console.error('Failed to fetch recommendations:', error);
         const description = error instanceof Error ? error.message : "An unknown error occurred.";
         
-        if (description.includes('API key') || description.includes('API_KEY_INVALID')) {
+        if (description === 'API_KEY_INVALID') {
             disableAi();
             toast({
                 variant: 'destructive',
                 title: 'Google AI Key Invalid',
-                description: 'Your API key is invalid. All AI features have been disabled.',
+                description: 'Your API key is invalid. AI features have been disabled.',
             });
         } else {
             toast({

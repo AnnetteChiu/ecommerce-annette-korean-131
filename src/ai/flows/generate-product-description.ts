@@ -59,7 +59,7 @@ const generateProductDescriptionFlow = ai.defineFlow(
     } catch (err) {
       console.error('Error in generateProductDescriptionFlow:', err);
       if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        throw err;
+        throw new Error('API_KEY_INVALID');
       }
       throw new Error("Could not generate a description at this time. Please try again.");
     }

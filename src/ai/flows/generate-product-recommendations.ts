@@ -118,7 +118,7 @@ const productRecommendationFlow = ai.defineFlow(
     } catch (err) {
       console.error('Error in productRecommendationFlow:', err);
       if (err instanceof Error && (err.message.includes('API_KEY_INVALID') || err.message.includes('API key not valid'))) {
-        throw err;
+        throw new Error('API_KEY_INVALID');
       }
       throw new Error("Could not generate recommendations at this time. Please try again.");
     }
