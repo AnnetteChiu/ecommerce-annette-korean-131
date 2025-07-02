@@ -95,8 +95,20 @@ GOOGLE_API_KEY="YOUR_API_KEY_HERE"
                     <h3 className="font-semibold text-lg">For Production Deployment</h3>
                 </div>
                  <p className="text-muted-foreground text-sm">
-                  When deploying to Firebase App Hosting, your key must be stored securely in Google Cloud Secret Manager. The following <code className="font-code">gcloud</code> commands will set this up.
+                  When you deploy your site, the API key must be stored securely in Google Cloud Secret Manager. Your <code className="font-code text-xs">apphosting.yaml</code> file is already configured to look for this secret.
                 </p>
+                <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
+                    <Terminal className="h-4 w-4 !text-yellow-600 dark:!text-yellow-300" />
+                    <AlertTitle className="text-yellow-800 dark:text-yellow-200">Prerequisites</AlertTitle>
+                    <AlertDescription className="text-yellow-700 dark:text-yellow-300">
+                        Make sure you have the Google Cloud SDK installed and are logged in. If not, follow the official
+                        <Button asChild variant="link" className="p-0 h-auto ml-1">
+                            <Link href="https://cloud.google.com/sdk/docs/install" target="_blank" rel="noopener noreferrer">
+                                installation guide
+                            </Link>
+                        </Button>.
+                    </AlertDescription>
+                </Alert>
                 <div className="space-y-4">
                   <div>
                     <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Step 1: Create the Secret</Label>
