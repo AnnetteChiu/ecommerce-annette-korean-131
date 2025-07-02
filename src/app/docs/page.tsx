@@ -37,10 +37,6 @@ console.log('Please refresh the page to see the changes take effect.');
 GOOGLE_API_KEY="YOUR_API_KEY_HERE"
   `.trim();
   
-  const gcloudCreateSecret = `gcloud secrets create GOOGLE_API_KEY --replication-policy="automatic"`;
-  const gcloudAddSecret = `echo -n "YOUR_API_KEY_HERE" | gcloud secrets versions add GOOGLE_API_KEY --data-file=-`;
-  const firebaseDeploy = `firebase deploy`;
-
   return (
     <div className="space-y-8">
       <h1 className="text-4xl font-headline font-bold text-center">Developer Documentation</h1>
@@ -52,7 +48,7 @@ GOOGLE_API_KEY="YOUR_API_KEY_HERE"
             <div className="flex flex-col">
               <CardTitle className="text-2xl">Enabling AI Features</CardTitle>
               <CardDescription>
-                To activate the AI features, you must provide your Google AI API key. The setup depends on your environment.
+                To activate the AI features for local development, you must provide your Google AI API key.
               </CardDescription>
             </div>
           </div>
@@ -62,7 +58,7 @@ GOOGLE_API_KEY="YOUR_API_KEY_HERE"
             <Info className="h-4 w-4 !text-blue-600 dark:!text-blue-300" />
             <AlertTitle className="text-blue-800 dark:text-blue-200">First, Get Your Key</AlertTitle>
             <AlertDescription className="text-blue-700 dark:text-blue-300">
-              No matter your environment, you first need to generate a free API key from Google AI Studio.
+              You first need to generate a free API key from Google AI Studio.
                <Button asChild variant="link" className="p-0 h-auto ml-1">
                   <Link href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer">
                       Create Your API Key
@@ -70,72 +66,23 @@ GOOGLE_API_KEY="YOUR_API_KEY_HERE"
               </Button>
             </AlertDescription>
           </Alert>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4 p-6 border rounded-lg">
-                <div className="flex items-center gap-2">
-                    <FileCode className="h-5 w-5" />
-                    <h3 className="font-semibold text-lg">For Local Development</h3>
-                </div>
-                <p className="text-muted-foreground text-sm">
-                  For running the app on your local machine, create a <code>.env.local</code> file in the project's root directory and add your key to it.
-                </p>
-                <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
-                  <code className="font-code text-sm text-muted-foreground">
-                    {envSnippet}
-                  </code>
-                </pre>
+          
+          <div className="space-y-4 p-6 border rounded-lg max-w-2xl mx-auto">
+              <div className="flex items-center gap-2">
+                  <FileCode className="h-5 w-5" />
+                  <h3 className="font-semibold text-lg">Local Development Setup</h3>
+              </div>
+              <p className="text-muted-foreground text-sm">
+                For running the app on your local machine, create a <code>.env.local</code> file in the project's root directory and add your key to it.
+              </p>
+              <pre className="bg-muted p-4 rounded-lg overflow-x-auto">
+                <code className="font-code text-sm text-muted-foreground">
+                  {envSnippet}
+                </code>
+              </pre>
                  <p className="text-muted-foreground text-sm">
                   <strong>Important:</strong> After creating this file, you must stop and restart your development server for the change to take effect.
                 </p>
-            </div>
-            <div className="space-y-4 p-6 border rounded-lg">
-                <div className="flex items-center gap-2">
-                    <Server className="h-5 w-5" />
-                    <h3 className="font-semibold text-lg">For Production Deployment</h3>
-                </div>
-                 <p className="text-muted-foreground text-sm">
-                  When you deploy your site, the API key must be stored securely in Google Cloud Secret Manager. Your <code className="font-code text-xs">apphosting.yaml</code> file is already configured to look for this secret.
-                </p>
-                <Alert variant="default" className="bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800">
-                    <Terminal className="h-4 w-4 !text-yellow-600 dark:!text-yellow-300" />
-                    <AlertTitle className="text-yellow-800 dark:text-yellow-200">Prerequisites</AlertTitle>
-                    <AlertDescription className="text-yellow-700 dark:text-yellow-300">
-                        Make sure you have the Google Cloud SDK installed and are logged in. If not, follow the official
-                        <Button asChild variant="link" className="p-0 h-auto ml-1">
-                            <Link href="https://cloud.google.com/sdk/docs/install" target="_blank" rel="noopener noreferrer">
-                                installation guide
-                            </Link>
-                        </Button>.
-                    </AlertDescription>
-                </Alert>
-                <div className="space-y-4">
-                  <div>
-                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Step 1: Create the Secret</Label>
-                    <pre className="bg-muted p-3 rounded-lg overflow-x-auto mt-1">
-                      <code className="font-code text-xs text-muted-foreground">
-                        {gcloudCreateSecret}
-                      </code>
-                    </pre>
-                  </div>
-                   <div>
-                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Step 2: Add Your Key as the Secret Value</Label>
-                    <pre className="bg-muted p-3 rounded-lg overflow-x-auto mt-1">
-                      <code className="font-code text-xs text-muted-foreground">
-                        {gcloudAddSecret}
-                      </code>
-                    </pre>
-                  </div>
-                  <div>
-                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Step 3: Deploy Your App</Label>
-                    <pre className="bg-muted p-3 rounded-lg overflow-x-auto mt-1">
-                      <code className="font-code text-xs text-muted-foreground">
-                        {firebaseDeploy}
-                      </code>
-                    </pre>
-                  </div>
-                </div>
-            </div>
           </div>
         </CardContent>
       </Card>
@@ -147,7 +94,7 @@ GOOGLE_API_KEY="YOUR_API_KEY_HERE"
                 <CardTitle>AI Feature Details & Testing</CardTitle>
             </div>
             <CardDescription>
-                An overview of how each AI feature works.
+                An overview of how each AI feature works and how to test it.
             </CardDescription>
         </CardHeader>
         <CardContent>
