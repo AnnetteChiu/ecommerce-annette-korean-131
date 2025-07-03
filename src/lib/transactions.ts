@@ -18,20 +18,32 @@ export async function getTransactions(): Promise<Transaction[]> {
     const transactionSnapshot = await getDocs(q);
     const transactionsList = transactionSnapshot.docs.map(docSnapshot => {
       const data = docSnapshot.data();
-      // Firestore Timestamps need to be converted to JS Date objects then to string
-      const date = data.date instanceof Timestamp ? data.date.toDate().toISOString().split('T')[0] : data.date;
+      
+      // Defensively parse all fields to prevent crashes from malformed data
+      let dateStr = '';
+      if (data.date) {
+        try {
+          dateStr = data.date instanceof Timestamp 
+            ? data.date.toDate().toISOString().split('T')[0] 
+            : String(data.date);
+          // Basic validation for YYYY-MM-DD format
+          if (!/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+            dateStr = ''; // Invalid format, reset to empty
+          }
+        } catch {
+          dateStr = ''; // Error during date conversion
+        }
+      }
+
       return {
-        // Spread the data from the document
-        customer: data.customer,
-        email: data.email,
-        subtotal: data.subtotal,
-        shipping: data.shipping,
-        taxes: data.taxes,
-        total: data.total,
-        // Add the orderId from the document id
         orderId: docSnapshot.id,
-        // Add the converted date
-        date: date,
+        customer: String(data.customer || 'N/A'),
+        email: String(data.email || 'N/A'),
+        date: dateStr,
+        subtotal: Number(data.subtotal) || 0,
+        shipping: Number(data.shipping) || 0,
+        taxes: Number(data.taxes) || 0,
+        total: Number(data.total) || 0,
       } as Transaction;
     });
     return transactionsList;
