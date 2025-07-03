@@ -32,6 +32,9 @@ export function Footer() {
             <Link href="/supplier-management" className="hover:text-primary transition-colors">
               Supplier Management
             </Link>
+             <Link href="/marketing" className="hover:text-primary transition-colors">
+              Marketing
+            </Link>
             <Link href="/transactions" className="hover:text-primary transition-colors">
               Transactions
             </Link>
