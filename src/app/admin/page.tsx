@@ -215,7 +215,7 @@ export default function AdminPage() {
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>AI Features Disabled</AlertTitle>
             <AlertDescription>
-                The AI-powered sales report requires a Google AI API key. Please see the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
+                The AI-powered sales report requires a Google AI API key. Please add it to your <code>.env.local</code> file and restart the server. See the <Link href="/docs" className="underline font-semibold">documentation</Link> for instructions.
             </AlertDescription>
         </Alert>
       )}

@@ -224,9 +224,9 @@ export default function FittingRoomPage() {
             {!isAiEnabled && (
                 <Alert variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Google AI API Key Required</AlertTitle>
+                    <AlertTitle>AI Features Disabled</AlertTitle>
                     <AlertDescription>
-                      This feature is disabled. Please see the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
+                      This feature requires a Google AI API key. Please add it to your <code>.env.local</code> file and restart the server. See the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
                     </AlertDescription>
                 </Alert>
             )}
@@ -317,9 +317,9 @@ export default function FittingRoomPage() {
                                 <div className="p-4 w-full">
                                     <Alert variant="destructive">
                                         <AlertTriangle className="h-4 w-4" />
-                                        <AlertTitle>Google AI API Key Required</AlertTitle>
+                                        <AlertTitle>AI Features Disabled</AlertTitle>
                                         <AlertDescription>
-                                          This feature is disabled. Please see the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
+                                          This feature requires a Google AI API key. Please add it to your <code>.env.local</code> file and restart the server. See the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
                                         </AlertDescription>
                                     </Alert>
                                 </div>
