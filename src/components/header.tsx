@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Book, Camera, Palette, Map, Info, Image as ImageIcon } from 'lucide-react';
+import { Search, Book, Camera, Palette, Map, Info, Image as ImageIcon, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -87,6 +87,19 @@ export function Header({ isProduction }: HeaderProps) {
                       <p>Shopping Cart</p>
                     </TooltipContent>
                   </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" asChild className={cn((pathname === '/login' || pathname === '/signup') && 'bg-accent text-accent-foreground')}>
+                        <Link href="/login">
+                            <User className="h-5 w-5" />
+                            <span className="sr-only">Account</span>
+                        </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Account</p>
+                  </TooltipContent>
+                </Tooltip>
               </TooltipProvider>
             </div>
           </nav>
