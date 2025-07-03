@@ -212,7 +212,7 @@ export default function TransactionsPage() {
                       </TableCell>
                     </TableRow>
                   )}
-                </Body>
+                </TableBody>
               </Table>
             </CardContent>
           </Card>
