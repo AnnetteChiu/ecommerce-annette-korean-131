@@ -22,6 +22,8 @@ const mockSuppliers = [
   { id: 'sup1', name: 'Supplier A', contact: 'contact@suppliera.com', products: 5, address: '123 Fashion Ave, New York, NY, USA' },
   { id: 'sup2', name: 'Supplier B', contact: 'contact@supplierb.com', products: 12, address: '456 Textile Road, London, UK' },
   { id: 'sup3', name: 'Supplier C', contact: 'contact@supplierc.com', products: 8, address: '789 Design Court, Tokyo, Japan' },
+  { id: 'sup4', name: 'Supplier D', contact: 'info@supplierd.it', products: 20, address: '10 Corso Como, Milan, Italy' },
+  { id: 'sup5', name: 'Supplier E', contact: 'sales@suppliere.co.kr', products: 15, address: '135-7, Cheongdam-dong, Gangnam-gu, Seoul, South Korea' },
 ];
 
 export default function SupplierManagementPage() {
