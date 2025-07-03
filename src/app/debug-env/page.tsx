@@ -1,9 +1,10 @@
 
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Terminal } from 'lucide-react';
+import { AlertTriangle, CheckCircle } from 'lucide-react';
 
 export default function DebugEnvPage() {
   const envVars = [
@@ -57,28 +58,47 @@ export default function DebugEnvPage() {
     },
   ];
 
+  const allKeysSet = envVars.every(v => v.isSet);
+
   return (
     <div className="space-y-8">
       <div className="text-center">
         <h1 className="text-4xl font-headline font-bold">Environment Setup Check</h1>
         <p className="text-muted-foreground mt-2">
-          This page checks if your environment variables are correctly loaded by the application.
+          Verify that your API keys are correctly loaded by the application.
         </p>
       </div>
 
-      <Alert>
-        <Terminal className="h-4 w-4" />
-        <AlertTitle>Important!</AlertTitle>
-        <AlertDescription>
-          After adding or changing any values in your <code>.env.local</code> file, you must **restart your development server** for the changes to take effect.
-        </AlertDescription>
-      </Alert>
+      {!allKeysSet ? (
+         <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Action Required: Missing API Keys</AlertTitle>
+            <AlertDescription>
+                <p>One or more of your API keys are not set. Please follow these steps:</p>
+                <ol className="list-decimal list-inside mt-2 space-y-1">
+                    <li>Locate or create the <code>.env.local</code> file in your project's root directory.</li>
+                    <li>Ensure all variables from the table below are present in the file.</li>
+                    <li>Copy the correct key values from their respective service dashboards.</li>
+                    <li><strong>Important:</strong> Stop your development server and restart it with <code>npm run dev</code> for changes to apply.</li>
+                    <li>For more detailed instructions, visit the <Link href="/docs" className="font-semibold underline">documentation page</Link>.</li>
+                </ol>
+            </AlertDescription>
+        </Alert>
+      ) : (
+        <Alert variant="default" className="border-green-500/50 text-green-700 dark:border-green-500/50 dark:text-green-300 [&>svg]:text-green-600 dark:[&>svg]:text-green-400">
+            <CheckCircle className="h-4 w-4" />
+            <AlertTitle className="text-green-800 dark:text-green-200">All Keys Loaded!</AlertTitle>
+            <AlertDescription>
+                All required environment variables have been successfully loaded. If a feature is still not working, please ensure the key values themselves are correct and active.
+            </AlertDescription>
+        </Alert>
+      )}
 
       <Card>
         <CardHeader>
           <CardTitle>API Key Status</CardTitle>
           <CardDescription>
-            This table shows the status of the required API keys. This does not check if the keys are *valid*, only if they have been *set*.
+            This table shows the status of required API keys. This does not check if the keys are *valid*, only if they have been *set*.
           </CardDescription>
         </CardHeader>
         <CardContent>
