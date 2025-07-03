@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/cart-context';
@@ -8,11 +9,31 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Minus, Plus, ShoppingCart, Trash2, Search, LayoutGrid } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Trash2, Search, LayoutGrid, Tag } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export default function CartPage() {
-  const { cartItems, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
+  const { 
+    cartItems, 
+    updateQuantity, 
+    removeFromCart, 
+    clearCart,
+    subtotal,
+    discountAmount,
+    total,
+    appliedCoupon,
+    applyCouponCode,
+    removeCoupon,
+  } = useCart();
   const { isAiEnabled } = useAi();
+  const [couponCode, setCouponCode] = useState('');
+
+  const handleApplyCoupon = () => {
+    if (couponCode.trim()) {
+      applyCouponCode(couponCode.trim());
+      setCouponCode('');
+    }
+  };
 
   if (cartItems.length === 0) {
     return (
@@ -118,10 +139,30 @@ export default function CartPage() {
             <CardTitle>Order Summary</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!appliedCoupon && (
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Coupon Code" 
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+                <Button onClick={handleApplyCoupon}>Apply</Button>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Subtotal</span>
-              <span>${cartTotal.toFixed(2)}</span>
+              <span>${subtotal.toFixed(2)}</span>
             </div>
+             {appliedCoupon && (
+              <div className="flex justify-between items-center text-primary">
+                <div className="flex items-center gap-2">
+                   <Tag className="h-4 w-4" />
+                   <p>Discount <Badge variant="secondary" className="font-mono">{appliedCoupon.code}</Badge></p>
+                   <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={removeCoupon}><Trash2 className="h-3 w-3"/></Button>
+                </div>
+                <span>-${discountAmount.toFixed(2)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>Shipping</span>
               <span>Free</span>
@@ -129,7 +170,7 @@ export default function CartPage() {
             <Separator />
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span>${cartTotal.toFixed(2)}</span>
+              <span>${total.toFixed(2)}</span>
             </div>
           </CardContent>
           <CardFooter className="flex-col gap-2">

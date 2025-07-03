@@ -11,8 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, Truck, ShoppingCart } from 'lucide-react';
+import { CreditCard, Truck, ShoppingCart, Tag } from 'lucide-react';
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 
 const formSchema = z.object({
   // Shipping details
@@ -31,7 +32,7 @@ const formSchema = z.object({
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cartItems, cartTotal, clearCart } = useCart();
+  const { cartItems, subtotal, discountAmount, total, appliedCoupon, clearCart } = useCart();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -228,8 +229,14 @@ export default function CheckoutPage() {
               <Separator />
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>${subtotal.toFixed(2)}</span>
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between text-primary">
+                  <span>Discount <Badge variant="secondary" className="font-mono">{appliedCoupon.code}</Badge></span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>Shipping</span>
                 <span>Free</span>
@@ -237,7 +244,7 @@ export default function CheckoutPage() {
               <Separator />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span>${cartTotal.toFixed(2)}</span>
+                <span>${total.toFixed(2)}</span>
               </div>
             </CardContent>
             <CardFooter>

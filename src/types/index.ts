@@ -46,3 +46,8 @@ export interface SalesData {
   monthlyTrend: { month: string; sales: number; revenue: string }[];
   topRegions: { region: string; sales: number; percentage: string }[];
 }
+
+export interface CouponDiscount {
+  type: 'percentage' | 'fixed';
+  value: number;
+}
