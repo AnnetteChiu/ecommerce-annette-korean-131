@@ -33,6 +33,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { getTransactions } from '@/lib/transactions';
 
 const ADMIN_PASSWORD = 'admin123';
 
@@ -56,15 +57,16 @@ export default function AdminPage() {
     if (isAdminLoggedIn) {
       const data = getSalesData();
       setSalesData(data);
-       try {
-            const userTransactionsStr = localStorage.getItem('userTransactions');
-            const transactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
-            transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-            setRecentOrders(transactions);
-        } catch (error) {
-            console.error("Failed to load transactions from localStorage", error);
-            setRecentOrders([]);
-        }
+       const fetchOrders = async () => {
+          try {
+              const transactions = await getTransactions();
+              setRecentOrders(transactions);
+          } catch (error) {
+              console.error("Failed to load transactions", error);
+              setRecentOrders([]);
+          }
+       };
+       fetchOrders();
     }
   }, [isAdminLoggedIn]);
   
