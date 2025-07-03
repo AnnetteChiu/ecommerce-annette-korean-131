@@ -2,6 +2,7 @@
 # Firebase Studio E-Commerce Starter
 
 This is a Next.js starter application for Firebase Studio, demonstrating a modern e-commerce experience with integrated AI features.
+https://ai-tech-fashion-media.netlify.app/
 
 ## 🚀 Getting Started
 
