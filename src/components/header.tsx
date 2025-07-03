@@ -27,6 +27,7 @@ export function Header({ isProduction }: HeaderProps) {
     { href: '/fitting-room', label: 'Fitting Room', icon: Camera },
     { href: '/graphic-designer', label: 'Graphic Designer', icon: Palette },
     { href: '/live-tracking', label: 'Live Tracking', icon: Map },
+    { href: '/transactions', label: 'Transactions', icon: DollarSign },
     { href: '/docs', label: 'Docs', icon: Book },
   ];
   

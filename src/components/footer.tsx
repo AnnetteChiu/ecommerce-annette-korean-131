@@ -23,6 +23,9 @@ export function Footer() {
             <Link href="/about" className="hover:text-primary transition-colors">
               About CodiStyle
             </Link>
+            <Link href="/transactions" className="hover:text-primary transition-colors">
+              Transactions
+            </Link>
             <Link href="/admin" className="hover:text-primary transition-colors">
               Admin Dashboard
             </Link>
