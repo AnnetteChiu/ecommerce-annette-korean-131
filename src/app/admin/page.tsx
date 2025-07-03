@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -132,7 +131,7 @@ export default function AdminPage() {
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
             <h1 className="text-4xl font-headline font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Enter the password to view the sales dashboard.</p>
+            <p className="text-muted-foreground mt-2">Enter the password to view the 流行趨勢.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input
@@ -157,7 +156,7 @@ export default function AdminPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline">Sales Dashboard</h1>
+        <h1 className="text-3xl font-bold font-headline">流行趨勢</h1>
         <p className="text-muted-foreground">{salesData.productName}</p>
       </div>
       

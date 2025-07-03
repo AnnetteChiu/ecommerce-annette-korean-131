@@ -20,7 +20,7 @@ export function Footer() {
           <p suppressHydrationWarning>&copy; {year} CodiStyle. All Rights Reserved.</p>
           <nav className="flex items-center gap-4">
             <Link href="/admin" className="hover:text-primary transition-colors">
-              Sales Dashboard
+              流行趨勢
             </Link>
             <Link href="/manage-products" className="hover:text-primary transition-colors">
               Manage Products
