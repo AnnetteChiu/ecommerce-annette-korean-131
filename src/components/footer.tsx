@@ -35,9 +35,6 @@ export function Footer() {
              <Link href="/marketing" className="hover:text-primary transition-colors">
               Marketing
             </Link>
-            <Link href="/transactions" className="hover:text-primary transition-colors">
-              Transactions
-            </Link>
             <Link href="/debug-env" className="hover:text-primary transition-colors">
               Debug ENV
             </Link>
