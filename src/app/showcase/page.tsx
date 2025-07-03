@@ -20,6 +20,17 @@ export default function ShowcasePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
       </div>
+      <div className="relative w-full overflow-hidden rounded-lg shadow-lg animate-in fade-in zoom-in-95 duration-700 delay-300">
+        <Image
+          src="https://i4.codibook.net/files/1982112875000/60a4de6128c03a98/1935104839.jpg"
+          alt="Woman in stylish outfit posing in a cafe"
+          width={800}
+          height={1200}
+          className="w-full h-auto"
+          data-ai-hint="fashion cafe"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
+      </div>
     </div>
   );
 }
