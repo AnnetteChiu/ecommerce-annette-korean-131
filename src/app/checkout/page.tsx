@@ -6,15 +6,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/cart-context';
+import { useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Separator } from '@/components/ui/separator';
-import { CreditCard, Truck, ShoppingCart, Tag } from 'lucide-react';
+import { CreditCard, Truck, ShoppingCart, Tag, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
+import { processCheckoutAndSendEmail } from './actions';
 
 const formSchema = z.object({
   // Shipping details
@@ -35,6 +38,8 @@ const formSchema = z.object({
 export default function CheckoutPage() {
   const router = useRouter();
   const { cartItems, subtotal, discountAmount, total, appliedCoupon, clearCart } = useCart();
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -53,9 +58,30 @@ export default function CheckoutPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log('Checkout successful with values:', values);
-    clearCart();
-    router.push('/checkout/thank-you');
+    startTransition(async () => {
+      const result = await processCheckoutAndSendEmail({
+        email: values.email,
+        fullName: values.fullName,
+        cartDetails: {
+          cartItems,
+          subtotal,
+          discountAmount,
+          total,
+          appliedCoupon,
+        },
+      });
+
+      if (result.success) {
+        clearCart();
+        router.push('/checkout/thank-you');
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Checkout Failed',
+          description: result.error || 'An unexpected error occurred. Please try again.',
+        });
+      }
+    });
   }
 
   if (cartItems.length === 0) {
@@ -264,8 +290,9 @@ export default function CheckoutPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" size="lg" className="w-full">
-                Place Order
+              <Button type="submit" size="lg" className="w-full" disabled={isPending}>
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isPending ? 'Processing...' : 'Place Order'}
               </Button>
             </CardFooter>
           </Card>

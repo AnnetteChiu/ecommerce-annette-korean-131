@@ -1,8 +1,8 @@
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Home, Info } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { CheckCircle, Home } from 'lucide-react';
 
 export default function ThankYouPage() {
   return (
@@ -14,17 +14,10 @@ export default function ThankYouPage() {
           </div>
           <CardTitle className="mt-4 text-3xl font-headline">Thank You for Your Order!</CardTitle>
           <CardDescription>
-            Your order has been placed successfully.
+            Your order has been placed successfully. A confirmation email has been sent to you.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>This is a demo application</AlertTitle>
-              <AlertDescription>
-                In a real application, a confirmation email would be sent to you. Since this is a demonstration, no email has been sent.
-              </AlertDescription>
-            </Alert>
+        <CardContent>
           <Button asChild>
             <Link href="/">
               <Home className="mr-2" />
