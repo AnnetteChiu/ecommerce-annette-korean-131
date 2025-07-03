@@ -34,6 +34,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { getTransactions } from '@/lib/transactions';
+import { FirestoreSecurityRulesInstructions } from '@/components/firestore-security-rules-instructions';
 
 const ADMIN_PASSWORD = 'admin123';
 
@@ -44,6 +45,7 @@ export default function AdminPage() {
   const [report, setReport] = useState<string>('');
   const [isGenerating, startTransition] = useTransition();
   const [recentOrders, setRecentOrders] = useState<Transaction[]>([]);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const { toast } = useToast();
   const { isAiEnabled, disableAi } = useAi();
 
@@ -58,10 +60,17 @@ export default function AdminPage() {
       const data = getSalesData();
       setSalesData(data);
        const fetchOrders = async () => {
+          setOrdersError(null);
           try {
               const transactions = await getTransactions();
               setRecentOrders(transactions);
           } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+              if (errorMessage.includes('PERMISSION_DENIED')) {
+                  setOrdersError('PERMISSION_DENIED');
+              } else {
+                  setOrdersError(errorMessage);
+              }
               console.error("Failed to load transactions", error);
               setRecentOrders([]);
           }
@@ -315,42 +324,52 @@ export default function AdminPage() {
           <CardDescription>An overview of the latest transactions.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentOrders.length > 0 ? (
-                recentOrders.map((order) => (
-                  <TableRow key={order.orderId}>
-                    <TableCell className="font-mono text-xs">{order.orderId || 'N/A'}</TableCell>
-                    <TableCell>
-                      <div className="font-medium">{order.customer || 'N/A'}</div>
-                    </TableCell>
-                    <TableCell>{order.email || 'N/A'}</TableCell>
-                    <TableCell>{order.date || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">Processing</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">${(order.total || 0).toFixed(2)}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
+          {ordersError === 'PERMISSION_DENIED' ? (
+              <FirestoreSecurityRulesInstructions />
+          ) : ordersError ? (
+              <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Error Loading Orders</AlertTitle>
+                  <AlertDescription>{ordersError}</AlertDescription>
+              </Alert>
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center">
-                    No recent orders to display.
-                  </TableCell>
+                  <TableHead>Order ID</TableHead>
+                  <TableHead>Customer</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {recentOrders.length > 0 ? (
+                  recentOrders.map((order) => (
+                    <TableRow key={order.orderId}>
+                      <TableCell className="font-mono text-xs">{order.orderId || 'N/A'}</TableCell>
+                      <TableCell>
+                        <div className="font-medium">{order.customer || 'N/A'}</div>
+                      </TableCell>
+                      <TableCell>{order.email || 'N/A'}</TableCell>
+                      <TableCell>{order.date || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">Processing</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">${(order.total || 0).toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={6} className="h-24 text-center">
+                      No recent orders to display.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

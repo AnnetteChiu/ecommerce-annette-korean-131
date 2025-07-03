@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { User, LogOut, History, CreditCard, Loader2 } from 'lucide-react';
+import { User, LogOut, History, CreditCard, Loader2, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import type { Transaction } from '@/types';
 import { getTransactions } from '@/lib/transactions';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { FirestoreSecurityRulesInstructions } from '@/components/firestore-security-rules-instructions';
 
 type BrowsingHistoryItem = {
   id: string;
@@ -30,6 +32,7 @@ export default function AccountPage() {
   const [browsingHistory, setBrowsingHistory] = useState<BrowsingHistoryItem[]>([]);
   const [orders, setOrders] = useState<DisplayOrder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [ordersError, setOrdersError] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -49,6 +52,7 @@ export default function AccountPage() {
       // Load user's orders from Firestore
       const fetchOrders = async () => {
           setIsLoading(true);
+          setOrdersError(null);
           try {
               // In a real app, you would filter transactions by user ID.
               // For this demo, we will fetch all transactions.
@@ -63,6 +67,12 @@ export default function AccountPage() {
                 }));
               setOrders(userOrders);
           } catch (error) {
+              const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+              if (errorMessage.includes('PERMISSION_DENIED')) {
+                  setOrdersError('PERMISSION_DENIED');
+              } else {
+                  setOrdersError(errorMessage);
+              }
               console.error("Failed to fetch user transactions:", error);
               setOrders([]); // Fallback to empty on error
           } finally {
@@ -127,7 +137,15 @@ export default function AccountPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {orders.length > 0 ? (
+            {ordersError === 'PERMISSION_DENIED' ? (
+                <FirestoreSecurityRulesInstructions />
+            ) : ordersError ? (
+                <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Error Loading Orders</AlertTitle>
+                    <AlertDescription>{ordersError}</AlertDescription>
+                </Alert>
+            ) : orders.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
