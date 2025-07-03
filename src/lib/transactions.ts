@@ -1,3 +1,4 @@
+
 import type { Transaction } from '@/types';
 import { db } from './firebase';
 import { collection, doc, setDoc, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
@@ -23,7 +24,7 @@ export async function getTransactions(): Promise<Transaction[]> {
       let dateStr = '';
       if (data.date) {
         try {
-          // Dates are stored as Timestamps, so we convert them back to strings here.
+          // Dates can be stored as Timestamps (correct) or strings (from older data), so we handle both.
           dateStr = data.date instanceof Timestamp 
             ? data.date.toDate().toISOString().split('T')[0] 
             : String(data.date);
@@ -55,7 +56,8 @@ export async function getTransactions(): Promise<Transaction[]> {
         console.error("Firestore index missing. Please create the required index in your Firebase console.");
         throw new Error("Database is not properly configured. A Firestore index is required to sort transactions. Please check the server logs for a link to create it.");
     }
-    return [];
+    // Propagate other errors to be handled by the UI
+    throw error;
   }
 }
 
