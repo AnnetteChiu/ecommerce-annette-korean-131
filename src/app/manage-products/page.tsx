@@ -42,6 +42,7 @@ import { Edit, Trash2, Info, Sparkles, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
+import { suggestProductPrice } from '@/ai/flows/suggest-product-price';
 import { useAi } from '@/context/ai-context';
 
 const ADMIN_PASSWORD = 'admin123';
@@ -53,6 +54,7 @@ export default function ManageProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [isGeneratingDesc, startDescTransition] = useTransition();
+  const [isGeneratingPrice, startPriceTransition] = useTransition();
   const { toast } = useToast();
   const { isAiEnabled, disableAi } = useAi();
 
@@ -128,6 +130,41 @@ export default function ManageProductsPage() {
             toast({
               variant: 'destructive',
               title: 'Generation Failed',
+              description,
+            });
+        }
+      }
+    });
+  };
+
+  const handleSuggestPrice = () => {
+    if (!editingProduct) return;
+
+    startPriceTransition(async () => {
+      try {
+        const result = await suggestProductPrice({
+          name: editingProduct.name,
+          category: editingProduct.category,
+          description: editingProduct.description,
+        });
+        if (result.price) {
+          setEditingProduct({ ...editingProduct, price: result.price });
+          toast({ title: 'Price Suggested!', description: `The AI suggested a price of $${result.price.toFixed(2)}.` });
+        }
+      } catch (error) {
+        console.error('Failed to suggest price', error);
+        const description = error instanceof Error ? error.message : "An unknown error occurred.";
+        if (description === 'API_KEY_INVALID') {
+            disableAi();
+            toast({
+                variant: 'destructive',
+                title: 'Google AI Key Invalid',
+                description: 'Your API key is invalid. All AI features have been disabled.',
+            });
+        } else {
+            toast({
+              variant: 'destructive',
+              title: 'Suggestion Failed',
               description,
             });
         }
@@ -253,7 +290,7 @@ export default function ManageProductsPage() {
 
       {editingProduct && (
         <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>Edit Product</DialogTitle>
               <DialogDescription>
@@ -285,7 +322,7 @@ export default function ManageProductsPage() {
                   />
                   {isAiEnabled && (
                     <div className="flex justify-end">
-                      <Button type="button" variant="ghost" size="sm" onClick={handleGenerateDescription} disabled={isGeneratingDesc}>
+                      <Button type="button" variant="ghost" size="sm" onClick={handleGenerateDescription} disabled={isGeneratingDesc || isGeneratingPrice}>
                         {isGeneratingDesc ? <Loader2 className="animate-spin" /> : <Sparkles />}
                         Generate with AI
                       </Button>
@@ -311,10 +348,19 @@ export default function ManageProductsPage() {
                 <Input
                   id="price"
                   type="number"
+                  step="0.01"
                   value={editingProduct.price}
                   onChange={(e) => setEditingProduct({ ...editingProduct, price: parseFloat(e.target.value) || 0 })}
-                  className="col-span-3"
+                  className="col-span-2"
                 />
+                 <div className="col-span-1">
+                  {isAiEnabled && (
+                      <Button type="button" variant="outline" size="sm" onClick={handleSuggestPrice} disabled={isGeneratingDesc || isGeneratingPrice}>
+                          {isGeneratingPrice ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                          Suggest
+                      </Button>
+                  )}
+                 </div>
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="stock" className="text-right">
