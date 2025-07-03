@@ -1,3 +1,4 @@
+
 export interface Product {
   id: string;
   name: string;
@@ -33,4 +34,15 @@ export interface Story {
   title: string;
   coverImageUrl: string;
   pages: StoryPage[];
+}
+
+export interface SalesData {
+  productName: string;
+  totalSales: number;
+  revenue: string;
+  averageRating: number;
+  totalReviews: number;
+  returnRate: string;
+  monthlyTrend: { month: string; sales: number; revenue: string }[];
+  topRegions: { region: string; sales: number; percentage: string }[];
 }

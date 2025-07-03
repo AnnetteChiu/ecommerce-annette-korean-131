@@ -1,0 +1,25 @@
+
+{
+    "productName": "Samsung Galaxy S24 Ultra 256GB",
+    "totalSales": 1247,
+    "revenue": "₩1,742,306,000",
+    "averageRating": 4.8,
+    "totalReviews": 1234,
+    "returnRate": "2.3%",
+    "monthlyTrend": [
+      { "month": "1月", "sales": 89, "revenue": "₩124,422,000" },
+      { "month": "2月", "sales": 156, "revenue": "₩218,088,000" },
+      { "month": "3月", "sales": 203, "revenue": "₩283,794,000" },
+      { "month": "4月", "sales": 187, "revenue": "₩261,426,000" },
+      { "month": "5月", "sales": 234, "revenue": "₩327,132,000" },
+      { "month": "6月", "sales": 189, "revenue": "₩264,222,000" },
+      { "month": "7月", "sales": 189, "revenue": "₩264,222,000" }
+    ],
+    "topRegions": [
+      { "region": "首爾", "sales": 387, "percentage": "31.0%" },
+      { "region": "釜山", "sales": 149, "percentage": "11.9%" },
+      { "region": "仁川", "sales": 112, "percentage": "9.0%" },
+      { "region": "大邱", "sales": 87, "percentage": "7.0%" },
+      { "region": "其他", "sales": 512, "percentage": "41.1%" }
+    ]
+  }
