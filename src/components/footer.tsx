@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -23,7 +24,7 @@ export function Footer() {
               About CodiStyle
             </Link>
             <Link href="/admin" className="hover:text-primary transition-colors">
-              Popular Trends
+              Admin Dashboard
             </Link>
             <Link href="/manage-products" className="hover:text-primary transition-colors">
               Manage Products

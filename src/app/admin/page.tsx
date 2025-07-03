@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -22,10 +23,57 @@ import { DollarSign, Package, Star, MessageSquare, TrendingDown, Sparkles, Loade
 import { useAi } from '@/context/ai-context';
 import { generateAdminReport } from '@/ai/flows/generate-admin-report';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 const ADMIN_PASSWORD = 'admin123';
+
+const mockRecentOrders = [
+  {
+    orderId: 'CS-9A8B7C',
+    customer: 'Alice Johnson',
+    email: 'alice@example.com',
+    total: 239.98,
+    status: 'Shipped',
+    date: '2023-11-10',
+    items: 'The Minimalist Tote, Organic Cotton Tee'
+  },
+  {
+    orderId: 'CS-6F5E4D',
+    customer: 'Bob Williams',
+    email: 'bob@example.com',
+    total: 165.00,
+    status: 'Processing',
+    date: '2023-11-10',
+    items: 'Classic Beige Blazer'
+  },
+  {
+    orderId: 'CS-3I2H1G',
+    customer: 'Charlie Brown',
+    email: 'charlie@example.com',
+    total: 89.99,
+    status: 'Delivered',
+    date: '2023-11-08',
+    items: 'Relaxed Fit Blue Jeans'
+  },
+  {
+    orderId: 'CS-KJ23L9',
+    customer: 'Diana Prince',
+    email: 'diana@example.com',
+    total: 270.00,
+    status: 'Shipped',
+    date: '2023-11-07',
+    items: 'Cozy Knit Cardigan, Organic Cotton Tee'
+  },
+];
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -131,7 +179,7 @@ export default function AdminPage() {
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
             <h1 className="text-4xl font-headline font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Enter the password to view the Popular Trends.</p>
+            <p className="text-muted-foreground mt-2">Enter the password to view the Sales Dashboard.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <Input
@@ -156,7 +204,7 @@ export default function AdminPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline">Popular Trends</h1>
+        <h1 className="text-3xl font-bold font-headline">Sales Dashboard</h1>
         <p className="text-muted-foreground">{salesData.productName}</p>
       </div>
       
@@ -277,6 +325,50 @@ export default function AdminPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Orders</CardTitle>
+          <CardDescription>An overview of the latest transactions. (This is sample data)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Items</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {mockRecentOrders.map((order) => (
+                <TableRow key={order.orderId}>
+                  <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
+                  <TableCell>
+                    <div className="font-medium">{order.customer}</div>
+                    <div className="text-sm text-muted-foreground">{order.email}</div>
+                  </TableCell>
+                   <TableCell>{order.date}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">{order.items}</TableCell>
+                  <TableCell>
+                    <Badge variant={
+                      order.status === 'Delivered' ? 'default' : 
+                      order.status === 'Shipped' ? 'secondary' : 
+                      'outline'
+                    }>
+                      {order.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 }
