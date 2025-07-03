@@ -19,6 +19,9 @@ export function Footer() {
         <div className="text-muted-foreground text-sm mt-8 border-t pt-4 flex flex-wrap justify-between items-center gap-4">
           <p suppressHydrationWarning>&copy; {year} CodiStyle. All Rights Reserved.</p>
           <nav className="flex items-center gap-4">
+            <Link href="/about" className="hover:text-primary transition-colors">
+              About CodiStyle
+            </Link>
             <Link href="/admin" className="hover:text-primary transition-colors">
               Popular Trends
             </Link>

@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Book, Camera, Palette, Map } from 'lucide-react';
+import { Search, Book, Camera, Palette, Map, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -22,6 +22,7 @@ export function Header({ isProduction }: HeaderProps) {
   const pathname = usePathname();
 
   const allNavLinks = [
+    { href: '/about', label: 'About', icon: Info },
     { href: '/fitting-room', label: 'Fitting Room', icon: Camera },
     { href: '/graphic-designer', label: 'Graphic Designer', icon: Palette },
     { href: '/live-tracking', label: 'Live Tracking', icon: Map },
