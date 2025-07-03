@@ -19,58 +19,10 @@ import type { Transaction } from '@/types';
 
 const ADMIN_PASSWORD = 'admin123';
 
-const mockTransactions: Transaction[] = [
-  {
-    orderId: 'CS-9A8B7C',
-    customer: 'Alice Johnson',
-    date: '2023-11-10',
-    subtotal: 220.00,
-    shipping: 19.98,
-    taxes: 17.60,
-    total: 239.98,
-  },
-  {
-    orderId: 'CS-6F5E4D',
-    customer: 'Bob Williams',
-    date: '2023-11-10',
-    subtotal: 150.00,
-    shipping: 15.00,
-    taxes: 12.00,
-    total: 165.00,
-  },
-  {
-    orderId: 'CS-3I2H1G',
-    customer: 'Charlie Brown',
-    date: '2023-11-08',
-    subtotal: 80.00,
-    shipping: 9.99,
-    taxes: 6.40,
-    total: 89.99,
-  },
-  {
-    orderId: 'CS-KJ23L9',
-    customer: 'Diana Prince',
-    date: '2023-11-07',
-    subtotal: 250.00,
-    shipping: 20.00,
-    taxes: 20.00,
-    total: 270.00,
-  },
-  {
-    orderId: 'CS-M4N5O6',
-    customer: 'Eve Adams',
-    date: '2023-11-05',
-    subtotal: 120.50,
-    shipping: 12.05,
-    taxes: 9.64,
-    total: 132.55,
-  }
-];
-
 export default function TransactionsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const { toast } = useToast();
   
   const totalTransactions = transactions.length;
@@ -87,22 +39,14 @@ export default function TransactionsPage() {
         try {
             const userTransactionsStr = localStorage.getItem('userTransactions');
             const userTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
-            // Combine mock data with user-generated data, ensuring no duplicates.
-            const allTransactions = [...mockTransactions];
-            const mockOrderIds = new Set(mockTransactions.map(t => t.orderId));
-            userTransactions.forEach(userTx => {
-                if (!mockOrderIds.has(userTx.orderId)) {
-                    allTransactions.push(userTx);
-                }
-            });
             
             // Sort by date, newest first
-            allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            userTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-            setTransactions(allTransactions);
+            setTransactions(userTransactions);
         } catch (error) {
             console.error("Failed to load transactions from localStorage", error);
-            setTransactions(mockTransactions);
+            setTransactions([]);
         }
     }
   }, [isLoggedIn]);
@@ -179,7 +123,7 @@ export default function TransactionsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Detailed Transactions</CardTitle>
-          <CardDescription>A complete log of all financial transactions.</CardDescription>
+          <CardDescription>A complete log of all financial transactions generated during this session.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -195,19 +139,27 @@ export default function TransactionsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transactions.map((transaction) => (
-                <TableRow key={transaction.orderId}>
-                  <TableCell className="font-mono text-xs">{transaction.orderId}</TableCell>
-                  <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <div className="font-medium">{transaction.customer}</div>
+              {transactions.length > 0 ? (
+                transactions.map((transaction) => (
+                  <TableRow key={transaction.orderId}>
+                    <TableCell className="font-mono text-xs">{transaction.orderId}</TableCell>
+                    <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">{transaction.customer}</div>
+                    </TableCell>
+                    <TableCell className="text-right">${transaction.subtotal.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">${transaction.shipping.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">${transaction.taxes.toFixed(2)}</TableCell>
+                    <TableCell className="text-right font-semibold">${transaction.total.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="h-24 text-center">
+                    No transactions have been recorded yet.
                   </TableCell>
-                  <TableCell className="text-right">${transaction.subtotal.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">${transaction.shipping.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">${transaction.taxes.toFixed(2)}</TableCell>
-                  <TableCell className="text-right font-semibold">${transaction.total.toFixed(2)}</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>
