@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -41,7 +42,7 @@ const sendCouponFormSchema = z.object({
 });
 
 export default function MarketingPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [coupons, setCoupons] = useState<{ [code: string]: CouponDiscount & { isMock?: boolean } }>({});
   
@@ -67,22 +68,22 @@ export default function MarketingPage() {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      setIsLoggedIn(true);
+    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+      setIsAdminLoggedIn(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isAdminLoggedIn) {
       loadCoupons();
     }
-  }, [isLoggedIn]);
+  }, [isAdminLoggedIn]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim() === ADMIN_PASSWORD) {
-      setIsLoggedIn(true);
-      localStorage.setItem('isLoggedIn', 'true');
+      setIsAdminLoggedIn(true);
+      localStorage.setItem('isAdminLoggedIn', 'true');
       toast({ title: 'Login Successful', description: 'Welcome, admin!' });
     } else {
       toast({
@@ -91,6 +92,13 @@ export default function MarketingPage() {
         description: 'Incorrect password. Please try again.',
       });
     }
+  };
+
+  const handleLogout = () => {
+    setIsAdminLoggedIn(false);
+    setPassword('');
+    localStorage.removeItem('isAdminLoggedIn');
+    toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
   };
   
   const handleCreateCoupon = (e: React.FormEvent) => {
@@ -142,7 +150,7 @@ export default function MarketingPage() {
     });
   }
 
-  if (!isLoggedIn) {
+  if (!isAdminLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-full max-w-md space-y-6">
@@ -168,9 +176,12 @@ export default function MarketingPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold font-headline">Marketing</h1>
-        <p className="text-muted-foreground">Create, manage, and send discount codes to your customers.</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 className="text-3xl font-bold font-headline">Marketing</h1>
+            <p className="text-muted-foreground">Create, manage, and send discount codes to your customers.</p>
+        </div>
+        <Button onClick={handleLogout} variant="outline">Logout</Button>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">

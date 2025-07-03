@@ -37,7 +37,7 @@ const mockSuppliers = [
 ];
 
 export default function SupplierManagementPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const { toast } = useToast();
   const { isAiEnabled, disableAi } = useAi();
@@ -47,16 +47,16 @@ export default function SupplierManagementPage() {
   const [isGenerating, startTransition] = useTransition();
 
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      setIsLoggedIn(true);
+    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+      setIsAdminLoggedIn(true);
     }
   }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim() === ADMIN_PASSWORD) {
-      setIsLoggedIn(true);
-      localStorage.setItem('isLoggedIn', 'true');
+      setIsAdminLoggedIn(true);
+      localStorage.setItem('isAdminLoggedIn', 'true');
       toast({ title: 'Login Successful', description: 'Welcome, admin!' });
     } else {
       toast({
@@ -68,9 +68,9 @@ export default function SupplierManagementPage() {
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    setIsAdminLoggedIn(false);
     setPassword('');
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('isAdminLoggedIn');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
   };
   
@@ -111,7 +111,7 @@ export default function SupplierManagementPage() {
     });
 };
 
-  if (!isLoggedIn) {
+  if (!isAdminLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-full max-w-md space-y-6">

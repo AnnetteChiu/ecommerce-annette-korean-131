@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -36,7 +37,7 @@ import { Badge } from '@/components/ui/badge';
 const ADMIN_PASSWORD = 'admin123';
 
 export default function AdminPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [salesData, setSalesData] = useState<SalesData | null>(null);
   const [report, setReport] = useState<string>('');
@@ -46,13 +47,13 @@ export default function AdminPage() {
   const { isAiEnabled, disableAi } = useAi();
 
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      setIsLoggedIn(true);
+    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+      setIsAdminLoggedIn(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isAdminLoggedIn) {
       const data = getSalesData();
       setSalesData(data);
        try {
@@ -65,10 +66,10 @@ export default function AdminPage() {
             setRecentOrders([]);
         }
     }
-  }, [isLoggedIn]);
+  }, [isAdminLoggedIn]);
   
   useEffect(() => {
-    if (isLoggedIn && salesData && isAiEnabled) {
+    if (isAdminLoggedIn && salesData && isAiEnabled) {
       startTransition(async () => {
         try {
           const result = await generateAdminReport(salesData);
@@ -93,13 +94,13 @@ export default function AdminPage() {
         }
       });
     }
-  }, [isLoggedIn, salesData, isAiEnabled, toast, disableAi]);
+  }, [isAdminLoggedIn, salesData, isAiEnabled, toast, disableAi]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim() === ADMIN_PASSWORD) {
-      setIsLoggedIn(true);
-      localStorage.setItem('isLoggedIn', 'true');
+      setIsAdminLoggedIn(true);
+      localStorage.setItem('isAdminLoggedIn', 'true');
       toast({ title: 'Login Successful', description: 'Welcome, admin!' });
     } else {
       toast({
@@ -108,6 +109,13 @@ export default function AdminPage() {
         description: 'Incorrect password. Please try again.',
       });
     }
+  };
+
+  const handleLogout = () => {
+    setIsAdminLoggedIn(false);
+    setPassword('');
+    localStorage.removeItem('isAdminLoggedIn');
+    toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
   };
 
   const monthlyChartConfig = {
@@ -143,7 +151,7 @@ export default function AdminPage() {
     },
   };
 
-  if (!isLoggedIn) {
+  if (!isAdminLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-full max-w-md space-y-6">
@@ -173,9 +181,12 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold font-headline">Sales Dashboard</h1>
-        <p className="text-muted-foreground">{salesData.productName}</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 className="text-3xl font-bold font-headline">Sales Dashboard</h1>
+            <p className="text-muted-foreground">{salesData.productName}</p>
+        </div>
+        <Button onClick={handleLogout} variant="outline">Logout</Button>
       </div>
       
       {isAiEnabled && (
@@ -199,7 +210,7 @@ export default function AdminPage() {
         </Card>
       )}
 
-      {!isAiEnabled && isLoggedIn && (
+      {!isAiEnabled && isAdminLoggedIn && (
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>AI Features Disabled</AlertTitle>

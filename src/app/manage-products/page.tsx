@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -47,7 +48,7 @@ import { useAi } from '@/context/ai-context';
 const ADMIN_PASSWORD = 'admin123';
 
 export default function ManageProductsPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -59,8 +60,8 @@ export default function ManageProductsPage() {
 
   useEffect(() => {
     // Check login status from localStorage
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      setIsLoggedIn(true);
+    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+      setIsAdminLoggedIn(true);
     }
     setProducts(getProducts());
   }, []);
@@ -68,8 +69,8 @@ export default function ManageProductsPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim() === ADMIN_PASSWORD) {
-      setIsLoggedIn(true);
-      localStorage.setItem('isLoggedIn', 'true');
+      setIsAdminLoggedIn(true);
+      localStorage.setItem('isAdminLoggedIn', 'true');
       toast({ title: 'Login Successful', description: 'Welcome, admin!' });
     } else {
       toast({
@@ -81,9 +82,9 @@ export default function ManageProductsPage() {
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    setIsAdminLoggedIn(false);
     setPassword('');
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('isAdminLoggedIn');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
   };
   
@@ -181,7 +182,7 @@ export default function ManageProductsPage() {
     return <Badge variant="outline">In Stock ({stock})</Badge>;
   };
 
-  if (!isLoggedIn) {
+  if (!isAdminLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-full max-w-md space-y-6">

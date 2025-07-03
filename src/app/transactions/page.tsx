@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -19,7 +20,7 @@ import type { Transaction } from '@/types';
 const ADMIN_PASSWORD = 'admin123';
 
 export default function TransactionsPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const { toast } = useToast();
@@ -28,13 +29,13 @@ export default function TransactionsPage() {
   const totalRevenue = transactions.reduce((acc, t) => acc + t.total, 0);
 
   useEffect(() => {
-    if (localStorage.getItem('isLoggedIn') === 'true') {
-      setIsLoggedIn(true);
+    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+      setIsAdminLoggedIn(true);
     }
   }, []);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isAdminLoggedIn) {
         try {
             const userTransactionsStr = localStorage.getItem('userTransactions');
             const userTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
@@ -48,13 +49,13 @@ export default function TransactionsPage() {
             setTransactions([]);
         }
     }
-  }, [isLoggedIn]);
+  }, [isAdminLoggedIn]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password.trim() === ADMIN_PASSWORD) {
-      setIsLoggedIn(true);
-      localStorage.setItem('isLoggedIn', 'true');
+      setIsAdminLoggedIn(true);
+      localStorage.setItem('isAdminLoggedIn', 'true');
       toast({ title: 'Login Successful', description: 'Welcome, admin!' });
     } else {
       toast({
@@ -65,7 +66,14 @@ export default function TransactionsPage() {
     }
   };
 
-  if (!isLoggedIn) {
+  const handleLogout = () => {
+    setIsAdminLoggedIn(false);
+    setPassword('');
+    localStorage.removeItem('isAdminLoggedIn');
+    toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
+  };
+
+  if (!isAdminLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-full max-w-md space-y-6">
@@ -91,9 +99,12 @@ export default function TransactionsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold font-headline">Transaction Summary</h1>
-        <p className="text-muted-foreground">Financial overview for tax and accounting purposes.</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 className="text-3xl font-bold font-headline">Transaction Summary</h1>
+            <p className="text-muted-foreground">Financial overview for tax and accounting purposes.</p>
+        </div>
+        <Button onClick={handleLogout} variant="outline">Logout</Button>
       </div>
 
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
