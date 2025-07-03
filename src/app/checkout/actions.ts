@@ -15,6 +15,7 @@ const checkoutActionInputSchema = z.object({
     cartItems: z.array(z.any()), // Not strictly validating cart items from client
     subtotal: z.number(),
     discountAmount: z.number(),
+    shipping: z.number(),
     total: z.number(),
     appliedCoupon: z.any().optional().nullable(),
   })
@@ -29,7 +30,7 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
     }
     
     const { email, fullName, cartDetails } = validation.data;
-    const { cartItems, subtotal, discountAmount, total, appliedCoupon } = cartDetails;
+    const { cartItems, subtotal, discountAmount, shipping, total, appliedCoupon } = cartDetails;
     
     const orderId = `CS-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
     const orderDate = new Date().toLocaleDateString('en-US', {
@@ -43,7 +44,7 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
         customer: fullName,
         date: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
         subtotal,
-        shipping: 0, // Assuming free shipping for now
+        shipping,
         taxes: total * 0.08, // Assuming 8% tax for demo
         total,
     };

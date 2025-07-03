@@ -38,7 +38,7 @@ const formSchema = z.object({
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cartItems, subtotal, discountAmount, total, appliedCoupon, clearCart } = useCart();
+  const { cartItems, subtotal, discountAmount, shipping, total, appliedCoupon, clearCart } = useCart();
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
@@ -67,6 +67,7 @@ export default function CheckoutPage() {
           cartItems,
           subtotal,
           discountAmount,
+          shipping,
           total,
           appliedCoupon,
         },
@@ -291,7 +292,7 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>Free</span>
+                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
               </div>
               <Separator />
               <div className="flex justify-between font-bold text-lg">

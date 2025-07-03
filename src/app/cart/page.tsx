@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -20,6 +21,7 @@ export default function CartPage() {
     clearCart,
     subtotal,
     discountAmount,
+    shipping,
     total,
     appliedCoupon,
     applyCouponCode,
@@ -165,7 +167,7 @@ export default function CartPage() {
             )}
             <div className="flex justify-between">
               <span>Shipping</span>
-              <span>Free</span>
+              <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-bold text-lg">

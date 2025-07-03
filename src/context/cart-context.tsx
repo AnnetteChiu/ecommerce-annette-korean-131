@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useMemo } from 'react';
@@ -16,6 +17,7 @@ interface CartContextType {
   cartCount: number;
   subtotal: number;
   discountAmount: number;
+  shipping: number;
   total: number;
   appliedCoupon: { code: string; discount: CouponDiscount } | null;
 }
@@ -118,8 +120,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   
-  const { subtotal, discountAmount, total } = useMemo(() => {
+  const { subtotal, discountAmount, shipping, total } = useMemo(() => {
     const sub = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const shippingCost = sub >= 35 ? 0 : 4.99;
+    
     let discount = 0;
     if (appliedCoupon) {
         if (appliedCoupon.discount.type === 'percentage') {
@@ -131,11 +135,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Ensure discount doesn't exceed subtotal
     discount = Math.min(sub, discount);
     
-    const finalTotal = sub - discount;
+    const finalTotal = sub - discount + shippingCost;
 
     return {
         subtotal: sub,
         discountAmount: discount,
+        shipping: shippingCost,
         total: finalTotal > 0 ? finalTotal : 0,
     };
   }, [cartItems, appliedCoupon]);
@@ -152,6 +157,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     cartCount,
     subtotal,
     discountAmount,
+    shipping,
     total,
     appliedCoupon,
   };
