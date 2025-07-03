@@ -13,17 +13,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin } from 'lucide-react';
+import { MapPin, Truck } from 'lucide-react';
 
 const ADMIN_PASSWORD = 'admin123';
 
 // Mock data for suppliers
 const mockSuppliers = [
-  { id: 'sup1', name: 'Supplier A', contact: 'contact@suppliera.com', products: 5, address: '123 Fashion Ave, New York, NY, USA' },
-  { id: 'sup2', name: 'Supplier B', contact: 'contact@supplierb.com', products: 12, address: '456 Textile Road, London, UK' },
-  { id: 'sup3', name: 'Supplier C', contact: 'contact@supplierc.com', products: 8, address: '789 Design Court, Tokyo, Japan' },
-  { id: 'sup4', name: 'Supplier D', contact: 'info@supplierd.it', products: 20, address: '10 Corso Como, Milan, Italy' },
-  { id: 'sup5', name: 'Supplier E', contact: 'sales@suppliere.co.kr', products: 15, address: '135-7, Cheongdam-dong, Gangnam-gu, Seoul, South Korea' },
+  { id: 'sup1', name: 'Supplier A', contact: 'contact@suppliera.com', products: 5, address: '123 Fashion Ave, New York, NY, USA', deliveryTime: '5-7 business days' },
+  { id: 'sup2', name: 'Supplier B', contact: 'contact@supplierb.com', products: 12, address: '456 Textile Road, London, UK', deliveryTime: '7-10 business days' },
+  { id: 'sup3', name: 'Supplier C', contact: 'contact@supplierc.com', products: 8, address: '789 Design Court, Tokyo, Japan', deliveryTime: '10-14 business days' },
+  { id: 'sup4', name: 'Supplier D', contact: 'info@supplierd.it', products: 20, address: '10 Corso Como, Milan, Italy', deliveryTime: '8-12 business days' },
+  { id: 'sup5', name: 'Supplier E', contact: 'sales@suppliere.co.kr', products: 15, address: '135-7, Cheongdam-dong, Gangnam-gu, Seoul, South Korea', deliveryTime: '9-13 business days' },
 ];
 
 export default function SupplierManagementPage() {
@@ -98,6 +98,7 @@ export default function SupplierManagementPage() {
               <TableHead>Supplier Name</TableHead>
               <TableHead>Contact Email</TableHead>
               <TableHead>Location</TableHead>
+              <TableHead>Est. Delivery</TableHead>
               <TableHead className="text-right">Product Count</TableHead>
             </TableRow>
           </TableHeader>
@@ -115,6 +116,12 @@ export default function SupplierManagementPage() {
                         View on Map
                       </a>
                     </Button>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-muted-foreground" />
+                    <span>{supplier.deliveryTime}</span>
                   </div>
                 </TableCell>
                 <TableCell className="text-right">{supplier.products}</TableCell>
