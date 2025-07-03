@@ -48,68 +48,66 @@ async function TransactionsData() {
     );
   }
 
-  try {
-    const transactions = await getTransactions();
+  const { transactions, error } = await getTransactions();
 
-    if (transactions.length === 0) {
-      return (
-        <div className="text-center py-12">
-            <Package className="mx-auto h-16 w-16 text-muted-foreground" />
-            <h2 className="mt-4 text-2xl font-bold">No Transactions Yet</h2>
-            <p className="mt-2 text-muted-foreground">When new orders are placed, they will appear here.</p>
-            <Button asChild className="mt-6">
-                <Link href="/">Continue Shopping</Link>
-            </Button>
-        </div>
-      );
-    }
-    
-    return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Order ID</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Total</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {transactions.map((order) => (
-            <TableRow key={order.orderId}>
-              <TableCell className="font-mono text-xs">{order.orderId || 'N/A'}</TableCell>
-              <TableCell>
-                <div className="font-medium">{order.customer || 'N/A'}</div>
-                <div className="text-xs text-muted-foreground">{order.email || 'N/A'}</div>
-              </TableCell>
-              <TableCell>{order.date || 'N/A'}</TableCell>
-              <TableCell>
-                <Badge variant="secondary">Processing</Badge>
-              </TableCell>
-              <TableCell className="text-right">${(order.total || 0).toFixed(2)}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    );
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-    
-    if (errorMessage.includes('PERMISSION_DENIED')) {
-      return <FirestoreSecurityRulesInstructions />;
-    }
-    
+  if (error?.code === 'PERMISSION_DENIED') {
+    return <FirestoreSecurityRulesInstructions />;
+  }
+  
+  if (error) {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
         <AlertTitle>Error Loading Data</AlertTitle>
         <AlertDescription>
-            Failed to load transactions. {errorMessage}
+            Failed to load transactions. {error.message}
         </AlertDescription>
       </Alert>
     );
   }
+
+  if (transactions.length === 0) {
+    return (
+      <div className="text-center py-12">
+          <Package className="mx-auto h-16 w-16 text-muted-foreground" />
+          <h2 className="mt-4 text-2xl font-bold">No Transactions Yet</h2>
+          <p className="mt-2 text-muted-foreground">When new orders are placed, they will appear here.</p>
+          <Button asChild className="mt-6">
+              <Link href="/">Continue Shopping</Link>
+          </Button>
+      </div>
+    );
+  }
+  
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Order ID</TableHead>
+          <TableHead>Customer</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead className="text-right">Total</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {transactions.map((order) => (
+          <TableRow key={order.orderId}>
+            <TableCell className="font-mono text-xs">{order.orderId || 'N/A'}</TableCell>
+            <TableCell>
+              <div className="font-medium">{order.customer || 'N/A'}</div>
+              <div className="text-xs text-muted-foreground">{order.email || 'N/A'}</div>
+            </TableCell>
+            <TableCell>{order.date || 'N/A'}</TableCell>
+            <TableCell>
+              <Badge variant="secondary">Processing</Badge>
+            </TableCell>
+            <TableCell className="text-right">${(order.total || 0).toFixed(2)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
 }
 
 

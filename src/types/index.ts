@@ -62,3 +62,11 @@ export interface Transaction {
     taxes: number;
     total: number;
 }
+
+export type GetTransactionsResult = {
+  transactions: Transaction[];
+  error?: {
+    message: string;
+    code: 'PERMISSION_DENIED' | 'INDEX_MISSING' | 'CONFIG_MISSING' | 'UNKNOWN';
+  };
+};

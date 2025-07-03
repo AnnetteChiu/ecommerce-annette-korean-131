@@ -1,17 +1,16 @@
 
-import type { Transaction } from '@/types';
+import type { Transaction, GetTransactionsResult } from '@/types';
 import { db } from './firebase';
 import { collection, doc, setDoc, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
 
 /**
  * Retrieves all transactions from Firestore, ordered by date descending.
- * @returns A promise that resolves to an array of Transaction objects.
+ * @returns A promise that resolves to an object with transactions or an error.
  */
-export async function getTransactions(): Promise<Transaction[]> {
-  // Ensure required config is present to avoid runtime errors on server
+export async function getTransactions(): Promise<GetTransactionsResult> {
   if (!db.app.options.apiKey) {
       console.warn("Firebase is not configured. Skipping Firestore fetch.");
-      return [];
+      return { transactions: [] };
   }
   try {
     const transactionsCol = collection(db, 'transactions');
@@ -20,20 +19,17 @@ export async function getTransactions(): Promise<Transaction[]> {
     const transactionsList = transactionSnapshot.docs.map(docSnapshot => {
       const data = docSnapshot.data();
       
-      // Defensively parse all fields to prevent crashes from malformed data
       let dateStr = '';
       if (data.date) {
         try {
-          // Dates can be stored as Timestamps (correct) or strings (from older data), so we handle both.
           dateStr = data.date instanceof Timestamp 
             ? data.date.toDate().toISOString().split('T')[0] 
             : String(data.date);
-          // Basic validation for YYYY-MM-DD format
           if (!/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
-            dateStr = ''; // Invalid format, reset to empty
+            dateStr = '';
           }
         } catch {
-          dateStr = ''; // Error during date conversion
+          dateStr = '';
         }
       }
 
@@ -48,16 +44,20 @@ export async function getTransactions(): Promise<Transaction[]> {
         total: Number(data.total) || 0,
       } as Transaction;
     });
-    return transactionsList;
+    return { transactions: transactionsList };
   } catch (error) {
-    console.error("Error fetching transactions: ", error);
-    // Add a more specific error message for missing indexes
-    if (error instanceof Error && error.message.includes('requires an index')) {
-        console.error("Firestore index missing. Please create the required index in your Firebase console.");
-        throw new Error("Database is not properly configured. A Firestore index is required to sort transactions. Please check the server logs for a link to create it.");
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    
+    if (errorMessage.includes('PERMISSION_DENIED')) {
+        return { transactions: [], error: { message: errorMessage, code: 'PERMISSION_DENIED' } };
     }
-    // Propagate other errors to be handled by the UI
-    throw error;
+    
+    if (errorMessage.includes('requires an index')) {
+        const indexCreationMessage = "Database is not properly configured. A Firestore index is required to sort transactions. Please check the server logs for a link to create it.";
+        return { transactions: [], error: { message: indexCreationMessage, code: 'INDEX_MISSING' } };
+    }
+    
+    return { transactions: [], error: { message: errorMessage, code: 'UNKNOWN' } };
   }
 }
 
@@ -67,7 +67,6 @@ export async function getTransactions(): Promise<Transaction[]> {
  * @param transaction The transaction data to add, including a custom orderId.
  */
 export async function addTransaction(transaction: Transaction) {
-    // Ensure required config is present
     if (!db.app.options.apiKey) {
       console.error("Firebase is not configured. Skipping Firestore write.");
       throw new Error("Database is not configured, cannot save transaction.");
@@ -75,7 +74,6 @@ export async function addTransaction(transaction: Transaction) {
     try {
         const transactionToSave = {
             ...transaction,
-            // Convert date string to a proper Firestore Timestamp for correct sorting
             date: Timestamp.fromDate(new Date(transaction.date)),
         };
         const transactionRef = doc(db, 'transactions', transaction.orderId);

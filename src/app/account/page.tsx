@@ -53,11 +53,19 @@ export default function AccountPage() {
       const fetchOrders = async () => {
           setIsLoading(true);
           setOrdersError(null);
-          try {
-              // In a real app, you would filter transactions by user ID.
-              // For this demo, we will fetch all transactions.
-              const allTransactions = await getTransactions();
-              const userOrders: DisplayOrder[] = allTransactions
+          
+          const { transactions, error } = await getTransactions();
+
+          if (error) {
+              if (error.code === 'PERMISSION_DENIED') {
+                  setOrdersError('PERMISSION_DENIED');
+              } else {
+                  setOrdersError(error.message);
+              }
+              console.error("Failed to fetch user transactions:", error.message);
+              setOrders([]);
+          } else {
+              const userOrders: DisplayOrder[] = transactions
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                 .map(tx => ({
                     id: tx.orderId,
@@ -66,18 +74,8 @@ export default function AccountPage() {
                     status: 'Processing'
                 }));
               setOrders(userOrders);
-          } catch (error) {
-              const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-              if (errorMessage.includes('PERMISSION_DENIED')) {
-                  setOrdersError('PERMISSION_DENIED');
-              } else {
-                  setOrdersError(errorMessage);
-              }
-              console.error("Failed to fetch user transactions:", error);
-              setOrders([]); // Fallback to empty on error
-          } finally {
-              setIsLoading(false);
           }
+          setIsLoading(false);
       };
       fetchOrders();
     } else {

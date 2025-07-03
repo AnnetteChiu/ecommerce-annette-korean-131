@@ -61,18 +61,18 @@ export default function AdminPage() {
       setSalesData(data);
        const fetchOrders = async () => {
           setOrdersError(null);
-          try {
-              const transactions = await getTransactions();
-              setRecentOrders(transactions);
-          } catch (error) {
-              const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
-              if (errorMessage.includes('PERMISSION_DENIED')) {
+          const { transactions, error } = await getTransactions();
+          
+          if (error) {
+              if (error.code === 'PERMISSION_DENIED') {
                   setOrdersError('PERMISSION_DENIED');
               } else {
-                  setOrdersError(errorMessage);
+                  setOrdersError(error.message);
               }
-              console.error("Failed to load transactions", error);
+              console.error("Failed to load transactions", error.message);
               setRecentOrders([]);
+          } else {
+              setRecentOrders(transactions);
           }
        };
        fetchOrders();
