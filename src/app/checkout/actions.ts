@@ -3,7 +3,7 @@
 
 import { Resend } from 'resend';
 import { OrderConfirmationEmail } from '@/components/emails/order-confirmation-email';
-import type { CartItem, CouponDiscount } from '@/types';
+import type { CartItem, CouponDiscount, Transaction } from '@/types';
 import { z } from 'zod';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -23,15 +23,6 @@ const checkoutActionInputSchema = z.object({
 type CheckoutActionInput = z.infer<typeof checkoutActionInputSchema>;
 
 export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
-  // Check if Resend API key is available
-  if (!process.env.RESEND_API_KEY) {
-    console.warn("RESEND_API_KEY is not set. Skipping email sending. This is normal for a demo without an API key.");
-    // In a demo environment, we can treat this as a success so the user flow isn't blocked.
-    // In a real production app, you might want to throw an error or have more robust logging.
-    return { success: true };
-  }
-
-  try {
     const validation = checkoutActionInputSchema.safeParse(input);
     if (!validation.success) {
       throw new Error('Invalid input for checkout action.');
@@ -46,39 +37,53 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
       month: 'long',
       day: 'numeric',
     });
-
-    const { data, error } = await resend.emails.send({
-      // IMPORTANT: For production, you must replace 'onboarding@resend.dev' with a verified domain.
-      from: 'CodiStyle <onboarding@resend.dev>',
-      to: [email],
-      subject: `Your CodiStyle Order Confirmation (#${orderId})`,
-      react: OrderConfirmationEmail({
-        customerName: fullName,
+    
+    const newTransaction: Transaction = {
         orderId,
-        orderDate,
-        cartItems: cartItems as CartItem[],
+        customer: fullName,
+        date: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
         subtotal,
-        shipping: 0, // Assuming free shipping
-        discountAmount,
+        shipping: 0, // Assuming free shipping for now
+        taxes: total * 0.08, // Assuming 8% tax for demo
         total,
-        appliedCoupon: appliedCoupon as { code: string; discount: CouponDiscount } | null,
-      }),
-    });
+    };
 
-    if (error) {
-      console.error('Email sending failed:', error);
-      // Even if email fails, we might want to let the order "succeed" on the frontend
-      // but we should log this failure for ops to investigate.
-      // For this demo, we'll throw an error to notify the user.
-      throw new Error('Could not send confirmation email.');
-    }
+  // Check if Resend API key is available
+  if (process.env.RESEND_API_KEY) {
+      try {
+        const { data, error } = await resend.emails.send({
+          // IMPORTANT: For production, you must replace 'onboarding@resend.dev' with a verified domain.
+          from: 'CodiStyle <onboarding@resend.dev>',
+          to: [email],
+          subject: `Your CodiStyle Order Confirmation (#${orderId})`,
+          react: OrderConfirmationEmail({
+            customerName: fullName,
+            orderId,
+            orderDate,
+            cartItems: cartItems as CartItem[],
+            subtotal,
+            shipping: newTransaction.shipping,
+            discountAmount,
+            total,
+            appliedCoupon: appliedCoupon as { code: string; discount: CouponDiscount } | null,
+          }),
+        });
 
-    console.log('Email sent successfully:', data);
-    return { success: true };
+        if (error) {
+          console.error('Email sending failed:', error);
+          throw new Error('Could not send confirmation email.');
+        }
 
-  } catch (error) {
-    console.error('Checkout processing error:', error);
-    const message = error instanceof Error ? error.message : 'An unknown error occurred during checkout.';
-    return { success: false, error: message };
+        console.log('Email sent successfully:', data);
+
+      } catch (error) {
+        console.error('Checkout processing error:', error);
+        const message = error instanceof Error ? error.message : 'An unknown error occurred during checkout.';
+        return { success: false, error: message };
+      }
+  } else {
+     console.warn("RESEND_API_KEY is not set. Skipping email sending. This is normal for a demo without an API key.");
   }
+
+  return { success: true, newTransaction };
 }

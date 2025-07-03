@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { processCheckoutAndSendEmail } from './actions';
+import type { Transaction } from '@/types';
 
 const formSchema = z.object({
   // Shipping details
@@ -71,7 +72,16 @@ export default function CheckoutPage() {
         },
       });
 
-      if (result.success) {
+      if (result.success && result.newTransaction) {
+        try {
+          const existingTransactionsStr = localStorage.getItem('userTransactions');
+          const existingTransactions: Transaction[] = existingTransactionsStr ? JSON.parse(existingTransactionsStr) : [];
+          const updatedTransactions = [...existingTransactions, result.newTransaction];
+          localStorage.setItem('userTransactions', JSON.stringify(updatedTransactions));
+        } catch (error) {
+            console.error("Failed to save transaction to localStorage", error);
+        }
+        
         clearCart();
         router.push('/checkout/thank-you');
       } else {

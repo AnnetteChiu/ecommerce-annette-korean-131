@@ -51,3 +51,13 @@ export interface CouponDiscount {
   type: 'percentage' | 'fixed';
   value: number;
 }
+
+export interface Transaction {
+    orderId: string;
+    customer: string;
+    date: string;
+    subtotal: number;
+    shipping: number;
+    taxes: number;
+    total: number;
+}

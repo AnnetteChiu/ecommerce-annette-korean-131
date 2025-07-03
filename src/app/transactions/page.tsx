@@ -15,10 +15,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { DollarSign, Hash } from 'lucide-react';
+import type { Transaction } from '@/types';
 
 const ADMIN_PASSWORD = 'admin123';
 
-const mockTransactions = [
+const mockTransactions: Transaction[] = [
   {
     orderId: 'CS-9A8B7C',
     customer: 'Alice Johnson',
@@ -69,16 +70,42 @@ const mockTransactions = [
 export default function TransactionsPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
+  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const { toast } = useToast();
   
-  const totalTransactions = mockTransactions.length;
-  const totalRevenue = mockTransactions.reduce((acc, t) => acc + t.total, 0);
+  const totalTransactions = transactions.length;
+  const totalRevenue = transactions.reduce((acc, t) => acc + t.total, 0);
 
   useEffect(() => {
     if (localStorage.getItem('isLoggedIn') === 'true') {
       setIsLoggedIn(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+        try {
+            const userTransactionsStr = localStorage.getItem('userTransactions');
+            const userTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
+            // Combine mock data with user-generated data, ensuring no duplicates.
+            const allTransactions = [...mockTransactions];
+            const mockOrderIds = new Set(mockTransactions.map(t => t.orderId));
+            userTransactions.forEach(userTx => {
+                if (!mockOrderIds.has(userTx.orderId)) {
+                    allTransactions.push(userTx);
+                }
+            });
+            
+            // Sort by date, newest first
+            allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+            setTransactions(allTransactions);
+        } catch (error) {
+            console.error("Failed to load transactions from localStorage", error);
+            setTransactions(mockTransactions);
+        }
+    }
+  }, [isLoggedIn]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,10 +195,10 @@ export default function TransactionsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockTransactions.map((transaction) => (
+              {transactions.map((transaction) => (
                 <TableRow key={transaction.orderId}>
                   <TableCell className="font-mono text-xs">{transaction.orderId}</TableCell>
-                  <TableCell>{transaction.date}</TableCell>
+                  <TableCell>{new Date(transaction.date).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <div className="font-medium">{transaction.customer}</div>
                   </TableCell>
