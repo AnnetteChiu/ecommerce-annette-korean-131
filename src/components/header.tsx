@@ -89,8 +89,8 @@ export function Header({ isProduction }: HeaderProps) {
                   </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" asChild className={cn((pathname === '/login' || pathname === '/signup') && 'bg-accent text-accent-foreground')}>
-                        <Link href="/login">
+                    <Button variant="ghost" size="icon" asChild className={cn((pathname === '/login' || pathname === '/signup' || pathname === '/account') && 'bg-accent text-accent-foreground')}>
+                        <Link href="/account">
                             <User className="h-5 w-5" />
                             <span className="sr-only">Account</span>
                         </Link>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from "@/components/ui/button"
@@ -22,11 +21,12 @@ export default function LoginPage() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you'd handle authentication here.
+    localStorage.setItem('isLoggedIn', 'true');
     toast({
         title: "Login Successful",
-        description: "Welcome back! (This is a demo)",
+        description: "Welcome back! Redirecting to your account page.",
     });
-    router.push('/');
+    router.push('/account');
   }
 
   return (
