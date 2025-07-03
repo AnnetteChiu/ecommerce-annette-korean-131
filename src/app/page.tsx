@@ -53,6 +53,12 @@ export default function Home() {
         data-ai-hint="fashion style"
       />
 
+      <ImageBanner 
+        src="https://i4.codibook.net/files/1982120939602/4b/1557734573.jpg"
+        alt="Stylish fashion banner"
+        data-ai-hint="fashion style"
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-4 lg:gap-12">
         <main className="lg:col-span-3 space-y-16 lg:order-last">
           <BrandWeek />
