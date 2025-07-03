@@ -17,11 +17,11 @@ export default function AboutPage() {
 
       <div className="relative aspect-[3/1] w-full overflow-hidden rounded-lg shadow-lg">
         <Image
-          src="https://placehold.co/1200x400.png"
-          alt="Our Team"
+          src="https://i4.codibook.net/files/1982120940801/966d8d4e4c2dbcc5/1942351839.jpg"
+          alt="Stylish outfit"
           fill
           className="object-cover"
-          data-ai-hint="team fashion"
+          data-ai-hint="fashion style"
         />
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 h-full flex flex-col justify-center items-center text-center text-white p-8">
