@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, Book, Camera, Palette, Map, Info, Image as ImageIcon, User } from 'lucide-react';
+import { Search, Book, Camera, Palette, Map, Info, Image as ImageIcon, User, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Tooltip,
@@ -27,11 +27,12 @@ export function Header({ isProduction }: HeaderProps) {
     { href: '/fitting-room', label: 'Fitting Room', icon: Camera },
     { href: '/graphic-designer', label: 'Graphic Designer', icon: Palette },
     { href: '/live-tracking', label: 'Live Tracking', icon: Map },
+    { href: '/transactions', label: 'Transactions', icon: DollarSign },
     { href: '/docs', label: 'Docs', icon: Book },
   ];
   
   const navLinks = isProduction 
-    ? allNavLinks.filter(link => link.href !== '/docs')
+    ? allNavLinks.filter(link => link.href !== '/docs' && link.href !== '/transactions')
     : allNavLinks;
 
   return (

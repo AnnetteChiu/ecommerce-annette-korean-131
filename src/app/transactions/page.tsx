@@ -35,7 +35,7 @@ export default function TransactionsPage() {
 
   useEffect(() => {
     // This check runs on the client and determines if Firebase is set up.
-    if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+    if (!process.env.NEXT_PUBLIC_FIREBASE_API_KEY || !process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
         setIsFirebaseConfigured(false);
         setIsLoading(false); // Stop loading if not configured
     }
@@ -134,9 +134,9 @@ export default function TransactionsPage() {
                 <p>This page requires a connection to a Firebase database, but the necessary API keys are missing.</p>
                 <ol className="list-decimal list-inside mt-2 space-y-1">
                     <li>Go to your Firebase project settings to get your API keys.</li>
-                    <li>Create a <code>.env.local</code> file in your project's root directory.</li>
+                    <li>Create or check the <code>.env.local</code> file in your project's root directory.</li>
                     <li>Add your Firebase keys (e.g., <code>NEXT_PUBLIC_FIREBASE_API_KEY</code>) to the file.</li>
-                    <li><strong>Important:</strong> Stop your development server and restart it for changes to apply.</li>
+                    <li><strong>Important:</strong> You must stop and restart the development server for changes to apply.</li>
                     <li>For more detailed instructions, visit the <Link href="/docs" className="font-semibold underline">documentation page</Link>.</li>
                 </ol>
             </AlertDescription>
@@ -212,7 +212,7 @@ export default function TransactionsPage() {
                       </TableCell>
                     </TableRow>
                   )}
-                </TableBody>
+                </Body>
               </Table>
             </CardContent>
           </Card>
