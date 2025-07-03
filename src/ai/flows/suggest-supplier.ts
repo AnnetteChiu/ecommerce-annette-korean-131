@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent for suggesting the best supplier for a product.
@@ -17,14 +18,14 @@ const SupplierSchema = z.object({
     deliveryTime: z.string().describe('The estimated delivery time from this supplier.'),
 });
 
-export const SuggestSupplierInputSchema = z.object({
+const SuggestSupplierInputSchema = z.object({
   productName: z.string().describe('The name of the product we need to source.'),
   productDescription: z.string().describe('A detailed description of the product.'),
   suppliers: z.array(SupplierSchema).describe('The list of available suppliers to choose from.'),
 });
 export type SuggestSupplierInput = z.infer<typeof SuggestSupplierInputSchema>;
 
-export const SuggestSupplierOutputSchema = z.object({
+const SuggestSupplierOutputSchema = z.object({
   supplierId: z.string().describe('The ID of the recommended supplier.'),
   justification: z.string().describe('A brief justification for why this supplier was recommended.'),
 });
