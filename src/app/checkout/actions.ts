@@ -1,4 +1,3 @@
-
 'use server';
 
 import { Resend } from 'resend';
@@ -61,6 +60,7 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
     const newTransaction: Transaction = {
         orderId,
         customer: fullName,
+        email,
         date: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
         subtotal,
         shipping,
@@ -103,7 +103,7 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
         return { success: false, error: message };
       }
   } else {
-     console.warn("RESEND_API_KEY is not set. Skipping email sending. This is normal for a demo without an API key.");
+     console.warn("RESEND_API_KEY is not set. Skipping email sending. This is normal for a real website without an API key.");
   }
 
   return { success: true, newTransaction };

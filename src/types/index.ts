@@ -55,6 +55,7 @@ export interface CouponDiscount {
 export interface Transaction {
     orderId: string;
     customer: string;
+    email: string;
     date: string;
     subtotal: number;
     shipping: number;

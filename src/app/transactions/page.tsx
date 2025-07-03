@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -123,7 +122,7 @@ export default function TransactionsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Detailed Transactions</CardTitle>
-          <CardDescription>A complete log of all financial transactions generated during this session.</CardDescription>
+          <CardDescription>A complete log of all financial transactions.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -132,6 +131,7 @@ export default function TransactionsPage() {
                 <TableHead>Order ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Customer</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead className="text-right">Subtotal</TableHead>
                 <TableHead className="text-right">Shipping</TableHead>
                 <TableHead className="text-right">Taxes</TableHead>
@@ -147,6 +147,7 @@ export default function TransactionsPage() {
                     <TableCell>
                       <div className="font-medium">{transaction.customer}</div>
                     </TableCell>
+                    <TableCell>{transaction.email}</TableCell>
                     <TableCell className="text-right">${transaction.subtotal.toFixed(2)}</TableCell>
                     <TableCell className="text-right">${transaction.shipping.toFixed(2)}</TableCell>
                     <TableCell className="text-right">${transaction.taxes.toFixed(2)}</TableCell>
@@ -155,7 +156,7 @@ export default function TransactionsPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center">
+                  <TableCell colSpan={8} className="h-24 text-center">
                     No transactions have been recorded yet.
                   </TableCell>
                 </TableRow>

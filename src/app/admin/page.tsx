@@ -307,6 +307,7 @@ export default function AdminPage() {
               <TableRow>
                 <TableHead>Order ID</TableHead>
                 <TableHead>Customer</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Total</TableHead>
@@ -320,6 +321,7 @@ export default function AdminPage() {
                     <TableCell>
                       <div className="font-medium">{order.customer}</div>
                     </TableCell>
+                    <TableCell>{order.email}</TableCell>
                     <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">Processing</Badge>
@@ -329,7 +331,7 @@ export default function AdminPage() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-24 text-center">
+                  <TableCell colSpan={6} className="h-24 text-center">
                     No recent orders to display.
                   </TableCell>
                 </TableRow>
