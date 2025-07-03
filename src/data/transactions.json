@@ -1,0 +1,43 @@
+
+[
+  {
+    "orderId": "CS-8A2BFE9C1",
+    "customer": "Eleanor Vance",
+    "email": "eleanor.v@example.com",
+    "date": "2024-05-15",
+    "subtotal": 194.99,
+    "shipping": 0,
+    "taxes": 9.75,
+    "total": 204.74
+  },
+  {
+    "orderId": "CS-3D4CE1A2B",
+    "customer": "Marcus Holloway",
+    "email": "m.holloway@example.com",
+    "date": "2024-05-14",
+    "subtotal": 45.00,
+    "shipping": 4.99,
+    "taxes": 0.45,
+    "total": 50.44
+  },
+  {
+    "orderId": "CS-F6G7H8I9J",
+    "customer": "Clara Oswald",
+    "email": "clara.o@example.com",
+    "date": "2024-05-12",
+    "subtotal": 280.00,
+    "shipping": 0,
+    "taxes": 14.00,
+    "total": 294.00
+  },
+  {
+    "orderId": "CS-K1L2M3N4O",
+    "customer": "Arthur Pendragon",
+    "email": "king.arthur@example.com",
+    "date": "2024-05-10",
+    "subtotal": 115.00,
+    "shipping": 0,
+    "taxes": 5.75,
+    "total": 120.75
+  }
+]

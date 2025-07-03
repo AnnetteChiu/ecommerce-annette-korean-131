@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import { DollarSign, Hash } from 'lucide-react';
 import type { Transaction } from '@/types';
+import { getHistoricalTransactions } from '@/lib/transactions';
 
 const ADMIN_PASSWORD = 'admin123';
 
@@ -37,16 +38,24 @@ export default function TransactionsPage() {
   useEffect(() => {
     if (isAdminLoggedIn) {
         try {
+            const historicalTransactions = getHistoricalTransactions();
             const userTransactionsStr = localStorage.getItem('userTransactions');
-            const userTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
+            const newTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
+            
+            // Combine historical data with new transactions from this session
+            const allTransactionsMap = new Map<string, Transaction>();
+            historicalTransactions.forEach(tx => allTransactionsMap.set(tx.orderId, tx));
+            newTransactions.forEach(tx => allTransactionsMap.set(tx.orderId, tx));
+            
+            const combinedTransactions = Array.from(allTransactionsMap.values());
             
             // Sort by date, newest first
-            userTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            combinedTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-            setTransactions(userTransactions);
+            setTransactions(combinedTransactions);
         } catch (error) {
-            console.error("Failed to load transactions from localStorage", error);
-            setTransactions([]);
+            console.error("Failed to load transactions", error);
+            setTransactions([]); // Fallback to empty on error
         }
     }
   }, [isAdminLoggedIn]);
