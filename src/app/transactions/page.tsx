@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -115,16 +116,16 @@ export default function TransactionsPage() {
         <TableBody>
           {transactions.map((order) => (
             <TableRow key={order.orderId}>
-              <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
+              <TableCell className="font-mono text-xs">{order.orderId || 'N/A'}</TableCell>
               <TableCell>
-                <div className="font-medium">{order.customer}</div>
-                <div className="text-xs text-muted-foreground">{order.email}</div>
+                <div className="font-medium">{order.customer || 'N/A'}</div>
+                <div className="text-xs text-muted-foreground">{order.email || 'N/A'}</div>
               </TableCell>
-              <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+              <TableCell>{order.date ? new Date(order.date).toLocaleDateString() : 'N/A'}</TableCell>
               <TableCell>
                 <Badge variant="secondary">Processing</Badge>
               </TableCell>
-              <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+              <TableCell className="text-right">${(order.total || 0).toFixed(2)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

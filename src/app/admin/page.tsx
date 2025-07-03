@@ -330,16 +330,16 @@ export default function AdminPage() {
               {recentOrders.length > 0 ? (
                 recentOrders.map((order) => (
                   <TableRow key={order.orderId}>
-                    <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
+                    <TableCell className="font-mono text-xs">{order.orderId || 'N/A'}</TableCell>
                     <TableCell>
-                      <div className="font-medium">{order.customer}</div>
+                      <div className="font-medium">{order.customer || 'N/A'}</div>
                     </TableCell>
-                    <TableCell>{order.email}</TableCell>
-                    <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                    <TableCell>{order.email || 'N/A'}</TableCell>
+                    <TableCell>{order.date ? new Date(order.date).toLocaleDateString() : 'N/A'}</TableCell>
                     <TableCell>
                       <Badge variant="secondary">Processing</Badge>
                     </TableCell>
-                    <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">${(order.total || 0).toFixed(2)}</TableCell>
                   </TableRow>
                 ))
               ) : (

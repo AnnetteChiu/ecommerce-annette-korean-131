@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -52,12 +53,14 @@ export default function AccountPage() {
               // In a real app, you would filter transactions by user ID.
               // For this demo, we will fetch all transactions.
               const allTransactions = await getTransactions();
-              const userOrders: DisplayOrder[] = allTransactions.map(tx => ({
-                  id: tx.orderId,
-                  date: new Date(tx.date).toLocaleDateString(),
-                  total: tx.total,
-                  status: 'Processing'
-              })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+              const userOrders: DisplayOrder[] = allTransactions
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .map(tx => ({
+                    id: tx.orderId,
+                    date: tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A',
+                    total: tx.total || 0,
+                    status: 'Processing'
+                }));
               setOrders(userOrders);
           } catch (error) {
               console.error("Failed to fetch user transactions:", error);
@@ -137,12 +140,12 @@ export default function AccountPage() {
                 <TableBody>
                   {orders.map(order => (
                     <TableRow key={order.id}>
-                      <TableCell className="font-mono text-xs">{order.id}</TableCell>
-                      <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                      <TableCell className="font-mono text-xs">{order.id || 'N/A'}</TableCell>
+                      <TableCell>{order.date}</TableCell>
                       <TableCell>
-                        <Badge variant={'secondary'}>{order.status}</Badge>
+                        <Badge variant={'secondary'}>{order.status || 'N/A'}</Badge>
                       </TableCell>
-                      <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                      <TableCell className="text-right">${(order.total || 0).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
