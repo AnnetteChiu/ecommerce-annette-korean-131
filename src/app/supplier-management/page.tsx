@@ -61,7 +61,7 @@ export default function SupplierManagementPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
-            <h1 className="text-4xl font-headline font-bold">供應商管理</h1>
+            <h1 className="text-4xl font-headline font-bold">공급업체 관리</h1>
             <p className="text-muted-foreground mt-2">Enter the password to manage suppliers.</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -83,7 +83,7 @@ export default function SupplierManagementPage() {
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-4xl font-headline font-bold">供應商管理</h1>
+        <h1 className="text-4xl font-headline font-bold">공급업체 관리</h1>
         <Button onClick={handleLogout} variant="outline">Logout</Button>
       </div>
       

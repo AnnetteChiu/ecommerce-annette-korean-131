@@ -23,7 +23,7 @@ export function Footer() {
               Manage Products
             </Link>
             <Link href="/supplier-management" className="hover:text-primary transition-colors">
-              供應商管理
+              공급업체 관리
             </Link>
           </nav>
         </div>
