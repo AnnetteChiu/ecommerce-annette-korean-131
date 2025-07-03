@@ -159,7 +159,7 @@ export default function CartPage() {
               <div className="flex justify-between items-center text-primary">
                 <div className="flex items-center gap-2">
                    <Tag className="h-4 w-4" />
-                   <p>Discount <Badge variant="secondary" className="font-mono">{appliedCoupon.code}</Badge></p>
+                   <p className="flex items-center gap-1">Discount <Badge variant="secondary" className="font-mono">{appliedCoupon.code}</Badge></p>
                    <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={removeCoupon}><Trash2 className="h-3 w-3"/></Button>
                 </div>
                 <span>-${discountAmount.toFixed(2)}</span>
