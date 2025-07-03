@@ -19,7 +19,7 @@ export function Footer() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-muted-foreground text-sm mt-8 border-t pt-4 flex flex-wrap justify-between items-center gap-4">
           <p suppressHydrationWarning>&copy; {year} CodiStyle. All Rights Reserved.</p>
-          <nav className="flex items-center gap-4">
+          <nav className="flex flex-wrap items-center gap-4">
             <Link href="/about" className="hover:text-primary transition-colors">
               About CodiStyle
             </Link>
@@ -30,7 +30,10 @@ export function Footer() {
               Manage Products
             </Link>
             <Link href="/supplier-management" className="hover:text-primary transition-colors">
-              공급업체 관리
+              Supplier Management
+            </Link>
+            <Link href="/transactions" className="hover:text-primary transition-colors">
+              Transactions
             </Link>
           </nav>
         </div>
