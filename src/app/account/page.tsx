@@ -10,22 +10,32 @@ import { User, LogOut, History, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import type { Transaction } from '@/types';
 
 type BrowsingHistoryItem = {
   id: string;
   name: string;
 };
 
-// Mock data for demonstration
+// Mock data for demonstration, used as a fallback
 const mockOrders = [
   { id: 'CS-1A2B3C', date: '2023-10-26', total: 149.99, status: 'Delivered' },
   { id: 'CS-4D5E6F', date: '2023-10-15', total: 89.99, status: 'Delivered' },
   { id: 'CS-7G8H9I', date: '2023-09-01', total: 235.00, status: 'Cancelled' },
 ];
 
+type DisplayOrder = {
+  id: string;
+  date: string;
+  total: number;
+  status: string;
+};
+
 export default function AccountPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [browsingHistory, setBrowsingHistory] = useState<BrowsingHistoryItem[]>([]);
+  const [orders, setOrders] = useState<DisplayOrder[]>([]);
+  const [isSampleData, setIsSampleData] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -40,6 +50,31 @@ export default function AccountPage() {
         }
       } catch (error) {
         console.error("Failed to parse browsing history:", error);
+      }
+
+      // Load user's actual orders or fall back to mock data
+      try {
+        const userTransactionsStr = localStorage.getItem('userTransactions');
+        const userTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
+
+        if (userTransactions.length > 0) {
+            const userOrders: DisplayOrder[] = userTransactions.map(tx => ({
+                id: tx.orderId,
+                date: tx.date,
+                total: tx.total,
+                status: 'Processing' // Assume recent orders are processing
+            })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            setOrders(userOrders);
+            setIsSampleData(false);
+        } else {
+            // If no user orders, show mock data as a placeholder
+            setOrders(mockOrders);
+            setIsSampleData(true);
+        }
+      } catch (error) {
+        console.error("Failed to parse user transactions:", error);
+        setOrders(mockOrders); // Fallback to mock data on error
+        setIsSampleData(true);
       }
     }
   }, []);
@@ -83,31 +118,44 @@ export default function AccountPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><CreditCard /> Order History</CardTitle>
-            <CardDescription>Your past orders are listed here. (This is sample data)</CardDescription>
+            <CardDescription>
+              {isSampleData 
+                ? "This is sample data. Orders you place will appear here." 
+                : "Your past orders are listed here."
+              }
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Order</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {mockOrders.map(order => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-mono text-xs">{order.id}</TableCell>
-                    <TableCell>{order.date}</TableCell>
-                    <TableCell>
-                      <Badge variant={order.status === 'Delivered' ? 'outline' : 'destructive'}>{order.status}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+            {orders.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Order</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Total</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {orders.map(order => (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-mono text-xs">{order.id}</TableCell>
+                      <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Badge variant={
+                          order.status === 'Delivered' ? 'outline' : 
+                          order.status === 'Processing' ? 'secondary' :
+                          'destructive'
+                        }>{order.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+                <p className="text-sm text-muted-foreground text-center py-4">You have not placed any orders yet.</p>
+            )}
           </CardContent>
         </Card>
 
