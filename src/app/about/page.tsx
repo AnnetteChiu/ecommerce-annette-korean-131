@@ -8,14 +8,14 @@ import { Users, Target, Palette } from 'lucide-react';
 export default function AboutPage() {
   return (
     <div className="space-y-12">
-      <div className="text-center">
+      <div className="text-center animate-in fade-in slide-in-from-top-4 duration-1000">
         <h1 className="text-5xl font-headline font-bold">About CodiStyle</h1>
         <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
           We believe fashion is more than just clothing—it's a form of self-expression. CodiStyle was born from a passion for blending timeless elegance with contemporary design, making sophisticated style accessible to everyone.
         </p>
       </div>
 
-      <div className="relative aspect-[3/1] w-full overflow-hidden rounded-lg shadow-lg">
+      <div className="relative aspect-[3/1] w-full overflow-hidden rounded-lg shadow-lg animate-in fade-in zoom-in-95 duration-700 delay-200">
         <Image
           src="https://i4.codibook.net/files/1982120940801/966d8d4e4c2dbcc5/1942351839.jpg"
           alt="Stylish outfit"
@@ -33,7 +33,7 @@ export default function AboutPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <Card>
+        <Card className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
           <CardHeader>
             <div className="mx-auto bg-primary/10 rounded-full h-16 w-16 flex items-center justify-center">
               <Palette className="h-8 w-8 text-primary" />
@@ -46,7 +46,7 @@ export default function AboutPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-400">
           <CardHeader>
             <div className="mx-auto bg-primary/10 rounded-full h-16 w-16 flex items-center justify-center">
               <Target className="h-8 w-8 text-primary" />
@@ -59,7 +59,7 @@ export default function AboutPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500">
           <CardHeader>
             <div className="mx-auto bg-primary/10 rounded-full h-16 w-16 flex items-center justify-center">
               <Users className="h-8 w-8 text-primary" />
@@ -74,7 +74,7 @@ export default function AboutPage() {
         </Card>
       </div>
 
-      <div className="text-center py-8">
+      <div className="text-center py-8 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-600">
         <h2 className="text-3xl font-headline font-bold">Join Our Journey</h2>
         <p className="mt-2 text-muted-foreground max-w-xl mx-auto">
           Explore our latest collection and start defining your unique style today.
