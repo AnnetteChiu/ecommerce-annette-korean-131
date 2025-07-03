@@ -13,14 +13,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
+import { MapPin } from 'lucide-react';
 
 const ADMIN_PASSWORD = 'admin123';
 
 // Mock data for suppliers
 const mockSuppliers = [
-  { id: 'sup1', name: 'Supplier A', contact: 'contact@suppliera.com', products: 5 },
-  { id: 'sup2', name: 'Supplier B', contact: 'contact@supplierb.com', products: 12 },
-  { id: 'sup3', name: 'Supplier C', contact: 'contact@supplierc.com', products: 8 },
+  { id: 'sup1', name: 'Supplier A', contact: 'contact@suppliera.com', products: 5, address: '123 Fashion Ave, New York, NY, USA' },
+  { id: 'sup2', name: 'Supplier B', contact: 'contact@supplierb.com', products: 12, address: '456 Textile Road, London, UK' },
+  { id: 'sup3', name: 'Supplier C', contact: 'contact@supplierc.com', products: 8, address: '789 Design Court, Tokyo, Japan' },
 ];
 
 export default function SupplierManagementPage() {
@@ -94,6 +95,7 @@ export default function SupplierManagementPage() {
             <TableRow>
               <TableHead>Supplier Name</TableHead>
               <TableHead>Contact Email</TableHead>
+              <TableHead>Location</TableHead>
               <TableHead className="text-right">Product Count</TableHead>
             </TableRow>
           </TableHeader>
@@ -102,6 +104,17 @@ export default function SupplierManagementPage() {
               <TableRow key={supplier.id}>
                 <TableCell className="font-medium">{supplier.name}</TableCell>
                 <TableCell>{supplier.contact}</TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-1">
+                    <span>{supplier.address}</span>
+                    <Button asChild variant="link" className="p-0 h-auto justify-start font-normal text-muted-foreground">
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(supplier.address)}`} target="_blank" rel="noopener noreferrer">
+                        <MapPin className="mr-1 h-3 w-3" />
+                        View on Map
+                      </a>
+                    </Button>
+                  </div>
+                </TableCell>
                 <TableCell className="text-right">{supplier.products}</TableCell>
               </TableRow>
             ))}
