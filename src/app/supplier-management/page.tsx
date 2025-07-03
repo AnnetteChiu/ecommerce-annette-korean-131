@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -13,7 +14,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Truck } from 'lucide-react';
+import { MapPin, Truck, Sparkles, Loader2, AlertTriangle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { useAi } from '@/context/ai-context';
+import { suggestSupplier } from '@/ai/flows/suggest-supplier';
+import type { SuggestSupplierOutput } from '@/ai/flows/suggest-supplier';
+import { cn } from '@/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Link from 'next/link';
 
 const ADMIN_PASSWORD = 'admin123';
 
@@ -30,6 +40,11 @@ export default function SupplierManagementPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const { toast } = useToast();
+  const { isAiEnabled, disableAi } = useAi();
+  const [productName, setProductName] = useState('');
+  const [productDescription, setProductDescription] = useState('');
+  const [recommendation, setRecommendation] = useState<SuggestSupplierOutput | null>(null);
+  const [isGenerating, startTransition] = useTransition();
 
   useEffect(() => {
     if (localStorage.getItem('isLoggedIn') === 'true') {
@@ -59,6 +74,43 @@ export default function SupplierManagementPage() {
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
   };
   
+  const handleGetSuggestion = () => {
+    if (!productName || !productDescription) {
+        toast({ variant: 'destructive', title: 'Missing Information', description: 'Please provide a product name and description.' });
+        return;
+    }
+
+    startTransition(async () => {
+        try {
+            const suppliersForPrompt = mockSuppliers.map(({ id, name, address, deliveryTime }) => ({ id, name, address, deliveryTime }));
+            const result = await suggestSupplier({
+                productName,
+                productDescription,
+                suppliers: suppliersForPrompt,
+            });
+            setRecommendation(result);
+            toast({ title: 'Recommendation Ready!', description: 'The AI has suggested a supplier below.' });
+        } catch (error) {
+            console.error('Failed to get supplier suggestion', error);
+            const description = error instanceof Error ? error.message : "An unknown error occurred.";
+            if (description === 'API_KEY_INVALID') {
+                disableAi();
+                toast({
+                    variant: 'destructive',
+                    title: 'Google AI Key Invalid',
+                    description: 'Your API key is invalid. All AI features have been disabled.',
+                });
+            } else {
+                toast({
+                    variant: 'destructive',
+                    title: 'Suggestion Failed',
+                    description,
+                });
+            }
+        }
+    });
+};
+
   if (!isLoggedIn) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -90,6 +142,52 @@ export default function SupplierManagementPage() {
         <Button onClick={handleLogout} variant="outline">Logout</Button>
       </div>
       
+      {isAiEnabled ? (
+          <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Sparkles /> AI Supplier Optimizer</CardTitle>
+                <CardDescription>Describe a new product to get an AI-powered supplier recommendation.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="product-name">Product Name</Label>
+                        <Input id="product-name" placeholder="e.g., Silk Scarf with Floral Print" value={productName} onChange={(e) => setProductName(e.target.value)} disabled={isGenerating} />
+                    </div>
+                     <div className="space-y-2 md:col-span-2">
+                        <Label htmlFor="product-description">Product Description</Label>
+                        <Textarea id="product-description" placeholder="e.g., A lightweight, luxurious silk scarf featuring a vibrant, hand-painted floral design. Made in Italy..." value={productDescription} onChange={(e) => setProductDescription(e.target.value)} disabled={isGenerating} rows={3} />
+                    </div>
+                </div>
+                 <Button onClick={handleGetSuggestion} disabled={isGenerating || !productName || !productDescription}>
+                    {isGenerating ? <Loader2 className="mr-2 animate-spin" /> : <Sparkles className="mr-2" />}
+                    {isGenerating ? 'Analyzing...' : 'Get Recommendation'}
+                </Button>
+            </CardContent>
+            { (isGenerating || recommendation) &&
+                <CardFooter>
+                    {isGenerating ? (
+                        <p className="text-muted-foreground flex items-center gap-2"><Loader2 className="animate-spin h-4 w-4" /> Thinking...</p>
+                    ) : recommendation ? (
+                        <Alert>
+                           <Sparkles className="h-4 w-4" />
+                            <AlertTitle>AI Recommendation</AlertTitle>
+                            <AlertDescription>{recommendation.justification}</AlertDescription>
+                        </Alert>
+                    ) : null}
+                </CardFooter>
+            }
+          </Card>
+      ) : (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>AI Features Disabled</AlertTitle>
+            <AlertDescription>
+                The AI Supplier Optimizer requires a Google AI API key. Please see the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
+            </AlertDescription>
+        </Alert>
+      )}
+
       <div className="border rounded-lg overflow-hidden">
         <Table>
           <TableCaption>A list of all suppliers.</TableCaption>
@@ -104,7 +202,10 @@ export default function SupplierManagementPage() {
           </TableHeader>
           <TableBody>
             {mockSuppliers.map((supplier) => (
-              <TableRow key={supplier.id}>
+              <TableRow 
+                key={supplier.id}
+                className={cn(recommendation?.supplierId === supplier.id && 'bg-primary/10 ring-2 ring-primary transition-all duration-500')}
+              >
                 <TableCell className="font-medium">{supplier.name}</TableCell>
                 <TableCell>{supplier.contact}</TableCell>
                 <TableCell>
