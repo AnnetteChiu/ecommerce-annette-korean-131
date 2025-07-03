@@ -1,7 +1,4 @@
-
-'use client';
-
-import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { getTransactions } from '@/lib/transactions';
 import { db } from '@/lib/firebase';
 import type { Transaction } from '@/types';
@@ -23,71 +20,34 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Loader2, AlertTriangle, Package } from 'lucide-react';
-import Link from 'next/link';
+import { AlertTriangle, Package } from 'lucide-react';
 
-export default function TransactionsPage() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+/**
+ * This is an asynchronous Server Component that fetches and renders transaction data.
+ * It handles loading, error, and empty states on the server.
+ */
+async function TransactionsData() {
   const isFirebaseConfigured = !!db.app.options.apiKey;
 
-  useEffect(() => {
-    if (!isFirebaseConfigured) {
-      setIsLoading(false);
-      return;
-    }
+  if (!isFirebaseConfigured) {
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Firebase Not Configured</AlertTitle>
+        <AlertDescription>
+          The transaction history feature requires a connection to a Firebase database.
+          Please set up your Firebase environment variables in your <code>.env.local</code> file
+          and restart the server. For detailed instructions, please see the{' '}
+          <Link href="/docs" className="underline font-semibold">
+            documentation
+          </Link>.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
-    async function fetchTransactions() {
-      try {
-        const data = await getTransactions();
-        setTransactions(data);
-      } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred.';
-        setError(`Failed to load transactions. ${errorMessage}`);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchTransactions();
-  }, [isFirebaseConfigured]);
-
-  const renderContent = () => {
-    if (!isFirebaseConfigured) {
-      return (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Firebase Not Configured</AlertTitle>
-          <AlertDescription>
-            The transaction history feature requires a connection to a Firebase database.
-            Please set up your Firebase environment variables in your <code>.env.local</code> file
-            and restart the server. For detailed instructions, please see the{' '}
-            <Link href="/docs" className="underline font-semibold">
-              documentation
-            </Link>.
-          </AlertDescription>
-        </Alert>
-      );
-    }
-
-    if (isLoading) {
-      return (
-        <div className="flex items-center justify-center min-h-[40vh]">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Error Loading Data</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      );
-    }
+  try {
+    const transactions = await getTransactions();
 
     if (transactions.length === 0) {
       return (
@@ -101,7 +61,7 @@ export default function TransactionsPage() {
         </div>
       );
     }
-
+    
     return (
       <Table>
         <TableHeader>
@@ -131,8 +91,22 @@ export default function TransactionsPage() {
         </TableBody>
       </Table>
     );
-  };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+    return (
+      <Alert variant="destructive">
+        <AlertTriangle className="h-4 w-4" />
+        <AlertTitle>Error Loading Data</AlertTitle>
+        <AlertDescription>
+            Failed to load transactions. {errorMessage}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+}
 
+
+export default function TransactionsPage() {
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -148,7 +122,7 @@ export default function TransactionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-            {renderContent()}
+            <TransactionsData />
         </CardContent>
       </Card>
     </div>
