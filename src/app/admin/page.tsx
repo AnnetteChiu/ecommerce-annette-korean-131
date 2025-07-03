@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
+import Link from 'next/link';
 import {
   BarChart,
   Bar,
@@ -18,7 +19,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { getSalesData } from '@/lib/sales';
 import type { SalesData } from '@/types';
-import { DollarSign, Package, Star, MessageSquare, TrendingDown } from 'lucide-react';
+import { DollarSign, Package, Star, MessageSquare, TrendingDown, Sparkles, Loader2, AlertTriangle } from 'lucide-react';
+import { useAi } from '@/context/ai-context';
+import { generateAdminReport } from '@/ai/flows/generate-admin-report';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
 
@@ -28,7 +32,10 @@ export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [salesData, setSalesData] = useState<SalesData | null>(null);
+  const [report, setReport] = useState<string>('');
+  const [isGenerating, startTransition] = useTransition();
   const { toast } = useToast();
+  const { isAiEnabled, disableAi } = useAi();
 
   useEffect(() => {
     if (localStorage.getItem('isLoggedIn') === 'true') {
@@ -42,6 +49,34 @@ export default function AdminPage() {
       setSalesData(data);
     }
   }, [isLoggedIn]);
+  
+  useEffect(() => {
+    if (isLoggedIn && salesData && isAiEnabled) {
+      startTransition(async () => {
+        try {
+          const result = await generateAdminReport(salesData);
+          setReport(result.report);
+        } catch (error) {
+          console.error("Failed to generate admin report:", error);
+          const description = error instanceof Error ? error.message : "An unknown error occurred.";
+          if (description === 'API_KEY_INVALID') {
+            disableAi();
+            toast({
+              variant: 'destructive',
+              title: 'Google AI Key Invalid',
+              description: 'Your API key is invalid. All AI features have been disabled.',
+            });
+          } else {
+            toast({
+              variant: 'destructive',
+              title: 'Report Generation Failed',
+              description,
+            });
+          }
+        }
+      });
+    }
+  }, [isLoggedIn, salesData, isAiEnabled, toast, disableAi]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +160,37 @@ export default function AdminPage() {
         <h1 className="text-3xl font-bold font-headline">Sales Dashboard</h1>
         <p className="text-muted-foreground">{salesData.productName}</p>
       </div>
+      
+      {isAiEnabled && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Sparkles /> AI Sales Report</CardTitle>
+            <CardDescription>An AI-generated summary of this product's performance.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isGenerating ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Generating insights...</span>
+              </div>
+            ) : report ? (
+              <p className="whitespace-pre-line text-sm text-muted-foreground">{report}</p>
+            ) : (
+               <p className="text-sm text-muted-foreground">Could not generate a report at this time.</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {!isAiEnabled && isLoggedIn && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>AI Features Disabled</AlertTitle>
+            <AlertDescription>
+                The AI-powered sales report requires a Google AI API key. Please see the <Link href="/docs" className="underline font-semibold">documentation</Link> for setup instructions.
+            </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card>

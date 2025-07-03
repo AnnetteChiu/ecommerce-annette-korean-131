@@ -5,3 +5,4 @@ import '@/ai/flows/virtual-try-on.ts';
 import '@/ai/flows/generate-graphic-design.ts';
 import '@/ai/flows/generate-product-description.ts';
 import '@/ai/flows/suggest-product-price.ts';
+import '@/ai/flows/generate-admin-report.ts';
