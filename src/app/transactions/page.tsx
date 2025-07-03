@@ -121,7 +121,7 @@ export default function TransactionsPage() {
                 <div className="font-medium">{order.customer || 'N/A'}</div>
                 <div className="text-xs text-muted-foreground">{order.email || 'N/A'}</div>
               </TableCell>
-              <TableCell>{order.date ? new Date(order.date).toLocaleDateString() : 'N/A'}</TableCell>
+              <TableCell>{order.date || 'N/A'}</TableCell>
               <TableCell>
                 <Badge variant="secondary">Processing</Badge>
               </TableCell>

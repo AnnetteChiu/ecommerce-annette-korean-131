@@ -57,7 +57,7 @@ export default function AccountPage() {
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
                 .map(tx => ({
                     id: tx.orderId,
-                    date: tx.date ? new Date(tx.date).toLocaleDateString() : 'N/A',
+                    date: tx.date || 'N/A',
                     total: tx.total || 0,
                     status: 'Processing'
                 }));
