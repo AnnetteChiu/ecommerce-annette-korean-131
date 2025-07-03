@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -213,14 +212,6 @@ export default function ManageProductsPage() {
         <Button onClick={handleLogout} variant="outline">Logout</Button>
       </div>
 
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertTitle>Developer Note</AlertTitle>
-        <AlertDescription>
-          Product edits and deletions are for demonstration purposes only and will not be saved permanently. Refreshing the page will reset all changes.
-        </AlertDescription>
-      </Alert>
-      
       <div className="border rounded-lg overflow-hidden">
         <Table>
           <TableCaption>A list of all products in your store.</TableCaption>

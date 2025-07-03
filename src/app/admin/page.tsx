@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -18,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { getSalesData } from '@/lib/sales';
-import type { SalesData } from '@/types';
+import type { SalesData, Transaction } from '@/types';
 import { DollarSign, Package, Star, MessageSquare, TrendingDown, Sparkles, Loader2, AlertTriangle } from 'lucide-react';
 import { useAi } from '@/context/ai-context';
 import { generateAdminReport } from '@/ai/flows/generate-admin-report';
@@ -36,51 +35,13 @@ import { Badge } from '@/components/ui/badge';
 
 const ADMIN_PASSWORD = 'admin123';
 
-const mockRecentOrders = [
-  {
-    orderId: 'CS-9A8B7C',
-    customer: 'Alice Johnson',
-    email: 'alice@example.com',
-    total: 239.98,
-    status: 'Shipped',
-    date: '2023-11-10',
-    items: 'The Minimalist Tote, Organic Cotton Tee'
-  },
-  {
-    orderId: 'CS-6F5E4D',
-    customer: 'Bob Williams',
-    email: 'bob@example.com',
-    total: 165.00,
-    status: 'Processing',
-    date: '2023-11-10',
-    items: 'Classic Beige Blazer'
-  },
-  {
-    orderId: 'CS-3I2H1G',
-    customer: 'Charlie Brown',
-    email: 'charlie@example.com',
-    total: 89.99,
-    status: 'Delivered',
-    date: '2023-11-08',
-    items: 'Relaxed Fit Blue Jeans'
-  },
-  {
-    orderId: 'CS-KJ23L9',
-    customer: 'Diana Prince',
-    email: 'diana@example.com',
-    total: 270.00,
-    status: 'Shipped',
-    date: '2023-11-07',
-    items: 'Cozy Knit Cardigan, Organic Cotton Tee'
-  },
-];
-
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [salesData, setSalesData] = useState<SalesData | null>(null);
   const [report, setReport] = useState<string>('');
   const [isGenerating, startTransition] = useTransition();
+  const [recentOrders, setRecentOrders] = useState<Transaction[]>([]);
   const { toast } = useToast();
   const { isAiEnabled, disableAi } = useAi();
 
@@ -94,6 +55,15 @@ export default function AdminPage() {
     if (isLoggedIn) {
       const data = getSalesData();
       setSalesData(data);
+       try {
+            const userTransactionsStr = localStorage.getItem('userTransactions');
+            const transactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
+            transactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            setRecentOrders(transactions);
+        } catch (error) {
+            console.error("Failed to load transactions from localStorage", error);
+            setRecentOrders([]);
+        }
     }
   }, [isLoggedIn]);
   
@@ -329,7 +299,7 @@ export default function AdminPage() {
       <Card>
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
-          <CardDescription>An overview of the latest transactions. (This is sample data)</CardDescription>
+          <CardDescription>An overview of the latest transactions.</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -338,33 +308,32 @@ export default function AdminPage() {
                 <TableHead>Order ID</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Date</TableHead>
-                <TableHead>Items</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockRecentOrders.map((order) => (
-                <TableRow key={order.orderId}>
-                  <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
-                  <TableCell>
-                    <div className="font-medium">{order.customer}</div>
-                    <div className="text-sm text-muted-foreground">{order.email}</div>
+              {recentOrders.length > 0 ? (
+                recentOrders.map((order) => (
+                  <TableRow key={order.orderId}>
+                    <TableCell className="font-mono text-xs">{order.orderId}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">{order.customer}</div>
+                    </TableCell>
+                    <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">Processing</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center">
+                    No recent orders to display.
                   </TableCell>
-                   <TableCell>{order.date}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">{order.items}</TableCell>
-                  <TableCell>
-                    <Badge variant={
-                      order.status === 'Delivered' ? 'default' : 
-                      order.status === 'Shipped' ? 'secondary' : 
-                      'outline'
-                    }>
-                      {order.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +24,7 @@ export default function SignupPage() {
         // In a real app, you'd handle account creation here.
         toast({
             title: "Account Created",
-            description: "You have successfully signed up! (This is a demo)",
+            description: "You have successfully signed up!",
         });
         router.push('/');
     }

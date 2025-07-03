@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -17,13 +16,6 @@ type BrowsingHistoryItem = {
   name: string;
 };
 
-// Mock data for demonstration, used as a fallback
-const mockOrders = [
-  { id: 'CS-1A2B3C', date: '2023-10-26', total: 149.99, status: 'Delivered' },
-  { id: 'CS-4D5E6F', date: '2023-10-15', total: 89.99, status: 'Delivered' },
-  { id: 'CS-7G8H9I', date: '2023-09-01', total: 235.00, status: 'Cancelled' },
-];
-
 type DisplayOrder = {
   id: string;
   date: string;
@@ -35,7 +27,6 @@ export default function AccountPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [browsingHistory, setBrowsingHistory] = useState<BrowsingHistoryItem[]>([]);
   const [orders, setOrders] = useState<DisplayOrder[]>([]);
-  const [isSampleData, setIsSampleData] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -52,29 +43,20 @@ export default function AccountPage() {
         console.error("Failed to parse browsing history:", error);
       }
 
-      // Load user's actual orders or fall back to mock data
+      // Load user's actual orders
       try {
         const userTransactionsStr = localStorage.getItem('userTransactions');
         const userTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
-
-        if (userTransactions.length > 0) {
-            const userOrders: DisplayOrder[] = userTransactions.map(tx => ({
-                id: tx.orderId,
-                date: tx.date,
-                total: tx.total,
-                status: 'Processing' // Assume recent orders are processing
-            })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-            setOrders(userOrders);
-            setIsSampleData(false);
-        } else {
-            // If no user orders, show mock data as a placeholder
-            setOrders(mockOrders);
-            setIsSampleData(true);
-        }
+        const userOrders: DisplayOrder[] = userTransactions.map(tx => ({
+            id: tx.orderId,
+            date: tx.date,
+            total: tx.total,
+            status: 'Processing' // Assume recent orders are processing
+        })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        setOrders(userOrders);
       } catch (error) {
         console.error("Failed to parse user transactions:", error);
-        setOrders(mockOrders); // Fallback to mock data on error
-        setIsSampleData(true);
+        setOrders([]); // Fallback to empty on error
       }
     }
   }, []);
@@ -119,10 +101,7 @@ export default function AccountPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><CreditCard /> Order History</CardTitle>
             <CardDescription>
-              {isSampleData 
-                ? "This is sample data. Orders you place will appear here." 
-                : "Your past orders are listed here."
-              }
+              Your past orders are listed here.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -142,11 +121,7 @@ export default function AccountPage() {
                       <TableCell className="font-mono text-xs">{order.id}</TableCell>
                       <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
                       <TableCell>
-                        <Badge variant={
-                          order.status === 'Delivered' ? 'outline' : 
-                          order.status === 'Processing' ? 'secondary' :
-                          'destructive'
-                        }>{order.status}</Badge>
+                        <Badge variant={'secondary'}>{order.status}</Badge>
                       </TableCell>
                       <TableCell className="text-right">${order.total.toFixed(2)}</TableCell>
                     </TableRow>

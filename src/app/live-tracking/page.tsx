@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -186,10 +185,6 @@ export default function LiveTrackingPage() {
           </CardContent>
         </Card>
       </div>
-
-       <div className="text-center text-sm text-muted-foreground mt-4">
-            <p>Note: This is a simulated delivery for demonstration purposes only.</p>
-        </div>
     </div>
   );
 }
