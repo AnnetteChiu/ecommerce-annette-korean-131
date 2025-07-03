@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { User, LogOut, History, CreditCard } from 'lucide-react';
+import { User, LogOut, History, CreditCard, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import type { Transaction } from '@/types';
+import { getTransactions } from '@/lib/transactions';
 
 type BrowsingHistoryItem = {
   id: string;
@@ -27,6 +28,7 @@ export default function AccountPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [browsingHistory, setBrowsingHistory] = useState<BrowsingHistoryItem[]>([]);
   const [orders, setOrders] = useState<DisplayOrder[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -43,21 +45,30 @@ export default function AccountPage() {
         console.error("Failed to parse browsing history:", error);
       }
 
-      // Load user's actual orders
-      try {
-        const userTransactionsStr = localStorage.getItem('userTransactions');
-        const userTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
-        const userOrders: DisplayOrder[] = userTransactions.map(tx => ({
-            id: tx.orderId,
-            date: tx.date,
-            total: tx.total,
-            status: 'Processing' // Assume recent orders are processing
-        })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        setOrders(userOrders);
-      } catch (error) {
-        console.error("Failed to parse user transactions:", error);
-        setOrders([]); // Fallback to empty on error
-      }
+      // Load user's orders from Firestore
+      const fetchOrders = async () => {
+          setIsLoading(true);
+          try {
+              // In a real app, you would filter transactions by user ID.
+              // For this demo, we will fetch all transactions.
+              const allTransactions = await getTransactions();
+              const userOrders: DisplayOrder[] = allTransactions.map(tx => ({
+                  id: tx.orderId,
+                  date: new Date(tx.date).toLocaleDateString(),
+                  total: tx.total,
+                  status: 'Processing'
+              })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+              setOrders(userOrders);
+          } catch (error) {
+              console.error("Failed to fetch user transactions:", error);
+              setOrders([]); // Fallback to empty on error
+          } finally {
+              setIsLoading(false);
+          }
+      };
+      fetchOrders();
+    } else {
+        setIsLoading(false);
     }
   }, []);
 
@@ -70,6 +81,14 @@ export default function AccountPage() {
     });
     router.push('/');
   };
+
+  if (isLoading) {
+    return (
+       <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   if (!isLoggedIn) {
     return (

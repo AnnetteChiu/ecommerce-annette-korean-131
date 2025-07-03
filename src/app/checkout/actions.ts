@@ -5,6 +5,7 @@ import { OrderConfirmationEmail } from '@/components/emails/order-confirmation-e
 import type { CartItem, CouponDiscount, Transaction, SalesData } from '@/types';
 import { z } from 'zod';
 import { getSalesData } from '@/lib/sales';
+import { addTransaction } from '@/lib/transactions';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -68,9 +69,12 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
         total: newTotal,
     };
 
-  // Check if Resend API key is available
-  if (process.env.RESEND_API_KEY) {
-      try {
+  try {
+    // Save to Firestore.
+    await addTransaction(newTransaction);
+    
+    // Check if Resend API key is available
+    if (process.env.RESEND_API_KEY) {
         const { data, error } = await resend.emails.send({
           // IMPORTANT: For production, you must replace 'onboarding@resend.dev' with a verified domain.
           from: 'CodiStyle <onboarding@resend.dev>',
@@ -92,19 +96,19 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
 
         if (error) {
           console.error('Email sending failed:', error);
-          throw new Error('Could not send confirmation email.');
+          // Still return success if DB write was successful but email failed
+        } else {
+          console.log('Email sent successfully:', data);
         }
+    } else {
+      console.warn("RESEND_API_KEY is not set. Skipping email sending.");
+    }
 
-        console.log('Email sent successfully:', data);
+    return { success: true, newTransaction };
 
-      } catch (error) {
-        console.error('Checkout processing error:', error);
-        const message = error instanceof Error ? error.message : 'An unknown error occurred during checkout.';
-        return { success: false, error: message };
-      }
-  } else {
-     console.warn("RESEND_API_KEY is not set. Skipping email sending. This is normal for a real website without an API key.");
+  } catch (error) {
+    console.error('Checkout processing error:', error);
+    const message = error instanceof Error ? error.message : 'An unknown error occurred during checkout.';
+    return { success: false, error: message };
   }
-
-  return { success: true, newTransaction };
 }

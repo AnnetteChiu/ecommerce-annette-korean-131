@@ -73,16 +73,7 @@ export default function CheckoutPage() {
         },
       });
 
-      if (result.success && result.newTransaction) {
-        try {
-          const existingTransactionsStr = localStorage.getItem('userTransactions');
-          const existingTransactions: Transaction[] = existingTransactionsStr ? JSON.parse(existingTransactionsStr) : [];
-          const updatedTransactions = [...existingTransactions, result.newTransaction];
-          localStorage.setItem('userTransactions', JSON.stringify(updatedTransactions));
-        } catch (error) {
-            console.error("Failed to save transaction to localStorage", error);
-        }
-        
+      if (result.success) {
         clearCart();
         toast({
           title: 'Order Placed!',

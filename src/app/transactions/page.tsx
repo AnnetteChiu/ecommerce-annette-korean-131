@@ -14,9 +14,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { DollarSign, Hash } from 'lucide-react';
+import { DollarSign, Hash, Loader2 } from 'lucide-react';
 import type { Transaction } from '@/types';
-import { getHistoricalTransactions } from '@/lib/transactions';
+import { getTransactions } from '@/lib/transactions';
 
 const ADMIN_PASSWORD = 'admin123';
 
@@ -24,6 +24,7 @@ export default function TransactionsPage() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [password, setPassword] = useState('');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   
   const totalTransactions = transactions.length;
@@ -32,33 +33,33 @@ export default function TransactionsPage() {
   useEffect(() => {
     if (localStorage.getItem('isAdminLoggedIn') === 'true') {
       setIsAdminLoggedIn(true);
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (isAdminLoggedIn) {
-        try {
-            const historicalTransactions = getHistoricalTransactions();
-            const userTransactionsStr = localStorage.getItem('userTransactions');
-            const newTransactions: Transaction[] = userTransactionsStr ? JSON.parse(userTransactionsStr) : [];
-            
-            // Combine historical data with new transactions from this session
-            const allTransactionsMap = new Map<string, Transaction>();
-            historicalTransactions.forEach(tx => allTransactionsMap.set(tx.orderId, tx));
-            newTransactions.forEach(tx => allTransactionsMap.set(tx.orderId, tx));
-            
-            const combinedTransactions = Array.from(allTransactionsMap.values());
-            
-            // Sort by date, newest first
-            combinedTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-            setTransactions(combinedTransactions);
-        } catch (error) {
-            console.error("Failed to load transactions", error);
-            setTransactions([]); // Fallback to empty on error
-        }
+        const fetchTransactions = async () => {
+            setIsLoading(true);
+            try {
+                const data = await getTransactions();
+                setTransactions(data);
+            } catch (error) {
+                console.error("Failed to load transactions", error);
+                toast({
+                    variant: 'destructive',
+                    title: 'Failed to load transactions',
+                    description: 'Could not fetch data from the database. Please try again.',
+                });
+                setTransactions([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchTransactions();
     }
-  }, [isAdminLoggedIn]);
+  }, [isAdminLoggedIn, toast]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,6 +105,14 @@ export default function TransactionsPage() {
         </div>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
   return (
