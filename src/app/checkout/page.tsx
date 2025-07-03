@@ -84,6 +84,10 @@ export default function CheckoutPage() {
         }
         
         clearCart();
+        toast({
+          title: 'Order Placed!',
+          description: 'A confirmation email is on its way (if configured).',
+        });
         router.push('/checkout/thank-you');
       } else {
         toast({
@@ -303,7 +307,7 @@ export default function CheckoutPage() {
             <CardFooter>
               <Button type="submit" size="lg" className="w-full" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isPending ? 'Processing...' : 'Place Order'}
+                {isPending ? 'Processing...' : `Place Order ($${total.toFixed(2)})`}
               </Button>
             </CardFooter>
           </Card>

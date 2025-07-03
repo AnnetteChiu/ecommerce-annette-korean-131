@@ -135,6 +135,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Ensure discount doesn't exceed subtotal
     discount = Math.min(sub, discount);
     
+    // Note: This total does not include taxes, which are calculated on the server.
     const finalTotal = sub - discount + shippingCost;
 
     return {

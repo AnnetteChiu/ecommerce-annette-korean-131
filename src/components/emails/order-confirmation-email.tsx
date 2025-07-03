@@ -23,6 +23,7 @@ interface OrderConfirmationEmailProps {
   subtotal: number;
   shipping: number;
   discountAmount: number;
+  taxes: number;
   total: number;
   appliedCoupon: { code: string; discount: CouponDiscount } | null;
 }
@@ -35,6 +36,7 @@ export const OrderConfirmationEmail = ({
   subtotal,
   shipping,
   discountAmount,
+  taxes,
   total,
   appliedCoupon,
 }: OrderConfirmationEmailProps) => (
@@ -94,6 +96,10 @@ export const OrderConfirmationEmail = ({
           <Row>
             <Column style={totalsLabel}>Shipping</Column>
             <Column style={totalsValue}>{shipping > 0 ? `$${shipping.toFixed(2)}` : 'Free'}</Column>
+          </Row>
+          <Row>
+            <Column style={totalsLabel}>Taxes</Column>
+            <Column style={totalsValue}>${taxes.toFixed(2)}</Column>
           </Row>
           <hr style={hr} />
           <Row>

@@ -3,8 +3,9 @@
 
 import { Resend } from 'resend';
 import { OrderConfirmationEmail } from '@/components/emails/order-confirmation-email';
-import type { CartItem, CouponDiscount, Transaction } from '@/types';
+import type { CartItem, CouponDiscount, Transaction, SalesData } from '@/types';
 import { z } from 'zod';
+import { getSalesData } from '@/lib/sales';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -30,7 +31,7 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
     }
     
     const { email, fullName, cartDetails } = validation.data;
-    const { cartItems, subtotal, discountAmount, shipping, total, appliedCoupon } = cartDetails;
+    const { cartItems, subtotal, discountAmount, shipping, appliedCoupon } = cartDetails;
     
     const orderId = `CS-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
     const orderDate = new Date().toLocaleDateString('en-US', {
@@ -39,14 +40,32 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
       day: 'numeric',
     });
     
+    // --- Dynamic Tax Calculation ---
+    const salesData: SalesData = getSalesData();
+    const latestMonthSales = salesData.monthlyTrend[salesData.monthlyTrend.length - 1];
+    // Assuming the currency of sales data and tax thresholds are consistent.
+    const monthlyRevenue = parseInt(latestMonthSales.revenue.replace(/[^\d]/g, ''), 10);
+    
+    let taxRate = 0;
+    if (monthlyRevenue >= 200000) {
+      taxRate = 0.05; // 5% tax
+    } else if (monthlyRevenue >= 100000) {
+      taxRate = 0.01; // 1% tax
+    }
+    // if less than 100,000, taxRate remains 0.
+
+    const taxableAmount = subtotal - discountAmount;
+    const taxes = taxableAmount > 0 ? taxableAmount * taxRate : 0;
+    const newTotal = taxableAmount + shipping + taxes;
+
     const newTransaction: Transaction = {
         orderId,
         customer: fullName,
         date: new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
         subtotal,
         shipping,
-        taxes: total * 0.08, // Assuming 8% tax for demo
-        total,
+        taxes,
+        total: newTotal,
     };
 
   // Check if Resend API key is available
@@ -63,9 +82,10 @@ export async function processCheckoutAndSendEmail(input: CheckoutActionInput) {
             orderDate,
             cartItems: cartItems as CartItem[],
             subtotal,
-            shipping: newTransaction.shipping,
+            shipping,
             discountAmount,
-            total,
+            taxes,
+            total: newTotal,
             appliedCoupon: appliedCoupon as { code: string; discount: CouponDiscount } | null,
           }),
         });
