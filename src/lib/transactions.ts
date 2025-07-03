@@ -23,6 +23,7 @@ export async function getTransactions(): Promise<Transaction[]> {
       let dateStr = '';
       if (data.date) {
         try {
+          // Dates are stored as Timestamps, so we convert them back to strings here.
           dateStr = data.date instanceof Timestamp 
             ? data.date.toDate().toISOString().split('T')[0] 
             : String(data.date);
@@ -49,12 +50,18 @@ export async function getTransactions(): Promise<Transaction[]> {
     return transactionsList;
   } catch (error) {
     console.error("Error fetching transactions: ", error);
+    // Add a more specific error message for missing indexes
+    if (error instanceof Error && error.message.includes('requires an index')) {
+        console.error("Firestore index missing. Please create the required index in your Firebase console.");
+        throw new Error("Database is not properly configured. A Firestore index is required to sort transactions. Please check the server logs for a link to create it.");
+    }
     return [];
   }
 }
 
 /**
  * Adds a new transaction to the Firestore database using a custom Order ID.
+ * The date string from the transaction object is converted to a Firestore Timestamp.
  * @param transaction The transaction data to add, including a custom orderId.
  */
 export async function addTransaction(transaction: Transaction) {
@@ -64,8 +71,13 @@ export async function addTransaction(transaction: Transaction) {
       throw new Error("Database is not configured, cannot save transaction.");
     }
     try {
+        const transactionToSave = {
+            ...transaction,
+            // Convert date string to a proper Firestore Timestamp for correct sorting
+            date: Timestamp.fromDate(new Date(transaction.date)),
+        };
         const transactionRef = doc(db, 'transactions', transaction.orderId);
-        await setDoc(transactionRef, transaction);
+        await setDoc(transactionRef, transactionToSave);
     } catch (error) {
         console.error("Error adding transaction: ", error);
         throw new Error("Could not save transaction to the database.");
