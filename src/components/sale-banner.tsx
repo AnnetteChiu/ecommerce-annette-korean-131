@@ -6,7 +6,7 @@ export function SaleBanner() {
   return (
     <section className="relative h-[60vh] rounded-lg overflow-hidden flex items-center justify-center text-center text-white p-8 shadow-xl">
       <Image
-        src="https://placehold.co/1200x800.png"
+        src="https://i4.codibook.net/files/1982121026409/229c0745afaad83b/773064913.jpg"
         alt="Stylish model wearing new arrivals"
         fill
         className="object-cover object-center"
